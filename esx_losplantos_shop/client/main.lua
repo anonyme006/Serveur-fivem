@@ -33,9 +33,11 @@ local function BuildShopPayload(shop)
     end
     return {
         shopId = shop.id,
+        name = shop.name or shop.label or 'MAGASIN',
         label = shop.label or 'MAGASIN',
         items = items,
         selected = SelectedIndex,
+        maxQuantity = Config.MaxQuantity or 100,
     }
 end
 
@@ -125,13 +127,14 @@ RegisterNUICallback('buy', function(data, cb)
     end
 
     local index = tonumber(data.index) or SelectedIndex
+    local count = math.floor(tonumber(data.count) or 1)
     local item = shop.items and shop.items[index]
     if not item then
         cb({ ok = false })
         return
     end
 
-    TriggerServerEvent('esx_losplantos_shop:buy', shop.id, index)
+    TriggerServerEvent('esx_losplantos_shop:buy', shop.id, index, count)
     cb({ ok = true })
 end)
 
@@ -219,6 +222,10 @@ CreateThread(function()
                 SendNUIMessage({ action = 'key', key = 'up' })
             elseif IsDisabledControlJustPressed(0, 173) then
                 SendNUIMessage({ action = 'key', key = 'down' })
+            elseif IsDisabledControlJustPressed(0, 174) then -- LEFT
+                SendNUIMessage({ action = 'key', key = 'left' })
+            elseif IsDisabledControlJustPressed(0, 175) then -- RIGHT
+                SendNUIMessage({ action = 'key', key = 'right' })
             elseif IsDisabledControlJustPressed(0, 191) then
                 SendNUIMessage({ action = 'key', key = 'enter' })
             elseif IsDisabledControlJustPressed(0, 177) or IsDisabledControlJustPressed(0, 200) then

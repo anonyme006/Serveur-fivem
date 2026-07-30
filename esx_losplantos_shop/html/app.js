@@ -6,11 +6,14 @@
 
   const app = document.getElementById('app');
   const listEl = document.getElementById('itemList');
-  const titleEl = document.getElementById('shopTitle');
+  const shopNameEl = document.getElementById('shopName');
+  const shopLabelEl = document.getElementById('shopLabel');
   const bannerImg = document.querySelector('.shop__banner-img');
 
   let items = [];
   let selected = 1;
+  let quantity = 1;
+  let maxQuantity = 100;
   let open = false;
   let shopId = null;
 
@@ -45,9 +48,19 @@
     if (row) row.scrollIntoView({ block: 'nearest' });
   }
 
+  function clampQty(v) {
+    const max = maxQuantity || 100;
+    return Math.min(max, Math.max(1, v));
+  }
+
+  function changeQty(delta) {
+    quantity = clampQty(quantity + delta);
+    render();
+  }
+
   function buySelected() {
     if (!items.length) return;
-    post('buy', { shopId, index: selected });
+    post('buy', { shopId, index: selected, count: quantity });
   }
 
   function render() {
@@ -63,10 +76,11 @@
 
     items.forEach((item, i) => {
       const index = i + 1;
+      const isSelected = index === selected;
       const li = document.createElement('li');
-      li.className = 'shop__item' + (index === selected ? ' is-selected' : '');
+      li.className = 'shop__item' + (isSelected ? ' is-selected' : '');
       li.setAttribute('role', 'option');
-      li.setAttribute('aria-selected', index === selected ? 'true' : 'false');
+      li.setAttribute('aria-selected', isSelected ? 'true' : 'false');
 
       const img = document.createElement('img');
       img.className = 'shop__item-icon';
@@ -77,6 +91,9 @@
         img.src = 'img/default.svg';
       };
 
+      const main = document.createElement('div');
+      main.className = 'shop__item-main';
+
       const name = document.createElement('span');
       name.className = 'shop__item-name';
       name.textContent = item.label || item.name;
@@ -85,14 +102,25 @@
       price.className = 'shop__item-price';
       price.textContent = formatPrice(item.price);
 
+      main.appendChild(name);
+      main.appendChild(price);
+
+      const qty = document.createElement('span');
+      qty.className = 'shop__item-qty';
+      // Format screenshot : sélectionné "< 1 >", sinon "1"
+      qty.textContent = isSelected ? `< ${quantity} >` : '1';
+
       li.appendChild(img);
-      li.appendChild(name);
-      li.appendChild(price);
+      li.appendChild(main);
+      li.appendChild(qty);
 
       li.addEventListener('click', () => {
-        selected = index;
+        if (selected !== index) {
+          selected = index;
+          quantity = 1;
+        }
         render();
-        post('select', { index });
+        post('select', { index, count: quantity });
       });
 
       li.addEventListener('dblclick', () => {
@@ -109,9 +137,11 @@
 
   function setSelected(index) {
     if (!items.length) return;
-    selected = Math.min(Math.max(1, index), items.length);
+    const next = Math.min(Math.max(1, index), items.length);
+    if (next !== selected) quantity = 1;
+    selected = next;
     render();
-    post('select', { index: selected });
+    post('select', { index: selected, count: quantity });
   }
 
   function move(delta) {
@@ -126,7 +156,10 @@
     shopId = data.shopId || null;
     items = Array.isArray(data.items) ? data.items : [];
     selected = Math.min(Math.max(1, data.selected || 1), Math.max(1, items.length));
-    titleEl.textContent = (data.label || 'MAGASIN').toUpperCase();
+    quantity = clampQty(data.count || 1);
+    maxQuantity = data.maxQuantity || 100;
+    shopNameEl.textContent = (data.name || 'MAGASIN').toUpperCase();
+    shopLabelEl.textContent = (data.label || 'MAGASIN').toUpperCase();
     app.classList.remove('hidden');
     open = true;
     render();
@@ -137,6 +170,7 @@
     app.classList.add('hidden');
     items = [];
     shopId = null;
+    quantity = 1;
   }
 
   window.addEventListener('message', (event) => {
@@ -155,6 +189,8 @@
         if (!open) return;
         if (msg.key === 'up') move(-1);
         if (msg.key === 'down') move(1);
+        if (msg.key === 'left') changeQty(-1);
+        if (msg.key === 'right') changeQty(1);
         if (msg.key === 'enter') buySelected();
         break;
       default:
@@ -174,29 +210,38 @@
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       move(1);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      changeQty(-1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      changeQty(1);
     } else if (e.key === 'Enter') {
       e.preventDefault();
       buySelected();
     }
   });
 
-  // Preview navigateur
+  // Preview navigateur — Twenty Four Seven
   if (!window.invokeNative) {
     document.body.style.background =
-      'radial-gradient(ellipse at 60% 40%, #5a4a3a 0%, #2a2820 50%, #121210 100%)';
+      'radial-gradient(ellipse at 60% 40%, #4a5a3a 0%, #2a3228 50%, #121610 100%)';
     openShop({
-      shopId: 'ammunation_melee',
+      shopId: 'twentyfourseven',
+      name: 'TWENTY FOUR SEVEN',
       label: 'MAGASIN',
       selected: 1,
+      maxQuantity: 100,
       items: [
-        { name: 'WEAPON_KNUCKLE', label: 'Poing américain', price: 777, image: 'img/knuckle.svg' },
-        { name: 'WEAPON_GOLFCLUB', label: 'Club de golf', price: 2500, image: 'img/golfclub.svg' },
-        { name: 'WEAPON_CROWBAR', label: 'Pied de biche', price: 800, image: 'img/crowbar.svg' },
-        { name: 'WEAPON_SWITCHBLADE', label: "Couteau à cran d'arrêt", price: 900, image: 'img/switchblade.svg' },
-        { name: 'WEAPON_KNIFE', label: 'Couteau', price: 250, image: 'img/knife.svg' },
-        { name: 'WEAPON_BAT', label: 'Batte', price: 500, image: 'img/bat.svg' },
-        { name: 'WEAPON_MACHETE', label: 'Machette', price: 1500, image: 'img/machete.svg' },
-        { name: 'WEAPON_FLASHLIGHT', label: 'Lampe torche', price: 100, image: 'img/flashlight.svg' },
+        { name: 'phone', label: 'Téléphone', price: 200, image: 'img/phone.svg' },
+        { name: 'umbrella', label: 'Parapluie', price: 60, image: 'img/umbrella.svg' },
+        { name: 'water', label: "Bouteille d'eau", price: 20, image: 'img/water.svg' },
+        { name: 'sandwich', label: 'Club sandwich', price: 20, image: 'img/sandwich.svg' },
+        { name: 'pizza', label: 'Pizza', price: 45, image: 'img/pizza.svg' },
+        { name: 'hotdog', label: 'Hot Dog', price: 20, image: 'img/hotdog.svg' },
+        { name: 'burger', label: 'Cheeseburger', price: 35, image: 'img/burger.svg' },
+        { name: 'beer', label: 'Bière', price: 30, image: 'img/beer.svg' },
+        { name: 'gps', label: 'GPS', price: 250, image: 'img/gps.svg' },
       ],
     });
   }

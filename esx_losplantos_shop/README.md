@@ -1,6 +1,11 @@
 # esx_losplantos_shop
 
-Menu **magasin** list-style Los Plantos pour ESX (même design que l’inventaire : bandeau synthwave, barre violette `MAGASIN`, liste, prix verts).
+Menu **magasin** list-style Los Plantos pour ESX — style Twenty Four Seven :
+
+- Bandeau synthwave Los Plantos  
+- Barre violette `TWENTY FOUR SEVEN - MAGASIN`  
+- Prix verts à côté du nom  
+- Quantité à droite (`< 1 >` sur la ligne sélectionnée)
 
 ## Installation
 
@@ -11,30 +16,33 @@ ensure esx_losplantos_shop
 
 ## Utilisation
 
-- Approchez un magasin (marker violet) → **E** pour ouvrir
-- **↑↓** naviguer · **Entrée** / double-clic acheter · **ESC** fermer
+| Action | Contrôle |
+|--------|----------|
+| Ouvrir | **E** près du magasin |
+| Naviguer | ↑ ↓ |
+| Quantité | ← → |
+| Acheter | Entrée / double-clic |
+| Fermer | ESC |
 
-## Magasins inclus
+## Magasins
 
 | ID | Contenu |
 |----|---------|
-| `ammunation_melee` | Armes de mêlée (Poing américain, batte, machette…) |
-| `superette` | Pain, eau, burger, téléphone |
+| `twentyfourseven` | Téléphone, Parapluie, Eau, Sandwich, Pizza, Hot Dog, Cheeseburger, Bière, GPS |
+| `ammunation_melee` | Armes de mêlée |
 
-Coords et catalogue dans `config.lua`.
+Catalogue / coords / prix dans `config.lua`.
 
-## Config
+## Items ESX à avoir
 
-- `Config.PayAccount` — `'money'` ou `'bank'`
-- `Config.Shops` — magasins, items (`type = 'weapon' | 'item'`), prix, blips
+```
+phone, umbrella, water, sandwich, pizza, hotdog, burger, beer, gps
+```
+
+(Adapte les `name` dans `config.lua` à tes items serveur.)
 
 ## Exports
 
 ```lua
-exports['esx_losplantos_shop']:OpenShop('ammunation_melee')
-exports['esx_losplantos_shop']:CloseShop()
+exports['esx_losplantos_shop']:OpenShop('twentyfourseven')
 ```
-
-## Aperçu NUI
-
-Ouvrir `html/index.html` dans un navigateur.

@@ -1,14 +1,14 @@
 :root {
-  --shop-width: 320px;
+  --shop-width: 340px;
   --shop-bg: rgba(8, 8, 10, 0.72);
   --shop-row-h: 42px;
   --shop-radius: 8px;
   --shop-text: #ffffff;
   --shop-text-selected: #0a0a0a;
   --shop-selected-bg: #ffffff;
-  --shop-title-bg: #6b2d9b;
+  --shop-title-bg: #4a1a6b;
   --shop-price: #3dff6a;
-  --shop-price-selected: #128a36;
+  --shop-price-selected: #12a33a;
   --font: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   --logo-font: 'Brush Script MT', 'Segoe Script', 'Apple Chancery', cursive;
 }
@@ -99,13 +99,28 @@ html, body {
 .shop__title {
   background: var(--shop-title-bg);
   color: #ffffff;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
   text-align: left;
   padding: 10px 14px;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shop__title-name {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.shop__title-sep,
+.shop__title-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  opacity: 0.95;
 }
 
 .shop__list {
@@ -131,9 +146,9 @@ html, body {
 .shop__item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   height: var(--shop-row-h);
-  padding: 0 14px 0 12px;
+  padding: 0 12px 0 12px;
   cursor: pointer;
   color: var(--shop-text);
   background: transparent;
@@ -162,9 +177,16 @@ html, body {
   filter: none;
 }
 
-.shop__item-name {
+.shop__item-main {
   flex: 1 1 auto;
   min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.shop__item-name {
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
@@ -184,6 +206,20 @@ html, body {
   color: var(--shop-price-selected);
 }
 
+.shop__item-qty {
+  flex-shrink: 0;
+  min-width: 48px;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+}
+
+.shop__item.is-selected .shop__item-qty {
+  min-width: 64px;
+}
+
 .shop__empty {
   padding: 24px 16px;
   text-align: center;
@@ -193,7 +229,7 @@ html, body {
 
 @media (max-width: 1280px) {
   :root {
-    --shop-width: 290px;
+    --shop-width: 310px;
   }
 
   .shop__banner {
