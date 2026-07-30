@@ -99,6 +99,26 @@ RegisterNUICallback('getPlayerCoords', function(_, cb)
     })
 end)
 
+RegisterNUICallback('teleport', function(data, cb)
+    if not data or not data.coords then
+        cb({ ok = false })
+        return
+    end
+    local c = data.coords
+    local ped = PlayerPedId()
+    SetEntityCoords(ped, c.x + 0.0, c.y + 0.0, c.z + 0.0, false, false, false, false)
+    if c.w then
+        SetEntityHeading(ped, c.w + 0.0)
+    end
+    cb({ ok = true })
+end)
+
+RegisterNUICallback('bootstrap', function(_, cb)
+    ClientCore.Callback('core_creator:getBootstrap', {}, function(result)
+        cb(result or { ok = false })
+    end)
+end)
+
 RegisterNUICallback('startPlacement', function(data, cb)
     ClientCore.CloseUI()
     TriggerEvent('core_creator:placement:start', data or {}, function(result)

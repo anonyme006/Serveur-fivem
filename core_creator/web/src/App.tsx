@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { BootstrapData, CreatorEntity, ModuleName } from './types'
 import { nui, onNuiMessage } from './lib/nui'
+import GtaMap from './components/GtaMap'
 import './styles/app.css'
 
 const MODULE_LABELS: Record<string, string> = {
@@ -15,13 +16,27 @@ const MODULE_LABELS: Record<string, string> = {
   robberies: 'Braquages',
 }
 
-const defaultEntity = (): CreatorEntity => ({
-  name: '',
-  label: '',
-  coords: { x: 0, y: 0, z: 0, w: 0 },
-  data: {},
-  active: true,
-})
+const MODULE_COUNT_LABEL: Record<string, string> = {
+  shops: 'boutiques',
+  blips: 'blips',
+  farms: 'farmings',
+  jobs: 'métiers',
+  garages: 'garages',
+  gangs: 'gangs',
+  apartments: 'appartements',
+  robberies: 'braquages',
+  vehicles: 'outils véhicule',
+}
+
+function defaultEntity(): CreatorEntity {
+  return {
+    name: '',
+    label: '',
+    coords: { x: 0, y: 0, z: 0, w: 0 },
+    data: {},
+    active: true,
+  }
+}
 
 function moduleDefaults(module: ModuleName): Record<string, unknown> {
   switch (module) {
@@ -65,14 +80,7 @@ function moduleDefaults(module: ModuleName): Record<string, unknown> {
         blip: { enabled: true, sprite: 498, colour: 3, scale: 0.8 },
       }
     case 'garages':
-      return {
-        type: 'public',
-        spawnPrice: 0,
-        impoundPrice: 500,
-        spawns: [],
-        store: null,
-        interaction: 'marker',
-      }
+      return { type: 'public', spawnPrice: 0, impoundPrice: 500, spawns: [], store: null, interaction: 'marker' }
     case 'gangs':
       return {
         color: '#ef5b5b',
@@ -84,13 +92,7 @@ function moduleDefaults(module: ModuleName): Record<string, unknown> {
         blip: { enabled: true, sprite: 84, colour: 1, scale: 0.85 },
       }
     case 'apartments':
-      return {
-        price: 150000,
-        rent: 0,
-        currency: 'bank',
-        interior: null,
-        shell: 'default',
-      }
+      return { price: 150000, rent: 0, currency: 'bank', interior: null, shell: 'default' }
     case 'robberies':
       return {
         type: 'store',
@@ -107,30 +109,85 @@ function moduleDefaults(module: ModuleName): Record<string, unknown> {
   }
 }
 
+function modeLabel(module: ModuleName, entity: CreatorEntity): { text: string; tone: 'blue' | 'green' | 'gray' } {
+  const data = entity.data || {}
+  if (module === 'shops') {
+    const mode = String(data.mode || 'buy')
+    return mode === 'sell'
+      ? { text: 'Vente', tone: 'green' }
+      : { text: 'Achat', tone: 'blue' }
+  }
+  if (module === 'garages') {
+    const type = String(data.type || 'public')
+    if (type === 'impound') return { text: 'Fourrière', tone: 'blue' }
+    if (type === 'job' || type === 'gang') return { text: 'Owned', tone: 'blue' }
+    return { text: 'Self-service', tone: 'green' }
+  }
+  if (module === 'robberies') return { text: String(data.type || 'custom'), tone: 'blue' }
+  if (module === 'farms') return { text: `${Array.isArray(data.stages) ? data.stages.length : 0} étapes`, tone: 'gray' }
+  if (module === 'jobs' || module === 'gangs') {
+    const grades = Array.isArray(data.grades) ? data.grades.length : 0
+    return { text: `${grades} grades`, tone: 'gray' }
+  }
+  return { text: entity.active ? 'Actif' : 'Off', tone: entity.active ? 'green' : 'gray' }
+}
+
+function pointsCount(entity: CreatorEntity): number {
+  const data = entity.data || {}
+  if (Array.isArray(data.stages)) return data.stages.length
+  if (Array.isArray(data.points)) return data.points.length
+  if (Array.isArray(data.spawns)) return data.spawns.length + (entity.coords ? 1 : 0)
+  if (Array.isArray(data.items)) return data.items.length
+  return entity.coords ? 1 : 0
+}
+
+function metaLine(module: ModuleName, entity: CreatorEntity): string {
+  const data = entity.data || {}
+  if (module === 'shops') return String(data.job || data.type || 'shop')
+  if (module === 'garages') return String(data.type || 'public')
+  if (module === 'jobs') return 'job'
+  if (module === 'gangs') return 'gang'
+  if (module === 'robberies') return String(data.type || 'robbery')
+  if (module === 'apartments') return data.owner ? 'owned' : 'available'
+  return module
+}
+
 export default function App() {
   const [visible, setVisible] = useState(false)
   const [boot, setBoot] = useState<BootstrapData | null>(null)
   const [page, setPage] = useState<'dashboard' | ModuleName>('dashboard')
   const [items, setItems] = useState<CreatorEntity[]>([])
   const [search, setSearch] = useState('')
-  const [filterActive, setFilterActive] = useState<'all' | 'on' | 'off'>('all')
+  const [selectedId, setSelectedId] = useState<number | null>(null)
   const [editor, setEditor] = useState<CreatorEntity | null>(null)
   const [dataJson, setDataJson] = useState('{}')
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'inform' } | null>(null)
-  const [placementCoords, setPlacementCoords] = useState<string>('')
   const [confirmDelete, setConfirmDelete] = useState<CreatorEntity | null>(null)
-  const [vehicleForm, setVehicleForm] = useState({ model: 'adder', plate: '', target: '', color1: 0, color2: 0, spawn: true })
+  const [vehicleForm, setVehicleForm] = useState({
+    model: 'adder',
+    plate: '',
+    target: '',
+    color1: 0,
+    color2: 0,
+    spawn: true,
+  })
 
   const showToast = (text: string, type: 'success' | 'error' | 'inform' = 'inform') => {
     setToast({ text, type })
-    window.setTimeout(() => setToast(null), 2800)
+    window.setTimeout(() => setToast(null), 2600)
   }
 
-  const loadList = async (module: ModuleName) => {
+  const loadList = useCallback(async (module: ModuleName) => {
     const res = await nui<CreatorEntity[]>('list', { module })
-    if (res.ok && Array.isArray(res.data)) setItems(res.data)
-    else setItems([])
-  }
+    if (res.ok && Array.isArray(res.data)) {
+      setItems(res.data)
+      const counts = { ...(boot?.counts || {}) }
+      counts[module] = res.data.length
+      if (boot) setBoot({ ...boot, counts })
+    } else {
+      setItems([])
+    }
+  }, [boot])
 
   useEffect(() => {
     return onNuiMessage((action, data) => {
@@ -138,12 +195,9 @@ export default function App() {
         setBoot(data as BootstrapData)
         setVisible(true)
         setPage('dashboard')
+        setSelectedId(null)
       }
       if (action === 'close') setVisible(false)
-      if (action === 'placementCoords' && data) {
-        const c = data as { x: number; y: number; z: number; w: number }
-        setPlacementCoords(`${c.x}, ${c.y}, ${c.z}, ${c.w}`)
-      }
       if (action === 'placementResult' && data && editor) {
         const c = data as { x: number; y: number; z: number; w: number }
         setEditor({ ...editor, coords: c })
@@ -163,21 +217,32 @@ export default function App() {
   useEffect(() => {
     if (page !== 'dashboard' && page !== 'vehicles') {
       loadList(page)
+      setSearch('')
+      setSelectedId(null)
     }
-  }, [page])
+  }, [page]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return items.filter((it) => {
-      const activeOk =
-        filterActive === 'all' || (filterActive === 'on' ? it.active : !it.active)
-      const searchOk =
-        !q ||
+      if (!q) return true
+      return (
         it.name.toLowerCase().includes(q) ||
-        it.label.toLowerCase().includes(q)
-      return activeOk && searchOk
+        it.label.toLowerCase().includes(q) ||
+        String(it.id || '').includes(q)
+      )
     })
-  }, [items, search, filterActive])
+  }, [items, search])
+
+  const title =
+    page === 'dashboard' ? 'Core Creator' : MODULE_LABELS[page] || page
+
+  const subtitle =
+    page === 'dashboard'
+      ? `${boot?.modules?.length || 0} modules actifs`
+      : page === 'vehicles'
+        ? 'Création & clés'
+        : `${filtered.length} ${MODULE_COUNT_LABEL[page] || 'éléments'}`
 
   if (!visible) return null
 
@@ -190,6 +255,7 @@ export default function App() {
   }
 
   const openEdit = (entity: CreatorEntity) => {
+    setSelectedId(entity.id ?? null)
     setEditor({ ...entity, data: entity.data || {} })
     setDataJson(JSON.stringify(entity.data || {}, null, 2))
   }
@@ -204,8 +270,9 @@ export default function App() {
       return
     }
     const entity = { ...editor, data: parsed }
-    const payload = { module: page, entity }
-    const res = entity.id ? await nui('update', payload) : await nui('create', payload)
+    const res = entity.id
+      ? await nui('update', { module: page, entity })
+      : await nui('create', { module: page, entity })
     if (!res.ok) {
       showToast(res.message || 'Erreur', 'error')
       return
@@ -213,24 +280,13 @@ export default function App() {
     showToast(entity.id ? 'Modifié' : 'Créé', 'success')
     setEditor(null)
     await loadList(page)
-    const bootRes = await nui<BootstrapData>('list', { module: page })
-    void bootRes
   }
 
   const doToggle = async (entity: CreatorEntity) => {
     if (page === 'dashboard' || page === 'vehicles') return
     const res = await nui('toggle', { module: page, id: entity.id, active: !entity.active })
     if (res.ok) {
-      showToast('État mis à jour', 'success')
-      loadList(page)
-    }
-  }
-
-  const doDuplicate = async (entity: CreatorEntity) => {
-    if (page === 'dashboard' || page === 'vehicles') return
-    const res = await nui('duplicate', { module: page, id: entity.id })
-    if (res.ok) {
-      showToast('Dupliqué', 'success')
+      showToast(entity.active ? 'Désactivé' : 'Activé', 'success')
       loadList(page)
     }
   }
@@ -245,42 +301,24 @@ export default function App() {
     } else showToast(res.message || 'Erreur', 'error')
   }
 
-  const doExport = async (entity: CreatorEntity) => {
-    if (page === 'dashboard' || page === 'vehicles') return
-    const res = await nui('exportOne', { module: page, id: entity.id })
-    if (!res.ok || !res.data) return
-    const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${page}_${entity.name}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-    showToast('Export prêt', 'success')
+  const doTeleport = async (entity: CreatorEntity) => {
+    if (!entity.coords) {
+      showToast('Pas de coordonnées', 'error')
+      return
+    }
+    const res = await nui('teleport', { coords: entity.coords })
+    if (res.ok) showToast('Téléportation', 'success')
   }
 
-  const doImport = async () => {
-    if (page === 'dashboard' || page === 'vehicles') return
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'application/json'
-    input.onchange = async () => {
-      const file = input.files?.[0]
-      if (!file) return
-      try {
-        const text = await file.text()
-        const json = JSON.parse(text)
-        const entity = json.entity || json
-        const res = await nui('importOne', { module: page, entity, onConflict: 'rename' })
-        if (res.ok) {
-          showToast('Import OK', 'success')
-          loadList(page)
-        } else showToast(res.message || 'Erreur import', 'error')
-      } catch {
-        showToast('Fichier invalide', 'error')
-      }
+  const reload = async () => {
+    if (page === 'dashboard' || page === 'vehicles') {
+      const res = await nui<BootstrapData>('bootstrap')
+      if (res.ok && res.data) setBoot(res.data)
+      showToast('Rechargé', 'success')
+      return
     }
-    input.click()
+    await loadList(page)
+    showToast('Liste rechargée', 'success')
   }
 
   const usePlayerCoords = async () => {
@@ -292,7 +330,7 @@ export default function App() {
   }
 
   const startPlacement = async () => {
-    await nui('startPlacement', { previewModel: page === 'blips' ? undefined : undefined })
+    await nui('startPlacement', {})
   }
 
   const createVehicle = async () => {
@@ -312,157 +350,271 @@ export default function App() {
     showToast('Véhicule demandé', 'success')
   }
 
+  const onSelectPin = useCallback((entity: CreatorEntity) => {
+    setSelectedId(entity.id ?? null)
+  }, [])
+
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <div className="brand">
-          <h1>Core Creator</h1>
-          <p>{boot?.framework || 'framework'} · {boot?.locale || 'fr'}</p>
-        </div>
-        <button className={`nav-btn ${page === 'dashboard' ? 'active' : ''}`} onClick={() => setPage('dashboard')}>
-          Tableau de bord
-        </button>
-        {(boot?.modules || []).map((m) => (
-          <button key={m} className={`nav-btn ${page === m ? 'active' : ''}`} onClick={() => setPage(m)}>
-            {MODULE_LABELS[m] || m}
-          </button>
-        ))}
-      </aside>
-
-      <section className="main">
-        <header className="topbar">
-          <h2>{page === 'dashboard' ? 'Tableau de bord' : MODULE_LABELS[page] || page}</h2>
-          <div className="topbar-actions">
-            {placementCoords && <span className="coords-live">{placementCoords}</span>}
-            <button className="btn ghost" onClick={() => nui('close')}>Fermer</button>
+    <div className="app-root">
+      <div className="shell">
+        <aside className="sidebar">
+          <div className="brand">
+            <h1>Core Creator</h1>
+            <span>{boot?.framework || 'auto'}</span>
           </div>
-        </header>
+          <button
+            className={`nav-item ${page === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setPage('dashboard')}
+          >
+            Tableau de bord
+          </button>
+          {(boot?.modules || []).map((m) => (
+            <button
+              key={m}
+              className={`nav-item ${page === m ? 'active' : ''}`}
+              onClick={() => setPage(m)}
+            >
+              <span>{MODULE_LABELS[m] || m}</span>
+              <span className="nav-count">{boot?.counts?.[m] ?? 0}</span>
+            </button>
+          ))}
+        </aside>
 
-        <div className="content">
-          {page === 'dashboard' && (
-            <>
-              <div className="cards">
-                {(boot?.modules || []).map((m) => (
-                  <button key={m} className="card" style={{ cursor: 'pointer', textAlign: 'left' }} onClick={() => setPage(m)}>
-                    <div className="label">{MODULE_LABELS[m]}</div>
-                    <div className="value">{boot?.counts?.[m] ?? 0}</div>
-                  </button>
-                ))}
-              </div>
-              <p className="empty" style={{ textAlign: 'left', paddingTop: 24 }}>
-                Créez et gérez boutiques, blips, farms, jobs, garages, gangs, appartements et braquages sans éditer les fichiers Lua.
-              </p>
-            </>
-          )}
+        <section className="main">
+          <header className="header">
+            <div>
+              <h2>{title}</h2>
+              <p className="subtitle">{subtitle}</p>
+            </div>
+            <button className="btn-close" onClick={() => nui('close')} aria-label="Fermer">
+              ×
+            </button>
+          </header>
 
-          {page === 'vehicles' && (
-            <div className="modal" style={{ position: 'relative', width: '100%', maxHeight: 'none' }}>
-              <h3>Créer un véhicule / clés</h3>
+          <div className="body">
+            <div className="list-panel">
+              {page === 'dashboard' && (
+                <div className="dashboard-grid">
+                  {(boot?.modules || []).map((m) => (
+                    <button key={m} className="dash-card" onClick={() => setPage(m)}>
+                      <div className="label">{MODULE_LABELS[m]}</div>
+                      <div className="value">{boot?.counts?.[m] ?? 0}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {page === 'vehicles' && (
+                <div className="modal" style={{ position: 'relative', width: '100%', maxHeight: 'none' }}>
+                  <h3>Créer un véhicule</h3>
+                  <div className="form-grid">
+                    <div className="field">
+                      <label>Modèle</label>
+                      <input value={vehicleForm.model} onChange={(e) => setVehicleForm({ ...vehicleForm, model: e.target.value })} />
+                    </div>
+                    <div className="field">
+                      <label>Plaque</label>
+                      <input value={vehicleForm.plate} onChange={(e) => setVehicleForm({ ...vehicleForm, plate: e.target.value })} />
+                    </div>
+                    <div className="field">
+                      <label>ID joueur cible</label>
+                      <input value={vehicleForm.target} onChange={(e) => setVehicleForm({ ...vehicleForm, target: e.target.value })} />
+                    </div>
+                    <div className="field">
+                      <label>Couleur 1</label>
+                      <input type="number" value={vehicleForm.color1} onChange={(e) => setVehicleForm({ ...vehicleForm, color1: Number(e.target.value) })} />
+                    </div>
+                  </div>
+                  <div className="modal-actions">
+                    <button className="btn primary" onClick={createVehicle}>Créer & spawn</button>
+                  </div>
+                </div>
+              )}
+
+              {page !== 'dashboard' && page !== 'vehicles' && (
+                <>
+                  <div className="toolbar">
+                    <input
+                      className="search"
+                      placeholder="Rechercher..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                    <button className="btn" onClick={reload}>Reload</button>
+                    <button className="btn primary" onClick={openCreate}>+ Create New</button>
+                  </div>
+
+                  <div className="table-wrap">
+                    {filtered.length === 0 ? (
+                      <div className="empty">Aucune création trouvée</div>
+                    ) : (
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th>Nom</th>
+                            <th>ID / Job</th>
+                            <th>Mode</th>
+                            <th>Points</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filtered.map((it) => {
+                            const mode = modeLabel(page, it)
+                            return (
+                              <tr
+                                key={it.id}
+                                className={selectedId === it.id ? 'selected' : ''}
+                                onClick={() => setSelectedId(it.id ?? null)}
+                              >
+                                <td className="cell-name">{it.label}</td>
+                                <td>
+                                  <div className="cell-id">
+                                    <span className="id">{it.name}</span>
+                                    <span className="meta">{metaLine(page, it)}</span>
+                                  </div>
+                                </td>
+                                <td>
+                                  <span className={`pill ${mode.tone}`}>{mode.text}</span>
+                                </td>
+                                <td>{pointsCount(it)}</td>
+                                <td>
+                                  <span className={it.active ? 'status-on' : 'status-off'}>
+                                    {it.active ? 'Actif' : 'Inactif'}
+                                  </span>
+                                </td>
+                                <td onClick={(e) => e.stopPropagation()}>
+                                  <div className="actions">
+                                    <button className="action" onClick={() => openEdit(it)}>Edit</button>
+                                    <button className="action" onClick={() => doTeleport(it)}>TP</button>
+                                    <button className="action" onClick={() => doToggle(it)}>
+                                      {it.active ? 'Disable' : 'Enable'}
+                                    </button>
+                                    <button className="action danger" onClick={() => setConfirmDelete(it)}>
+                                      Delete
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            <GtaMap
+              items={page === 'dashboard' || page === 'vehicles' ? [] : filtered}
+              selectedId={selectedId}
+              onSelect={onSelectPin}
+              onEdit={openEdit}
+            />
+          </div>
+        </section>
+
+        {editor && (
+          <div className="modal-backdrop">
+            <div className="modal">
+              <h3>{editor.id ? 'Modifier' : 'Créer'} — {MODULE_LABELS[page]}</h3>
               <div className="form-grid">
-                <div className="field"><label>Modèle</label><input value={vehicleForm.model} onChange={(e) => setVehicleForm({ ...vehicleForm, model: e.target.value })} /></div>
-                <div className="field"><label>Plaque (auto si vide)</label><input value={vehicleForm.plate} onChange={(e) => setVehicleForm({ ...vehicleForm, plate: e.target.value })} /></div>
-                <div className="field"><label>ID joueur cible</label><input value={vehicleForm.target} onChange={(e) => setVehicleForm({ ...vehicleForm, target: e.target.value })} /></div>
-                <div className="field"><label>Couleur 1</label><input type="number" value={vehicleForm.color1} onChange={(e) => setVehicleForm({ ...vehicleForm, color1: Number(e.target.value) })} /></div>
-                <div className="field"><label>Couleur 2</label><input type="number" value={vehicleForm.color2} onChange={(e) => setVehicleForm({ ...vehicleForm, color2: Number(e.target.value) })} /></div>
+                <div className="field">
+                  <label>Nom interne</label>
+                  <input value={editor.name} onChange={(e) => setEditor({ ...editor, name: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>Label</label>
+                  <input value={editor.label} onChange={(e) => setEditor({ ...editor, label: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>X</label>
+                  <input
+                    type="number"
+                    value={editor.coords?.x ?? 0}
+                    onChange={(e) =>
+                      setEditor({
+                        ...editor,
+                        coords: { ...(editor.coords || { x: 0, y: 0, z: 0 }), x: Number(e.target.value) },
+                      })
+                    }
+                  />
+                </div>
+                <div className="field">
+                  <label>Y</label>
+                  <input
+                    type="number"
+                    value={editor.coords?.y ?? 0}
+                    onChange={(e) =>
+                      setEditor({
+                        ...editor,
+                        coords: { ...(editor.coords || { x: 0, y: 0, z: 0 }), y: Number(e.target.value) },
+                      })
+                    }
+                  />
+                </div>
+                <div className="field">
+                  <label>Z</label>
+                  <input
+                    type="number"
+                    value={editor.coords?.z ?? 0}
+                    onChange={(e) =>
+                      setEditor({
+                        ...editor,
+                        coords: { ...(editor.coords || { x: 0, y: 0, z: 0 }), z: Number(e.target.value) },
+                      })
+                    }
+                  />
+                </div>
+                <div className="field">
+                  <label>Heading</label>
+                  <input
+                    type="number"
+                    value={editor.coords?.w ?? 0}
+                    onChange={(e) =>
+                      setEditor({
+                        ...editor,
+                        coords: { ...(editor.coords || { x: 0, y: 0, z: 0 }), w: Number(e.target.value) },
+                      })
+                    }
+                  />
+                </div>
+                <div className="field full">
+                  <label>Data JSON</label>
+                  <textarea value={dataJson} onChange={(e) => setDataJson(e.target.value)} />
+                </div>
               </div>
               <div className="modal-actions">
-                <button className="btn primary" onClick={createVehicle}>Créer & spawn</button>
+                <button className="btn" onClick={usePlayerCoords}>Coords joueur</button>
+                <button className="btn" onClick={startPlacement}>Placement 3D</button>
+                <button className="btn" onClick={() => setEditor(null)}>Annuler</button>
+                <button className="btn primary" onClick={saveEditor}>Enregistrer</button>
               </div>
-            </div>
-          )}
-
-          {page !== 'dashboard' && page !== 'vehicles' && (
-            <>
-              <div className="toolbar">
-                <input className="search" placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                <select className="btn" value={filterActive} onChange={(e) => setFilterActive(e.target.value as 'all' | 'on' | 'off')}>
-                  <option value="all">Tous</option>
-                  <option value="on">Actifs</option>
-                  <option value="off">Inactifs</option>
-                </select>
-                <button className="btn" onClick={doImport}>Importer</button>
-                <button className="btn primary" onClick={openCreate}>Créer</button>
-              </div>
-
-              {filtered.length === 0 ? (
-                <div className="empty">Aucune création trouvée</div>
-              ) : (
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Nom</th>
-                      <th>Label</th>
-                      <th>État</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.map((it) => (
-                      <tr key={it.id}>
-                        <td>{it.id}</td>
-                        <td>{it.name}</td>
-                        <td>{it.label}</td>
-                        <td><span className={`badge ${it.active ? 'on' : 'off'}`}>{it.active ? 'Actif' : 'Inactif'}</span></td>
-                        <td>
-                          <div className="row-actions">
-                            <button className="btn" onClick={() => openEdit(it)}>Modifier</button>
-                            <button className="btn" onClick={() => doDuplicate(it)}>Dupliquer</button>
-                            <button className="btn" onClick={() => doToggle(it)}>{it.active ? 'Désactiver' : 'Activer'}</button>
-                            <button className="btn" onClick={() => doExport(it)}>Export</button>
-                            <button className="btn danger" onClick={() => setConfirmDelete(it)}>Supprimer</button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </>
-          )}
-        </div>
-      </section>
-
-      {editor && (
-        <div className="modal-backdrop">
-          <div className="modal">
-            <h3>{editor.id ? 'Modifier' : 'Créer'} — {MODULE_LABELS[page]}</h3>
-            <div className="form-grid">
-              <div className="field"><label>Nom interne</label><input value={editor.name} onChange={(e) => setEditor({ ...editor, name: e.target.value })} /></div>
-              <div className="field"><label>Label</label><input value={editor.label} onChange={(e) => setEditor({ ...editor, label: e.target.value })} /></div>
-              <div className="field"><label>X</label><input type="number" value={editor.coords?.x ?? 0} onChange={(e) => setEditor({ ...editor, coords: { ...(editor.coords || { x:0,y:0,z:0 }), x: Number(e.target.value) } })} /></div>
-              <div className="field"><label>Y</label><input type="number" value={editor.coords?.y ?? 0} onChange={(e) => setEditor({ ...editor, coords: { ...(editor.coords || { x:0,y:0,z:0 }), y: Number(e.target.value) } })} /></div>
-              <div className="field"><label>Z</label><input type="number" value={editor.coords?.z ?? 0} onChange={(e) => setEditor({ ...editor, coords: { ...(editor.coords || { x:0,y:0,z:0 }), z: Number(e.target.value) } })} /></div>
-              <div className="field"><label>Heading</label><input type="number" value={editor.coords?.w ?? 0} onChange={(e) => setEditor({ ...editor, coords: { ...(editor.coords || { x:0,y:0,z:0 }), w: Number(e.target.value) } })} /></div>
-              <div className="field full">
-                <label>Data JSON (module)</label>
-                <textarea value={dataJson} onChange={(e) => setDataJson(e.target.value)} />
-              </div>
-            </div>
-            <div className="modal-actions">
-              <button className="btn" onClick={usePlayerCoords}>Coords joueur</button>
-              <button className="btn" onClick={startPlacement}>Placement 3D</button>
-              <button className="btn ghost" onClick={() => setEditor(null)}>Annuler</button>
-              <button className="btn primary" onClick={saveEditor}>Enregistrer</button>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {confirmDelete && (
-        <div className="modal-backdrop">
-          <div className="modal" style={{ width: 420 }}>
-            <h3>Confirmation</h3>
-            <p>Supprimer définitivement <strong>{confirmDelete.label}</strong> ?</p>
-            <div className="modal-actions">
-              <button className="btn ghost" onClick={() => setConfirmDelete(null)}>Annuler</button>
-              <button className="btn danger" onClick={doDelete}>Supprimer</button>
+        {confirmDelete && (
+          <div className="modal-backdrop">
+            <div className="modal" style={{ width: 420 }}>
+              <h3>Confirmation</h3>
+              <p style={{ color: 'var(--text-dim)', marginBottom: 8 }}>
+                Supprimer définitivement <strong style={{ color: '#fff' }}>{confirmDelete.label}</strong> ?
+              </p>
+              <div className="modal-actions">
+                <button className="btn" onClick={() => setConfirmDelete(null)}>Annuler</button>
+                <button className="btn" style={{ background: 'var(--red-soft)', borderColor: 'rgba(239,68,68,.4)', color: '#fca5a5' }} onClick={doDelete}>
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {toast && <div className={`toast ${toast.type}`}>{toast.text}</div>}
+        {toast && <div className={`toast ${toast.type}`}>{toast.text}</div>}
+      </div>
     </div>
   )
 }
