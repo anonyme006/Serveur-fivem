@@ -90,6 +90,14 @@ local function disableControls()
     DisablePlayerFiring(PlayerId(), true)
 end
 
+local function asXYZ(v)
+    if not v then return 0.0, 0.0, 0.0 end
+    if type(v) == 'vector3' or (type(v) == 'table' and v.x) then
+        return v.x + 0.0, v.y + 0.0, v.z + 0.0
+    end
+    return 0.0, 0.0, 0.0
+end
+
 local function attachProp(ped, data)
     local hash = loadModel(data.model)
     if not hash then return nil end
@@ -97,13 +105,14 @@ local function attachProp(ped, data)
     local coords = GetEntityCoords(ped)
     local obj = CreateObject(hash, coords.x, coords.y, coords.z + 0.2, true, true, true)
     local bone = data.bone or 60309
-    local pos = data.coords or { x = 0.0, y = 0.0, z = 0.0 }
-    local rot = data.rotation or { x = 0.0, y = 0.0, z = 0.0 }
+
+    local px, py, pz = asXYZ(data.coords or data.pos)
+    local rx, ry, rz = asXYZ(data.rotation or data.rot)
 
     AttachEntityToEntity(
         obj, ped, GetPedBoneIndex(ped, bone),
-        pos.x, pos.y, pos.z,
-        rot.x, rot.y, rot.z,
+        px, py, pz,
+        rx, ry, rz,
         true, true, false, true, 1, true
     )
     SetModelAsNoLongerNeeded(hash)
@@ -145,7 +154,10 @@ function Progress(action, finish)
         SetCurrentPedWeapon(ped, `WEAPON_UNARMED`, true)
     end
 
-    if action.animation and action.animation.animDict and action.animation.anim then
+    if action.scenario and type(action.scenario) == 'string' then
+        TaskStartScenarioInPlace(ped, action.scenario, 0, true)
+        isAnim = true
+    elseif action.animation and action.animation.animDict and action.animation.anim then
         if loadAnimDict(action.animation.animDict) then
             TaskPlayAnim(
                 ped,
@@ -169,6 +181,9 @@ function Progress(action, finish)
         isPropTwo = propTwo ~= nil
     end
 
+    local uiPosition = action.position or Config.Position
+    if uiPosition == 'middle' then uiPosition = 'center' end
+
     SendNUIMessage({
         action = 'start',
         label = label,
@@ -177,7 +192,7 @@ function Progress(action, finish)
         trackColor = Config.TrackColor,
         width = Config.Width,
         height = Config.Height,
-        position = Config.Position,
+        position = uiPosition,
     })
 
     CreateThread(function()

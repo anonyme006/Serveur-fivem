@@ -49,8 +49,17 @@ end)
 
 ### Intégrations
 
-- [`ox_garage`](../ox_garage) — rangement / sortie véhicule
-- [`esx_consumables`](../esx_consumables) — manger / boire
+- [`pa_garage`](../pa_garage) — rangement / sortie / fourrière
+- [`ox_inventory`](../ox_inventory) — manger, boire, craft (`usetime`)
+
+### API compatible ox_lib
+
+```lua
+exports['esx_progressbar']:progressBar({ label = '…', duration = 3000, canCancel = true, anim = { dict = '…', clip = '…' } })
+exports['esx_progressbar']:progressCircle({ ... }) -- même barre capsule
+exports['esx_progressbar']:progressActive()
+exports['esx_progressbar']:cancelProgress()
+```
 
 ### Événements
 
