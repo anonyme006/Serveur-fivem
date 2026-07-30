@@ -106,7 +106,7 @@ local function processPurchase(source, model)
     }
 
     MySQL.insert.await(
-        'INSERT INTO owned_vehicles (owner, plate, vehicle, type, stored) VALUES (?, ?, ?, ?, ?)',
+        'INSERT INTO `owned_vehicles` (`owner`, `plate`, `vehicle`, `type`, `stored`) VALUES (?, ?, ?, ?, ?)',
         { xPlayer.identifier, plate, json.encode(props), 'car', 0 }
     )
 
