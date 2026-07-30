@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventaire Los Plantos</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="no-actions">
+  <div id="app" class="hidden">
+    <aside class="inventory">
+      <header class="inventory__header">
+        <div class="inventory__banner">
+          <img src="assets/header.jpg" alt="Los Plantos" class="inventory__banner-img" />
+          <div class="inventory__logo" aria-hidden="true">Los Plantos</div>
+        </div>
+        <div class="inventory__weight" id="weightBar">INVENTAIRE 0.00 / 60 KG</div>
+      </header>
+
+      <ul class="inventory__list" id="itemList" role="listbox" aria-label="Inventaire"></ul>
+
+      <!-- Masqué par défaut (body.no-actions) pour coller au design ; retirer la classe pour afficher -->
+      <footer class="inventory__actions" id="actions">
+        <button type="button" data-action="use" title="Utiliser (Entrée)">Utiliser</button>
+        <button type="button" data-action="give" title="Donner">Donner</button>
+        <button type="button" data-action="drop" title="Jeter">Jeter</button>
+      </footer>
+    </aside>
+
+    <div class="context-menu hidden" id="contextMenu">
+      <button type="button" data-action="use">Utiliser</button>
+      <button type="button" data-action="give">Donner</button>
+      <button type="button" data-action="drop">Jeter</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
