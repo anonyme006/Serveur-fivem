@@ -256,10 +256,6 @@ body.editing .vehicle-hud.dragging {
     outline-color: rgba(46, 204, 113, 0.9);
 }
 
-body.editing .vehicle-hud {
-    /* Toujours visible en mode édition */
-}
-
 .edit-overlay {
     position: absolute;
     inset: 0;
