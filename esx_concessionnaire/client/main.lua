@@ -53,15 +53,35 @@ local function destroyCamera()
     RenderScriptCams(false, false, 0, true, true)
 end
 
+local function updateCameraToVehicle()
+    local vehCoords = Config.Preview.coords
+    if previewVehicle and DoesEntityExist(previewVehicle) then
+        vehCoords = GetEntityCoords(previewVehicle)
+    end
+
+    local offset = (Config.Preview.camera and Config.Preview.camera.offset) or vector3(-4.8, -3.6, 1.6)
+    local camPos = vector3(
+        vehCoords.x + offset.x,
+        vehCoords.y + offset.y,
+        vehCoords.z + offset.z
+    )
+    local lookAt = vector3(vehCoords.x, vehCoords.y, vehCoords.z + 0.55)
+    local fov = (Config.Preview.camera and Config.Preview.camera.fov) or 50.0
+
+    if not previewCam then
+        previewCam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
+    end
+
+    SetCamCoord(previewCam, camPos.x, camPos.y, camPos.z)
+    PointCamAtCoord(previewCam, lookAt.x, lookAt.y, lookAt.z)
+    SetCamFov(previewCam, fov)
+    SetCamActive(previewCam, true)
+    RenderScriptCams(true, true, 400, true, true)
+end
+
 local function createCamera()
     destroyCamera()
-    local cam = Config.Preview.camera
-    previewCam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
-    SetCamCoord(previewCam, cam.coords.x, cam.coords.y, cam.coords.z)
-    PointCamAtCoord(previewCam, cam.pointAt.x, cam.pointAt.y, cam.pointAt.z)
-    SetCamFov(previewCam, cam.fov or 45.0)
-    SetCamActive(previewCam, true)
-    RenderScriptCams(true, true, 500, true, true)
+    updateCameraToVehicle()
 end
 
 local function spawnPreview(model)
@@ -90,9 +110,11 @@ local function spawnPreview(model)
     SetVehicleDoorsLocked(previewVehicle, 2)
     FreezeEntityPosition(previewVehicle, true)
     SetEntityCollision(previewVehicle, false, false)
-    SetEntityAlpha(previewVehicle, 210, false)
+    SetEntityAlpha(previewVehicle, 230, false)
     SetVehicleNumberPlateText(previewVehicle, 'PREVIEW')
     SetModelAsNoLongerNeeded(hash)
+
+    updateCameraToVehicle()
 end
 
 local function releasePlayer()

@@ -27,14 +27,14 @@ Config.Zones = {
     },
 }
 
--- Position de prévisualisation du véhicule (éloignée du point d'interaction)
+-- Position de prévisualisation du véhicule (showroom PDM)
+-- camera.offset = décalage par rapport au véhicule (x, y, z)
 Config.Preview = {
-    coords = vector3(-42.80, -1101.60, 26.42),
-    heading = 110.0,
+    coords = vector3(-44.20, -1097.10, 26.42),
+    heading = 70.0,
     camera = {
-        coords = vector3(-46.90, -1104.80, 27.80),
-        pointAt = vector3(-42.80, -1101.60, 26.90),
-        fov = 45.0,
+        offset = vector3(-4.8, -3.6, 1.6),
+        fov = 50.0,
     },
 }
 
