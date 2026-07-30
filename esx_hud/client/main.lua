@@ -55,6 +55,36 @@ local function hideDefaultHudComponents()
     DisplayRadar(not Config.HideRadar)
 end
 
+-- Remonte la minimap pour dégager l'espace des barres status en dessous
+local function applyMinimapOffset()
+    if not Config.OffsetMinimap then
+        return
+    end
+
+    local offsetY = Config.MinimapOffsetY or 0.028
+
+    -- Refresh scaleform puis reposition
+    local defaultAspectRatio = 1920 / 1080
+    local resolutionX, resolutionY = GetActiveScreenResolution()
+    local aspectRatio = resolutionX / resolutionY
+    local minimapOffset = 0.0
+
+    if aspectRatio > defaultAspectRatio then
+        minimapOffset = ((defaultAspectRatio - aspectRatio) / 3.6) - 0.008
+    end
+
+    RequestStreamedTextureDict('squaremap', false)
+    SetMinimapClipType(0)
+
+    SetMinimapComponentPosition('minimap', 'L', 'B', 0.0 + minimapOffset, 0.0 + offsetY, 0.1638, 0.183)
+    SetMinimapComponentPosition('minimap_mask', 'L', 'B', 0.0 + minimapOffset, 0.0 + offsetY, 0.128, 0.20)
+    SetMinimapComponentPosition('minimap_blur', 'L', 'B', -0.01 + minimapOffset, 0.025 + offsetY, 0.262, 0.300)
+
+    SetRadarBigmapEnabled(true, false)
+    Wait(50)
+    SetRadarBigmapEnabled(false, false)
+end
+
 local function getFuelLevel(vehicle)
     if GetResourceState('LegacyFuel') == 'started' then
         local ok, value = pcall(function()
@@ -135,6 +165,7 @@ end
 RegisterNetEvent('esx:playerLoaded', function()
     isLoggedIn = true
     setHudVisible(true)
+    CreateThread(applyMinimapOffset)
 end)
 
 RegisterNetEvent('esx:onPlayerLogout', function()
@@ -156,6 +187,7 @@ CreateThread(function()
         if ESX.PlayerLoaded or (ESX.GetPlayerData and ESX.GetPlayerData().job) then
             isLoggedIn = true
             setHudVisible(true)
+            applyMinimapOffset()
             break
         end
         Wait(200)

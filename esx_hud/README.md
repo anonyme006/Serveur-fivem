@@ -33,6 +33,8 @@ ensure esx_hud
 | `Config.SpeedUnit` | `'kmh'` ou `'mph'` |
 | `Config.ShowVehicleHud` | Afficher le compteur véhicule |
 | `Config.HideRadar` | Cacher la minimap GTA |
+| `Config.OffsetMinimap` | Remonter la minimap pour les barres en dessous |
+| `Config.MinimapOffsetY` | Décalage vertical de la minimap |
 | `Config.Status.hunger` / `thirst` | Noms des status `esx_status` |
 
 ## Fonctionnement

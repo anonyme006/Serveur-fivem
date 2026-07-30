@@ -21,11 +21,16 @@ Config.Status = {
     thirst = 'thirst',
 }
 
--- Position des barres de status (CSS)
+-- Position des barres de status — sous la minimap
 Config.StatusPosition = {
-    bottom = '2.8%',
-    left = '1.6%',
+    bottom = '0.9%',
+    left = '1.55%',
 }
+
+-- Remonter la minimap pour laisser la place aux barres en dessous
+Config.OffsetMinimap = true
+-- Décalage vertical de la minimap (plus grand = plus haut)
+Config.MinimapOffsetY = 0.028
 
 -- Position du speedometer (centré en bas)
 Config.VehiclePosition = {

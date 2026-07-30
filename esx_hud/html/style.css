@@ -6,8 +6,8 @@
     --hud-white-dim: rgba(255, 255, 255, 0.35);
     --hud-glow: 0 0 8px rgba(255, 255, 255, 0.45);
     --bar-bg: rgba(0, 0, 0, 0.55);
-    --status-bottom: 2.8%;
-    --status-left: 1.6%;
+    --status-bottom: 0.9%;
+    --status-left: 1.55%;
     --vehicle-bottom: 3.5%;
 }
 
