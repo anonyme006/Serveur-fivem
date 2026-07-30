@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>esx_hud — preview</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                linear-gradient(160deg, #1a2332 0%, #0d1520 50%, #152018 100%);
+            font-family: system-ui, sans-serif;
+        }
+        iframe {
+            width: 100vw;
+            height: 100vh;
+            border: 0;
+            background: transparent;
+        }
+        .hint {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+            z-index: 99;
+            background: rgba(0,0,0,0.4);
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="hint">Preview NUI — pas utilisé en jeu. Ouvre html/index.html via un serveur local ou utilise les boutons ci-dessous après chargement.</div>
+    <iframe id="frame" src="index.html" allowtransparency="true"></iframe>
+    <script>
+        const frame = document.getElementById('frame');
+        frame.addEventListener('load', () => {
+            const win = frame.contentWindow;
+            win.postMessage({ action: 'setVisible', visible: true }, '*');
+            win.postMessage({
+                action: 'updateStatus',
+                health: 92, hunger: 48, thirst: 55, armour: 0
+            }, '*');
+            win.postMessage({
+                action: 'updateVehicle',
+                show: true,
+                speed: 96,
+                rpm: 62,
+                fuel: 78,
+                engine: 88,
+                plate: '11425',
+                unit: 'kmh'
+            }, '*');
+        });
+    </script>
+</body>
+</html>
