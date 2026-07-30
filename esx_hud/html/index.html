@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ESX HUD</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="hud" class="hidden">
+        <!-- Barres santé / faim / soif -->
+        <div id="status-hud" class="status-hud" data-hud="status">
+            <div class="status-bar health" title="Santé">
+                <div class="status-fill" id="health-fill"></div>
+            </div>
+            <div class="status-bar hunger" title="Faim">
+                <div class="status-fill" id="hunger-fill"></div>
+            </div>
+            <div class="status-bar thirst" title="Soif">
+                <div class="status-fill" id="thirst-fill"></div>
+            </div>
+        </div>
+
+        <!-- Speedometer circulaire -->
+        <div id="vehicle-hud" class="vehicle-hud hidden" data-hud="vehicle">
+            <div class="gauge gauge-side gauge-engine">
+                <svg viewBox="0 0 100 100" class="gauge-svg">
+                    <circle class="gauge-track" cx="50" cy="50" r="42" />
+                    <circle class="gauge-progress" id="engine-arc" cx="50" cy="50" r="42" />
+                </svg>
+                <div class="gauge-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M12 2l2.2 2.2h3.1v3.1L19.5 9.5v5l-2.2 2.2v3.1h-3.1L12 22l-2.2-2.2H6.7v-3.1L4.5 14.5v-5l2.2-2.2V4.2h3.1L12 2z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="gauge gauge-main">
+                <svg viewBox="0 0 140 140" class="gauge-svg">
+                    <circle class="gauge-track" cx="70" cy="70" r="58" />
+                    <circle class="gauge-progress" id="rpm-arc" cx="70" cy="70" r="58" />
+                </svg>
+                <div class="gauge-center">
+                    <span class="speed-dot"></span>
+                    <span class="speed-value" id="speed-value">0</span>
+                    <span class="speed-unit" id="speed-unit">KM/H</span>
+                    <div class="plate">
+                        <span class="plate-hash">#</span>
+                        <span class="plate-text" id="plate-text">------</span>
+                        <span class="plate-bar"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gauge gauge-side gauge-fuel">
+                <svg viewBox="0 0 100 100" class="gauge-svg">
+                    <circle class="gauge-track" cx="50" cy="50" r="42" />
+                    <circle class="gauge-progress" id="fuel-arc" cx="50" cy="50" r="42" />
+                </svg>
+                <div class="gauge-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M3 2h10a1 1 0 0 1 1 1v14h2V9.83a2 2 0 0 1 .59-1.41l2-2A2 2 0 0 1 20 5.83V19h1v2H3v-2h1V3a1 1 0 0 1 1-1zm2 2v14h6V4H5zm12 4.83V19h2V8.83l-1 1-1-1z"/>
+                    </svg>
+                </div>
+                <span class="fuel-label" id="fuel-label">Normal Range</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay mode édition -->
+    <div id="edit-overlay" class="edit-overlay hidden">
+        <div class="edit-panel">
+            <strong>Mode édition HUD</strong>
+            <p>Glisse les éléments pour les déplacer</p>
+            <ul>
+                <li><kbd>Entrée</kbd> Sauvegarder</li>
+                <li><kbd>Échap</kbd> Annuler</li>
+                <li><kbd>R</kbd> Réinitialiser</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
