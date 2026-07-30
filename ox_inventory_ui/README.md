@@ -1,68 +1,53 @@
-# ox_inventory_ui
+# Thème visuel ox_inventory
 
-Thème d’inventaire inspiré du visuel demandé (grilles 5×5 + boutons centraux), prévu pour **ox_inventory**.
+Remplace **uniquement l’UI** d’ox_inventory (pas une nouvelle ressource).
 
-## Couleurs des boutons
+## Couleurs
 
 | Bouton | Couleur |
 |--------|---------|
-| **Information** | Bleu |
+| Information | Bleu |
 | **Utiliser** | **Vert** |
-| **Échanger** | Teal |
+| Échanger | Teal |
 | **Fermer** | **Rouge** |
 
-## Installation
+## Installation (2 minutes)
 
-1. Copiez le dossier `ox_inventory_ui` dans `resources/[ox]/`
-2. Dans `server.cfg` :
+1. **Sauvegarde** ton dossier actuel :
+   ```
+   resources/[ox]/ox_inventory/web/build
+   ```
+2. **Remplace** tout le contenu de `ox_inventory/web/build/` par celui de :
+   ```
+   ox_inventory_ui/web/build/
+   ```
+3. (FR) Copie aussi la locale :
+   ```
+   ox_inventory_ui/locales/fr.json  →  ox_inventory/locales/fr.json
+   ```
+   (Utiliser / Échanger / Fermer / Information)
+4. Redémarre la ressource :
+   ```
+   ensure ox_inventory
+   ```
+   ou `restart ox_inventory`
 
-```cfg
-ensure ox_inventory
-ensure ox_inventory_ui
-```
+Aucune autre ressource à `ensure`. C’est toujours **ox_inventory** normal, avec le nouveau look.
 
-3. Aperçu navigateur (sans FiveM) : ouvrez `html/preview.html`
-
-4. En jeu : commande `/invui` pour ouvrir l’interface (charge les items ox_inventory si disponibles)
-
-## Structure
+## Contenu du dossier
 
 ```
 ox_inventory_ui/
-├── client/main.lua      # Bridge NUI + exports
-├── fxmanifest.lua
-├── theme-vibe.css       # Patch CSS pour l'UI React ox_inventory
-├── html/
-│   ├── index.html       # UI principale
-│   ├── style.css        # Thème (Utiliser vert / Fermer rouge)
-│   ├── app.js           # Logique + messages NUI
-│   └── preview.html     # Démo navigateur
+├── web/build/          ← à coller dans ox_inventory/web/build/
+├── locales/fr.json     ← labels FR
+├── src/patches/        ← sources (si tu rebuild l’UI plus tard)
 └── README.md
 ```
 
-### Patch UI React ox_inventory
+## Rebuild (optionnel)
 
-Si vous gardez l’UI d’origine d’ox_inventory, copiez `theme-vibe.css` dans `ox_inventory/web/build/` et ajoutez dans `index.html` :
+Si tu modifies le thème plus tard :
 
-```html
-<link rel="stylesheet" href="./theme-vibe.css" />
-```
-
-## Intégration ox_inventory
-
-- Les images d’items pointent vers `nui://ox_inventory/web/images/<name>.png`
-- Callbacks NUI : `useItem`, `giveItem`, `exit`, `closeInventory`
-- Exports client : `exports.ox_inventory_ui:open(payload)` / `close()`
-
-Pour remplacer entièrement l’UI React d’ox_inventory, branchez les mêmes messages NUI (`setupInventory`, `refreshSlots`, `closeInventory`) depuis votre client, ou utilisez cette ressource en overlay via `/invui`.
-
-## Personnalisation rapide
-
-Dans `html/style.css` :
-
-```css
---btn-use: #2fbf5a;    /* Utiliser (vert) */
---btn-close: #d62839;  /* Fermer (rouge) */
---btn-info: #1e7fd6;   /* Information */
---btn-give: #1a6b72;   /* Échanger */
-```
+1. Clone ox_inventory, copie `src/patches/*` aux bons endroits dans `web/`
+2. Dans `web/` : `bun install && bun run build`
+3. Recopie `web/build/` dans ta ressource ox_inventory
