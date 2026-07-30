@@ -2,29 +2,20 @@ local isOpen = false
 local previewVehicle = nil
 local previewCam = nil
 local currentZone = nil
-local nearbyZone = nil
+local selectedCategory = nil
 
-local function notify(msg)
+local function notify(msg, nType)
+    if lib and lib.notify then
+        lib.notify({
+            title = Translate('shop_title'),
+            description = msg,
+            type = nType or 'inform',
+        })
+        return
+    end
     if ESX and ESX.ShowNotification then
         ESX.ShowNotification(msg)
-    else
-        BeginTextCommandThefeedPost('STRING')
-        AddTextComponentSubstringPlayerName(msg)
-        EndTextCommandThefeedPostTicker(false, true)
     end
-end
-
---- Safe interact prompt (avoids EndTextCommandDisplayHelp crash on build 3570+)
-local function showHelp(msg)
-    SetTextFont(4)
-    SetTextScale(0.42, 0.42)
-    SetTextColour(255, 255, 255, 230)
-    SetTextCentre(true)
-    SetTextDropshadow(1, 0, 0, 0, 200)
-    SetTextOutline()
-    BeginTextCommandDisplayText('STRING')
-    AddTextComponentSubstringPlayerName(msg)
-    EndTextCommandDisplayText(0.5, 0.90)
 end
 
 local function formatMoney(amount)
@@ -92,67 +83,244 @@ local function spawnPreview(model)
     SetModelAsNoLongerNeeded(hash)
 end
 
-local function setNuiFocus(state)
-    SetNuiFocus(state, state)
-    SetNuiFocusKeepInput(false)
-end
-
 local function closeShop()
     if not isOpen then return end
     isOpen = false
-    setNuiFocus(false)
-    SendNUIMessage({ action = 'close' })
+    selectedCategory = nil
+    lib.hideContext()
+    lib.hideTextUI()
     deletePreview()
     destroyCamera()
     DisplayRadar(true)
 end
 
-local function openShop()
-    if isOpen then return end
-    isOpen = true
-    DisplayRadar(false)
-    createCamera()
-
-    local categoryLabels = {}
-    for _, cat in ipairs(Config.Categories) do
-        categoryLabels[cat.id] = cat.label
+local function getCategoryLabel(categoryId)
+    for i = 1, #Config.Categories do
+        if Config.Categories[i].id == categoryId then
+            return Config.Categories[i].label
+        end
     end
+    return categoryId
+end
 
-    local vehicles = {}
-    for _, v in ipairs(Config.Vehicles) do
-        vehicles[#vehicles + 1] = {
-            model = v.model,
-            name = v.name,
-            category = v.category,
-            categoryLabel = categoryLabels[v.category] or v.category,
-            price = v.price,
-        }
+local function getVehiclesByCategory(categoryId, search)
+    local list = {}
+    local q = search and search:lower() or nil
+    for i = 1, #Config.Vehicles do
+        local v = Config.Vehicles[i]
+        local catOk = not categoryId or v.category == categoryId
+        local searchOk = not q
+            or (v.name and v.name:lower():find(q, 1, true))
+            or (v.model and v.model:lower():find(q, 1, true))
+        if catOk and searchOk then
+            list[#list + 1] = v
+        end
     end
+    return list
+end
 
-    setNuiFocus(true)
-    SendNUIMessage({
-        action = 'open',
-        categories = Config.Categories,
-        vehicles = vehicles,
-        locale = {
-            title = Translate('shop_title'),
-            search = Translate('search_placeholder'),
-            buy = Translate('buy'),
+local openCategoriesMenu, openVehicleList, openVehicleActions
+
+local function buyVehicle(vehicle)
+    local confirm = lib.alertDialog({
+        header = Translate('shop_title'),
+        content = Translate('confirm_buy', vehicle.name, formatMoney(vehicle.price)),
+        centered = true,
+        cancel = true,
+        labels = {
+            confirm = Translate('buy'),
             cancel = Translate('cancel'),
-            confirm = Translate('confirm_buy'),
-            empty = Translate('no_vehicles'),
-            close = Translate('close'),
         },
     })
 
-    if #vehicles > 0 then
+    if confirm ~= 'confirm' then
+        openVehicleActions(vehicle)
+        return
+    end
+
+    local result = lib.callback.await('esx_concessionnaire:buyVehicle', false, vehicle.model)
+    if result and result.ok then
+        closeShop()
+        notify(Translate('purchase_success', result.name, formatMoney(result.price)), 'success')
+        notify(Translate('vehicle_out'), 'inform')
+    else
+        local reason = result and result.reason or 'purchase_failed'
+        if reason == 'money' then
+            notify(Translate('not_enough_money'), 'error')
+        else
+            local msg = Translate(reason)
+            if msg == reason then msg = Translate('purchase_failed') end
+            notify(msg, 'error')
+        end
+        openVehicleActions(vehicle)
+    end
+end
+
+openVehicleActions = function(vehicle)
+    spawnPreview(vehicle.model)
+
+    lib.registerContext({
+        id = 'esx_concessionnaire_vehicle',
+        title = vehicle.name,
+        menu = 'esx_concessionnaire_list',
+        options = {
+            {
+                title = Translate('buy'),
+                description = ('$%s'):format(formatMoney(vehicle.price)),
+                icon = 'cart-shopping',
+                iconColor = '#3dde6a',
+                onSelect = function()
+                    buyVehicle(vehicle)
+                end,
+            },
+            {
+                title = 'Prévisualiser',
+                description = vehicle.model,
+                icon = 'eye',
+                onSelect = function()
+                    spawnPreview(vehicle.model)
+                    openVehicleActions(vehicle)
+                end,
+            },
+            {
+                title = 'Retour',
+                icon = 'arrow-left',
+                onSelect = function()
+                    openVehicleList(selectedCategory)
+                end,
+            },
+        },
+    })
+
+    lib.showContext('esx_concessionnaire_vehicle')
+end
+
+openVehicleList = function(categoryId, search)
+    selectedCategory = categoryId
+    local vehicles = getVehiclesByCategory(categoryId, search)
+    local options = {}
+
+    if #vehicles == 0 then
+        options[#options + 1] = {
+            title = Translate('no_vehicles'),
+            icon = 'circle-xmark',
+            disabled = true,
+        }
+    else
+        for i = 1, #vehicles do
+            local v = vehicles[i]
+            options[#options + 1] = {
+                title = v.name,
+                description = ('%s — $%s'):format(getCategoryLabel(v.category), formatMoney(v.price)),
+                icon = 'car',
+                metadata = {
+                    { label = 'Prix', value = ('$%s'):format(formatMoney(v.price)) },
+                    { label = 'Modèle', value = v.model },
+                },
+                onSelect = function()
+                    openVehicleActions(v)
+                end,
+            }
+        end
+    end
+
+    lib.registerContext({
+        id = 'esx_concessionnaire_list',
+        title = categoryId and getCategoryLabel(categoryId) or 'Résultats',
+        menu = 'esx_concessionnaire_main',
+        options = options,
+    })
+
+    lib.showContext('esx_concessionnaire_list')
+
+    if vehicles[1] then
         spawnPreview(vehicles[1].model)
+    end
+end
+
+openCategoriesMenu = function()
+    local options = {
+        {
+            title = 'Rechercher',
+            description = Translate('search_placeholder'),
+            icon = 'magnifying-glass',
+            onSelect = function()
+                local input = lib.inputDialog(Translate('shop_title'), {
+                    {
+                        type = 'input',
+                        label = 'Recherche',
+                        placeholder = Translate('search_placeholder'),
+                        required = true,
+                        min = 1,
+                        max = 40,
+                    },
+                })
+                if input and input[1] then
+                    openVehicleList(nil, input[1])
+                else
+                    openCategoriesMenu()
+                end
+            end,
+        },
+    }
+
+    for i = 1, #Config.Categories do
+        local cat = Config.Categories[i]
+        local count = #getVehiclesByCategory(cat.id)
+        options[#options + 1] = {
+            title = cat.label,
+            description = ('%s véhicules'):format(count),
+            icon = 'tags',
+            arrow = true,
+            onSelect = function()
+                openVehicleList(cat.id)
+            end,
+        }
+    end
+
+    options[#options + 1] = {
+        title = Translate('close'),
+        icon = 'xmark',
+        iconColor = '#ef4444',
+        onSelect = function()
+            closeShop()
+        end,
+    }
+
+    lib.registerContext({
+        id = 'esx_concessionnaire_main',
+        title = Translate('shop_title'),
+        options = options,
+        onExit = function()
+            closeShop()
+        end,
+    })
+
+    lib.showContext('esx_concessionnaire_main')
+end
+
+local function openShop()
+    if isOpen then return end
+    if GetResourceState('ox_lib') ~= 'started' then
+        notify('ox_lib est requis pour ce concessionnaire', 'error')
+        return
+    end
+
+    isOpen = true
+    DisplayRadar(false)
+    createCamera()
+    openCategoriesMenu()
+
+    local first = Config.Vehicles[1]
+    if first then
+        spawnPreview(first.model)
     end
 end
 
 -- Blips
 CreateThread(function()
-    for _, zone in ipairs(Config.Zones) do
+    for i = 1, #Config.Zones do
+        local zone = Config.Zones[i]
         if zone.blip and zone.blip.enabled then
             local blip = AddBlipForCoord(zone.coords.x, zone.coords.y, zone.coords.z)
             SetBlipSprite(blip, zone.blip.sprite)
@@ -169,14 +337,17 @@ end)
 
 -- Markers / interaction
 CreateThread(function()
+    local showingTextUI = false
+
     while true do
         local sleep = 1000
         local ped = PlayerPedId()
         local coords = GetEntityCoords(ped)
-        nearbyZone = nil
+        local near = false
 
         if not isOpen then
-            for _, zone in ipairs(Config.Zones) do
+            for i = 1, #Config.Zones do
+                local zone = Config.Zones[i]
                 local dist = #(coords - zone.coords)
                 if dist < zone.drawDistance then
                     sleep = 0
@@ -192,11 +363,19 @@ CreateThread(function()
                     )
 
                     if dist < zone.interactDistance then
-                        nearbyZone = zone
-                        showHelp(Translate('press_open'))
+                        near = true
+                        currentZone = zone
+                        if not showingTextUI then
+                            lib.showTextUI(Translate('press_open'), {
+                                position = 'right-center',
+                                icon = 'car',
+                            })
+                            showingTextUI = true
+                        end
 
                         if IsControlJustReleased(0, 38) then -- E
-                            currentZone = zone
+                            lib.hideTextUI()
+                            showingTextUI = false
                             openShop()
                         end
                     end
@@ -206,70 +385,15 @@ CreateThread(function()
             sleep = 200
         end
 
+        if showingTextUI and not near then
+            lib.hideTextUI()
+            showingTextUI = false
+        end
+
         Wait(sleep)
     end
 end)
 
--- Disable controls while NUI open
-CreateThread(function()
-    while true do
-        if isOpen then
-            DisableControlAction(0, 1, true)
-            DisableControlAction(0, 2, true)
-            DisableControlAction(0, 24, true)
-            DisableControlAction(0, 25, true)
-            DisableControlAction(0, 257, true)
-            DisableControlAction(0, 263, true)
-            DisableControlAction(0, 264, true)
-            DisableControlAction(0, 30, true)
-            DisableControlAction(0, 31, true)
-            DisableControlAction(0, 21, true)
-            DisableControlAction(0, 22, true)
-            DisableControlAction(0, 23, true)
-            DisableControlAction(0, 75, true)
-            Wait(0)
-        else
-            Wait(400)
-        end
-    end
-end)
-
-RegisterNUICallback('close', function(_, cb)
-    closeShop()
-    cb('ok')
-end)
-
-RegisterNUICallback('preview', function(data, cb)
-    if data and data.model then
-        spawnPreview(data.model)
-    end
-    cb('ok')
-end)
-
-RegisterNUICallback('buy', function(data, cb)
-    if not data or not data.model then
-        cb({ ok = false })
-        return
-    end
-
-    ESX.TriggerServerCallback('esx_concessionnaire:buyVehicle', function(result)
-        if result and result.ok then
-            closeShop()
-            notify(Translate('purchase_success', result.name, formatMoney(result.price)))
-            notify(Translate('vehicle_out'))
-        else
-            local reason = result and result.reason or 'purchase_failed'
-            if reason == 'money' then
-                notify(Translate('not_enough_money'))
-            else
-                notify(Translate(reason) ~= reason and Translate(reason) or Translate('purchase_failed'))
-            end
-        end
-        cb(result or { ok = false })
-    end, data.model)
-end)
-
--- Commande admin / test
 RegisterNetEvent('esx_concessionnaire:spawnPurchased', function(data)
     if not data or not data.model then return end
 
@@ -290,9 +414,7 @@ RegisterNetEvent('esx_concessionnaire:spawnPurchased', function(data)
     SetVehicleNeedsToBeHotwired(vehicle, false)
     SetModelAsNoLongerNeeded(hash)
 
-    local ped = PlayerPedId()
-    TaskWarpPedIntoVehicle(ped, vehicle, -1)
-
+    TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
     TriggerEvent('esx_concessionnaire:vehiclePurchased', vehicle, data.plate, data.model)
 end)
 
@@ -303,7 +425,8 @@ end, false)
 AddEventHandler('onResourceStop', function(res)
     if res ~= GetCurrentResourceName() then return end
     if isOpen then
-        setNuiFocus(false)
+        lib.hideContext()
+        lib.hideTextUI()
     end
     deletePreview()
     destroyCamera()

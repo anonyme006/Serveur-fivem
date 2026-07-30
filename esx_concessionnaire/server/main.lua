@@ -74,23 +74,20 @@ local function giveKeys(src, plate, model)
     end)
 end
 
-ESX.RegisterServerCallback('esx_concessionnaire:buyVehicle', function(source, cb, model)
+local function processPurchase(source, model)
     local xPlayer = ESX.GetPlayerFromId(source)
     if not xPlayer then
-        cb({ ok = false, reason = 'purchase_failed' })
-        return
+        return { ok = false, reason = 'purchase_failed' }
     end
 
     local vehicle = getVehicleByModel(model)
     if not vehicle then
-        cb({ ok = false, reason = 'purchase_failed' })
-        return
+        return { ok = false, reason = 'purchase_failed' }
     end
 
     local paid, paidFrom = tryPay(xPlayer, vehicle.price)
     if not paid then
-        cb({ ok = false, reason = 'money' })
-        return
+        return { ok = false, reason = 'money' }
     end
 
     local plate = generatePlate()
@@ -100,8 +97,7 @@ ESX.RegisterServerCallback('esx_concessionnaire:buyVehicle', function(source, cb
         else
             xPlayer.addMoney(vehicle.price, 'concessionnaire-refund')
         end
-        cb({ ok = false, reason = 'already_owned_plate' })
-        return
+        return { ok = false, reason = 'already_owned_plate' }
     end
 
     local props = {
@@ -124,11 +120,20 @@ ESX.RegisterServerCallback('esx_concessionnaire:buyVehicle', function(source, cb
 
     giveKeys(source, plate, vehicle.model)
 
-    cb({
+    return {
         ok = true,
         name = vehicle.name,
         price = vehicle.price,
         plate = plate,
-    })
+    }
+end
+
+lib.callback.register('esx_concessionnaire:buyVehicle', function(source, model)
+    return processPurchase(source, model)
+end)
+
+-- Compat ESX callback (si un autre script l'appelle encore)
+ESX.RegisterServerCallback('esx_concessionnaire:buyVehicle', function(source, cb, model)
+    cb(processPurchase(source, model))
 end)
 
