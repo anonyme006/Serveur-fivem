@@ -257,16 +257,32 @@ function Cancel()
     isDoingAction = false
 end
 
+--- Version bloquante (style ox_lib) — retourne true si terminé, false si annulé / refusé
+--- @param action table
+--- @return boolean
+function ProgressAwait(action)
+    local p = promise.new()
+    local started = Progress(action, function(cancelled)
+        p:resolve(not cancelled)
+    end)
+    if not started then
+        return false
+    end
+    return Citizen.Await(p)
+end
+
 exports('Progress', Progress)
 exports('ProgressWithStartEvent', ProgressWithStartEvent)
 exports('ProgressWithTickEvent', ProgressWithTickEvent)
 exports('ProgressWithStartAndTick', ProgressWithStartAndTick)
 exports('isDoingSomething', isDoingSomething)
 exports('Cancel', Cancel)
+exports('ProgressAwait', ProgressAwait)
 
 -- Alias courants
 exports('Start', Progress)
 exports('IsActive', isDoingSomething)
+exports('Await', ProgressAwait)
 
 RegisterNetEvent('esx_progressbar:client:progress', function(action, finish)
     Progress(action, finish)

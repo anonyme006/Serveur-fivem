@@ -41,10 +41,16 @@ end)
 | Export | Description |
 |--------|-------------|
 | `Progress(action, finish)` | Lance la barre |
+| `ProgressAwait(action)` | Bloquant — `true` si terminé, `false` si annulé |
 | `ProgressWithStartEvent(action, start, finish)` | Callback au démarrage |
 | `ProgressWithTickEvent(action, tick, finish)` | Tick chaque frame |
 | `isDoingSomething()` | `true` si une action est en cours |
 | `Cancel()` | Annule l’action en cours |
+
+### Intégrations
+
+- [`ox_garage`](../ox_garage) — rangement / sortie véhicule
+- [`esx_consumables`](../esx_consumables) — manger / boire
 
 ### Événements
 
