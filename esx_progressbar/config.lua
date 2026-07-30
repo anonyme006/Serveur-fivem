@@ -16,7 +16,7 @@ Config.TrackColor = 'rgba(255, 255, 255, 0.12)'
 Config.Width = 28
 
 --- Hauteur de la barre (px)
-Config.Height = 6
+Config.Height = 8
 
 --- Autoriser l'annulation avec Échap / Backspace
 Config.CanCancel = true
