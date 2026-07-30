@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview — Progressbar capsule</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        body {
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+        }
+
+        .preview-ui {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        .preview-ui button {
+            pointer-events: auto;
+            border: 0;
+            border-radius: 8px;
+            padding: 8px 14px;
+            background: #1c1c1c;
+            color: #eee;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .preview-ui button:hover {
+            background: #2a2a2a;
+        }
+
+        .hint {
+            position: fixed;
+            bottom: 20px;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 12px;
+            letter-spacing: 0.04em;
+        }
+
+        /* En preview, forcer la barre au centre pour matcher la capture */
+        .progress-root[data-position="bottom"] {
+            bottom: auto;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-ui">
+        <button type="button" id="btn-start">Lancer (5s)</button>
+        <button type="button" id="btn-fast">Lancer (2s)</button>
+        <button type="button" id="btn-cancel">Annuler</button>
+    </div>
+
+    <div id="progress-root" class="progress-root hidden" data-position="bottom">
+        <div class="progress-wrap">
+            <p id="progress-label" class="progress-label hidden"></p>
+            <div class="progress-track" id="progress-track" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" role="progressbar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <p class="hint">Aperçu navigateur — barre capsule orange</p>
+
+    <script src="script.js"></script>
+    <script>
+        const api = window.__progressPreview;
+
+        document.getElementById('btn-start').addEventListener('click', () => {
+            api.start({ duration: 5000, label: '' });
+        });
+
+        document.getElementById('btn-fast').addEventListener('click', () => {
+            api.start({ duration: 2000, label: 'Fouille…' });
+        });
+
+        document.getElementById('btn-cancel').addEventListener('click', () => {
+            api.cancel();
+        });
+
+        // Auto-démo au chargement (comme la capture ~35–40 %)
+        api.start({ duration: 8000, label: '' });
+    </script>
+</body>
+</html>
