@@ -21,9 +21,9 @@ Config.Status = {
     thirst = 'thirst',
 }
 
--- Remonter la minimap pour laisser la place aux barres en dessous
-Config.OffsetMinimap = true
--- Décalage vertical de la minimap (plus grand = plus haut)
+-- Remonter la minimap (false = position GTA d'origine)
+Config.OffsetMinimap = false
+-- Décalage vertical de la minimap si OffsetMinimap = true (plus grand = plus haut)
 Config.MinimapOffsetY = 0.028
 
 -- Commandes
