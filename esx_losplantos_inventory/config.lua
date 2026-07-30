@@ -6,11 +6,20 @@ Config.OpenKey = 'F2'
 -- Poids max (kg) — aligné avec ESX Legacy weight system si disponible
 Config.MaxWeight = 60
 
+-- Distance max pour donner / échanger (mètres)
+Config.GiveDistance = 3.0
+
 -- Fermer avec ESC / Backspace
 Config.CloseKeys = { 177, 200 } -- BACKSPACE, ESC
 
 -- Afficher les items à quantité 0
 Config.ShowEmptyItems = false
+
+-- Comptes argent gérés comme items (donner / jeter)
+Config.Accounts = {
+    money = true,
+    black_money = true,
+}
 
 -- Mapping nom d'item -> fichier icône (dans html/img/)
 -- Si absent, utilise html/img/default.svg
@@ -55,4 +64,6 @@ Config.ItemLabels = {
     cheeseburger = 'Cheeseburger',
     finger_shokobite = 'Finger Shokobite',
     poulet_barquette = 'Poulet en barquette',
+    money = 'Argent',
+    black_money = 'Argent sale',
 }

@@ -127,7 +127,7 @@ html, body {
   overflow-x: hidden;
   flex: 1 1 auto;
   padding: 2px 0 6px;
-  max-height: calc(82vh - 112px - 34px);
+  max-height: calc(82vh - 112px - 34px - 44px);
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
 }
@@ -214,11 +214,11 @@ html, body {
   background: transparent;
   color: rgba(255, 255, 255, 0.85);
   font-family: var(--font);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
   text-transform: uppercase;
-  padding: 12px 6px;
+  padding: 12px 4px;
   cursor: pointer;
   transition: background 0.12s ease, color 0.12s ease;
 }
@@ -236,16 +236,11 @@ html, body {
   border-left: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Mode screenshot strict : masquer la barre d'actions */
-body.no-actions .inventory__actions {
-  display: none;
-}
-
 /* Menu contextuel clic droit */
 .context-menu {
   position: fixed;
   z-index: 100;
-  min-width: 140px;
+  min-width: 150px;
   background: rgba(12, 12, 14, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 6px;
@@ -268,6 +263,223 @@ body.no-actions .inventory__actions {
 
 .context-menu button:hover {
   background: rgba(255, 255, 255, 0.12);
+}
+
+.context-menu button:disabled,
+.inventory__actions button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ===== Modal action ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.modal__panel {
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  background: rgba(14, 14, 18, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 18px 16px 14px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+}
+
+.modal__title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.modal__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+
+.modal__item img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.modal__item-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.modal__item-count {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.modal__field {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.modal__field > span,
+.modal__field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 8px;
+}
+
+.modal__qty {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.modal__qty button,
+.modal__max {
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 700;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal__qty button:hover,
+.modal__max:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.modal__max {
+  width: auto;
+  padding: 0 12px;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+}
+
+.modal__qty input {
+  flex: 1;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+}
+
+.modal__qty input:focus {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.modal__players {
+  margin-bottom: 14px;
+}
+
+.modal__player-list {
+  list-style: none;
+  max-height: 140px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.modal__player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.modal__player:last-child {
+  border-bottom: none;
+}
+
+.modal__player:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.modal__player.is-selected {
+  background: #fff;
+  color: #111;
+}
+
+.modal__player-dist {
+  opacity: 0.65;
+  font-size: 12px;
+}
+
+.modal__hint {
+  padding: 12px;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.55;
+}
+
+.modal__buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.modal__buttons button {
+  flex: 1;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 11px 8px;
+  cursor: pointer;
+}
+
+.modal__cancel {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.modal__confirm {
+  background: #fff;
+  color: #111;
+}
+
+.modal__cancel:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.modal__confirm:hover {
+  background: #f0f0f0;
+}
+
+.modal__confirm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 @media (max-width: 1280px) {

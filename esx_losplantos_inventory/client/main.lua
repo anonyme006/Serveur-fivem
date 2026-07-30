@@ -26,11 +26,77 @@ local function GetItemLabel(item)
     return Config.ItemLabels[key] or item.name
 end
 
+local function GetNearbyPlayersSync()
+    local players = {}
+    local myPed = PlayerPedId()
+    local myCoords = GetEntityCoords(myPed)
+    local maxDist = Config.GiveDistance or 3.0
+    local ids = {}
+
+    for _, player in ipairs(GetActivePlayers()) do
+        if player ~= PlayerId() then
+            local ped = GetPlayerPed(player)
+            if DoesEntityExist(ped) then
+                local dist = #(myCoords - GetEntityCoords(ped))
+                if dist <= maxDist then
+                    local serverId = GetPlayerServerId(player)
+                    ids[#ids + 1] = serverId
+                    players[#players + 1] = {
+                        id = serverId,
+                        name = GetPlayerName(player) or ('ID ' .. serverId),
+                        distance = dist,
+                    }
+                end
+            end
+        end
+    end
+
+    table.sort(players, function(a, b)
+        return a.distance < b.distance
+    end)
+
+    -- Enrichit avec les noms RP si callback dispo (non bloquant pour le NUI)
+    if #ids > 0 and ESX and ESX.TriggerServerCallback then
+        ESX.TriggerServerCallback('esx_losplantos_inventory:getPlayerNames', function(names)
+            if type(names) ~= 'table' then return end
+            for i = 1, #players do
+                local key = tostring(players[i].id)
+                if names[key] and names[key] ~= '' then
+                    players[i].name = names[key]
+                end
+            end
+            if InventoryOpen then
+                SendNUIMessage({ action = 'nearbyPlayers', players = players })
+            end
+        end, ids)
+    end
+
+    return players
+end
+
 local function BuildInventoryPayload()
     local playerData = ESX.GetPlayerData()
     local inventory = playerData.inventory or {}
+    local accounts = playerData.accounts or {}
     local items = {}
     local currentWeight = 0.0
+
+    -- Comptes (argent / argent sale)
+    for _, account in ipairs(accounts) do
+        local money = account.money or 0
+        if Config.Accounts[account.name] and money > 0 then
+            items[#items + 1] = {
+                name = account.name,
+                label = account.label or GetItemLabel({ name = account.name }),
+                count = money,
+                weight = 0,
+                usable = false,
+                canRemove = true,
+                isAccount = true,
+                image = GetItemImage(account.name),
+            }
+        end
+    end
 
     for _, item in ipairs(inventory) do
         local count = item.count or item.amount or 0
@@ -42,16 +108,12 @@ local function BuildInventoryPayload()
                 label = GetItemLabel(item),
                 count = count,
                 weight = item.weight or 0,
-                usable = item.usable == true or item.canRemove == true,
+                usable = item.usable == true,
                 canRemove = item.canRemove ~= false,
+                isAccount = false,
                 image = GetItemImage(item.name),
             }
         end
-    end
-
-    -- Compte le poids via ESX Legacy si dispo
-    if playerData.maxWeight then
-        -- ok
     end
 
     local maxWeight = Config.MaxWeight
@@ -59,7 +121,6 @@ local function BuildInventoryPayload()
         maxWeight = playerData.maxWeight
     end
 
-    -- Certains ESX exposent weight déjà calculé
     if playerData.weight then
         currentWeight = playerData.weight
     end
@@ -115,6 +176,11 @@ local function RefreshIfOpen()
     end
 end
 
+local function ResolveItem(data)
+    local index = tonumber(data and data.index) or SelectedIndex
+    return CachedItems[index], index
+end
+
 RegisterCommand('losplantos_inventory', function()
     if InventoryOpen then
         CloseInventory()
@@ -131,54 +197,96 @@ RegisterNUICallback('close', function(_, cb)
 end)
 
 RegisterNUICallback('select', function(data, cb)
-    local index = tonumber(data.index) or 1
-    SelectedIndex = index
+    SelectedIndex = tonumber(data.index) or 1
     cb('ok')
 end)
 
+RegisterNUICallback('notify', function(data, cb)
+    if data and data.message then
+        Notify(data.message)
+    end
+    cb('ok')
+end)
+
+RegisterNUICallback('getNearbyPlayers', function(_, cb)
+    cb(GetNearbyPlayersSync())
+end)
+
 RegisterNUICallback('use', function(data, cb)
-    local index = tonumber(data.index) or SelectedIndex
-    local item = CachedItems[index]
+    local item = ResolveItem(data)
     if not item then
-        cb('error')
+        cb({ ok = false })
+        return
+    end
+
+    if item.isAccount then
+        Notify('Cet objet ne peut pas être utilisé')
+        cb({ ok = false })
         return
     end
 
     TriggerServerEvent('esx_losplantos_inventory:useItem', item.name)
-    cb('ok')
+    cb({ ok = true })
 end)
 
 RegisterNUICallback('give', function(data, cb)
-    local index = tonumber(data.index) or SelectedIndex
-    local count = tonumber(data.count) or 1
-    local item = CachedItems[index]
-    if not item then
-        cb('error')
+    local item = ResolveItem(data)
+    local count = math.floor(tonumber(data.count) or 1)
+    local target = tonumber(data.target)
+
+    if not item or count < 1 or not target then
+        cb({ ok = false })
         return
     end
 
-    local closestPlayer, closestDistance = ESX.Game.GetClosestPlayer()
-    if closestPlayer == -1 or closestDistance > 3.0 then
-        Notify('Aucun joueur à proximité')
-        cb('error')
+    if item.canRemove == false then
+        Notify('Cet objet ne peut pas être donné')
+        cb({ ok = false })
         return
     end
 
-    TriggerServerEvent('esx_losplantos_inventory:giveItem', GetPlayerServerId(closestPlayer), item.name, count)
-    cb('ok')
+    TriggerServerEvent('esx_losplantos_inventory:giveItem', target, item.name, count, item.isAccount == true)
+    cb({ ok = true })
+end)
+
+RegisterNUICallback('trade', function(data, cb)
+    -- Échanger = donner à un joueur proche (sélectionné)
+    local item = ResolveItem(data)
+    local count = math.floor(tonumber(data.count) or 1)
+    local target = tonumber(data.target)
+
+    if not item or count < 1 or not target then
+        cb({ ok = false })
+        return
+    end
+
+    if item.canRemove == false then
+        Notify('Cet objet ne peut pas être échangé')
+        cb({ ok = false })
+        return
+    end
+
+    TriggerServerEvent('esx_losplantos_inventory:giveItem', target, item.name, count, item.isAccount == true)
+    cb({ ok = true })
 end)
 
 RegisterNUICallback('drop', function(data, cb)
-    local index = tonumber(data.index) or SelectedIndex
-    local count = tonumber(data.count) or 1
-    local item = CachedItems[index]
-    if not item then
-        cb('error')
+    local item = ResolveItem(data)
+    local count = math.floor(tonumber(data.count) or 1)
+
+    if not item or count < 1 then
+        cb({ ok = false })
         return
     end
 
-    TriggerServerEvent('esx_losplantos_inventory:dropItem', item.name, count)
-    cb('ok')
+    if item.canRemove == false then
+        Notify('Cet objet ne peut pas être jeté')
+        cb({ ok = false })
+        return
+    end
+
+    TriggerServerEvent('esx_losplantos_inventory:dropItem', item.name, count, item.isAccount == true)
+    cb({ ok = true })
 end)
 
 RegisterNUICallback('navigate', function(data, cb)
@@ -204,7 +312,6 @@ RegisterNUICallback('navigate', function(data, cb)
     cb('ok')
 end)
 
--- Sync inventaire ESX
 RegisterNetEvent('esx:playerLoaded', function()
     RefreshIfOpen()
 end)
@@ -224,11 +331,19 @@ RegisterNetEvent('esx:removeInventoryItem', function()
     RefreshIfOpen()
 end)
 
+RegisterNetEvent('esx:setAccountMoney', function()
+    Wait(50)
+    RefreshIfOpen()
+end)
+
 RegisterNetEvent('esx_losplantos_inventory:refresh', function()
     RefreshIfOpen()
 end)
 
--- Contrôles clavier pendant NUI (flèches / entrée)
+RegisterNetEvent('esx_losplantos_inventory:notify', function(msg)
+    Notify(msg)
+end)
+
 CreateThread(function()
     while true do
         if InventoryOpen then
@@ -239,11 +354,11 @@ CreateThread(function()
             DisableControlAction(0, 142, true)
             DisableControlAction(0, 106, true)
 
-            if IsDisabledControlJustPressed(0, 172) then -- UP
+            if IsDisabledControlJustPressed(0, 172) then
                 SendNUIMessage({ action = 'key', key = 'up' })
-            elseif IsDisabledControlJustPressed(0, 173) then -- DOWN
+            elseif IsDisabledControlJustPressed(0, 173) then
                 SendNUIMessage({ action = 'key', key = 'down' })
-            elseif IsDisabledControlJustPressed(0, 191) then -- ENTER
+            elseif IsDisabledControlJustPressed(0, 191) then
                 SendNUIMessage({ action = 'key', key = 'enter' })
             elseif IsDisabledControlJustPressed(0, 177) or IsDisabledControlJustPressed(0, 200) then
                 CloseInventory()
@@ -255,7 +370,6 @@ CreateThread(function()
     end
 end)
 
--- Export pour d'autres scripts
 exports('OpenInventory', OpenInventory)
 exports('CloseInventory', CloseInventory)
 exports('IsInventoryOpen', function()
