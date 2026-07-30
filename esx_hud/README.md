@@ -3,7 +3,7 @@
 HUD ESX minimaliste pour FiveM, inspiré d’un design clean :
 
 - **Barres status** (bas gauche) : santé (vert), faim (jaune), soif (bleu)
-- **Speedometer** (bas droite, conducteur) : vitesse, RPM, moteur, carburant, plaque
+- **Speedometer** (centré en bas, visible uniquement en véhicule) : vitesse, RPM, moteur, carburant, plaque
 
 ## Prérequis
 
@@ -63,6 +63,6 @@ esx_hud/
 
 ## Notes
 
-- Affiche le speedometer uniquement pour le **conducteur**.
+- Affiche le speedometer **uniquement en véhicule** (centré en bas).
 - Sans `esx_status`, faim et soif restent à 100 %.
 - Compatible avec un restart à chaud de la ressource.

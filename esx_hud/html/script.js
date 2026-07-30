@@ -68,9 +68,6 @@
                 if (data.vehicleBottom) {
                     document.documentElement.style.setProperty('--vehicle-bottom', data.vehicleBottom);
                 }
-                if (data.vehicleRight) {
-                    document.documentElement.style.setProperty('--vehicle-right', data.vehicleRight);
-                }
                 break;
 
             case 'updateStatus':

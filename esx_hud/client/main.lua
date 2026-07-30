@@ -39,7 +39,6 @@ local function setHudVisible(visible)
         statusBottom = Config.StatusPosition.bottom,
         statusLeft = Config.StatusPosition.left,
         vehicleBottom = Config.VehiclePosition.bottom,
-        vehicleRight = Config.VehiclePosition.right,
     })
 end
 
@@ -197,7 +196,8 @@ CreateThread(function()
                 local ped = PlayerPedId()
                 local vehicle = GetVehiclePedIsIn(ped, false)
 
-                if vehicle ~= 0 and GetPedInVehicleSeat(vehicle, -1) == ped then
+                -- Affiché uniquement dans un véhicule (toute place)
+                if vehicle ~= 0 then
                     local speedRaw = GetEntitySpeed(vehicle)
                     local speed = Config.SpeedUnit == 'mph'
                         and math.floor(speedRaw * 2.236936 + 0.5)

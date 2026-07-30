@@ -27,8 +27,7 @@ Config.StatusPosition = {
     left = '1.6%',
 }
 
--- Position du speedometer (CSS)
+-- Position du speedometer (centré en bas)
 Config.VehiclePosition = {
     bottom = '3.5%',
-    right = '2.5%',
 }
