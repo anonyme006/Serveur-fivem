@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventaire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="hidden" aria-hidden="true">
+    <div class="inv-root">
+      <!-- Inventaire joueur (gauche) -->
+      <section class="inv-panel inv-player" aria-label="Inventaire joueur">
+        <header class="inv-header">
+          <h1 class="player-name" id="playerName">Joueur</h1>
+          <div class="weight-row">
+            <div class="weight-bar" aria-hidden="true">
+              <div class="weight-fill" id="playerWeightFill"></div>
+            </div>
+            <span class="weight-text" id="playerWeight">0.0 / 60.0 kg</span>
+          </div>
+        </header>
+        <div class="inv-grid" id="playerGrid"></div>
+      </section>
+
+      <!-- Contrôles centraux -->
+      <aside class="inv-controls" aria-label="Actions">
+        <div class="qty-box">
+          <input
+            type="text"
+            inputmode="numeric"
+            id="qtyInput"
+            class="qty-input"
+            value="0"
+            maxlength="6"
+            aria-label="Quantité"
+          />
+        </div>
+
+        <button type="button" class="ctrl-btn btn-info" id="btnInfo" title="Information">
+          <span class="ctrl-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 11v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+              <circle cx="12" cy="7.5" r="1.2" fill="currentColor"/>
+            </svg>
+          </span>
+          <span>Information</span>
+        </button>
+
+        <button type="button" class="ctrl-btn btn-use" id="btnUse" title="Utiliser">
+          <span class="ctrl-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M9 11.5V6.2a1.2 1.2 0 0 1 2.4 0V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M11.4 11V7.8a1.2 1.2 0 0 1 2.4 0V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M13.8 11V8.5a1.2 1.2 0 0 1 2.4 0V12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8.2 12.2V10.8A1.3 1.3 0 0 1 9.5 9.5h.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8.2 12.2c0 0-.8 1.2-.8 3.2 0 2.6 1.9 4.6 4.4 4.6h2.2c2.2 0 3.8-1.5 4.2-3.4l.8-3.6a1.4 1.4 0 0 0-1.4-1.7H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span>Utiliser</span>
+        </button>
+
+        <button type="button" class="ctrl-btn btn-give" id="btnGive" title="Échanger">
+          <span class="ctrl-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 8h10M13 4l4 4-4 4M17 16H7M11 20l-4-4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span>Échanger</span>
+        </button>
+
+        <button type="button" class="ctrl-btn btn-close" id="btnClose" title="Fermer">
+          <span class="ctrl-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span>Fermer</span>
+        </button>
+      </aside>
+
+      <!-- Inventaire secondaire (droite) -->
+      <section class="inv-panel inv-other" id="otherPanel" aria-label="Inventaire secondaire">
+        <header class="inv-header">
+          <h1 class="player-name other-title" id="otherName"></h1>
+          <div class="weight-row">
+            <div class="weight-bar" aria-hidden="true">
+              <div class="weight-fill" id="otherWeightFill"></div>
+            </div>
+            <span class="weight-text" id="otherWeight">0.0 / 60.0 kg</span>
+          </div>
+        </header>
+        <div class="inv-grid" id="otherGrid"></div>
+      </section>
+    </div>
+
+    <!-- Tooltip info item -->
+    <div class="item-tooltip hidden" id="itemTooltip" role="tooltip">
+      <div class="tip-title" id="tipTitle"></div>
+      <div class="tip-meta" id="tipMeta"></div>
+      <div class="tip-desc" id="tipDesc"></div>
+    </div>
+
+    <!-- Modal informations / raccourcis -->
+    <div class="modal-overlay hidden" id="infoModal">
+      <div class="modal" role="dialog" aria-labelledby="infoTitle">
+        <header class="modal-head">
+          <h2 id="infoTitle">Information</h2>
+          <button type="button" class="modal-x" id="infoClose" aria-label="Fermer">×</button>
+        </header>
+        <div class="modal-body">
+          <p><kbd>Clic gauche</kbd> — Sélectionner / déplacer un item</p>
+          <p><kbd>Double-clic</kbd> — Utiliser l'item sélectionné</p>
+          <p><kbd>Clic droit</kbd> — Menu contextuel</p>
+          <p><kbd>Échap</kbd> — Fermer l'inventaire</p>
+          <p>Indiquez une quantité dans la case centrale avant d’échanger ou de déplacer.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
