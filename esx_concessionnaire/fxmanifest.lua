@@ -4,11 +4,12 @@ lua54 'yes'
 
 name 'esx_concessionnaire'
 author 'VIBE'
-description 'Concessionnaire véhicules ESX — UI Voiture / VIBE'
-version '1.0.0'
+description 'Concessionnaire véhicules ESX — menus ox_lib'
+version '1.1.0'
 
 shared_scripts {
     '@es_extended/imports.lua',
+    '@ox_lib/init.lua',
     'config.lua',
     'locales/fr.lua',
 }
@@ -22,16 +23,8 @@ server_scripts {
     'server/main.lua',
 }
 
-ui_page 'html/index.html'
-
-files {
-    'html/index.html',
-    'html/css/style.css',
-    'html/js/app.js',
-    'html/img/logo.svg',
-}
-
 dependencies {
     'es_extended',
     'oxmysql',
+    'ox_lib',
 }
