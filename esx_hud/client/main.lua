@@ -129,7 +129,14 @@ local function hideDefaultHudComponents()
 end
 
 local function applyMinimapOffset()
+    -- Positions GTA d'origine
     if not Config.OffsetMinimap then
+        SetMinimapComponentPosition('minimap', 'L', 'B', -0.0045, 0.002, 0.150, 0.188888)
+        SetMinimapComponentPosition('minimap_mask', 'L', 'B', 0.020, 0.030, 0.111, 0.159)
+        SetMinimapComponentPosition('minimap_blur', 'L', 'B', -0.03, 0.022, 0.266, 0.237)
+        SetRadarBigmapEnabled(true, false)
+        Wait(50)
+        SetRadarBigmapEnabled(false, false)
         return
     end
 
