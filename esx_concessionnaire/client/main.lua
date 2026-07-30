@@ -122,13 +122,13 @@ local function openShop()
         categories = Config.Categories,
         vehicles = vehicles,
         locale = {
-            title = _('shop_title'),
-            search = _('search_placeholder'),
-            buy = _('buy'),
-            cancel = _('cancel'),
-            confirm = _('confirm_buy'),
-            empty = _('no_vehicles'),
-            close = _('close'),
+            title = Translate('shop_title'),
+            search = Translate('search_placeholder'),
+            buy = Translate('buy'),
+            cancel = Translate('cancel'),
+            confirm = Translate('confirm_buy'),
+            empty = Translate('no_vehicles'),
+            close = Translate('close'),
         },
     })
 
@@ -148,7 +148,7 @@ CreateThread(function()
             SetBlipColour(blip, zone.blip.colour)
             SetBlipAsShortRange(blip, true)
             BeginTextCommandSetBlipName('STRING')
-            AddTextComponentSubstringPlayerName(zone.blip.label or _('blip_label'))
+            AddTextComponentSubstringPlayerName(zone.blip.label or Translate('blip_label'))
             EndTextCommandSetBlipName(blip)
         end
     end
@@ -181,7 +181,7 @@ CreateThread(function()
                     if dist < zone.interactDistance then
                         nearbyZone = zone
                         BeginTextCommandDisplayHelp('STRING')
-                        AddTextComponentSubstringPlayerName(_('press_open'))
+                        AddTextComponentSubstringPlayerName(Translate('press_open'))
                         EndTextCommandDisplayHelp(0, false, true, -1)
 
                         if IsControlJustReleased(0, 38) then -- E
@@ -244,14 +244,14 @@ RegisterNUICallback('buy', function(data, cb)
     ESX.TriggerServerCallback('esx_concessionnaire:buyVehicle', function(result)
         if result and result.ok then
             closeShop()
-            notify(_('purchase_success', result.name, formatMoney(result.price)))
-            notify(_('vehicle_out'))
+            notify(Translate('purchase_success', result.name, formatMoney(result.price)))
+            notify(Translate('vehicle_out'))
         else
             local reason = result and result.reason or 'purchase_failed'
             if reason == 'money' then
-                notify(_('not_enough_money'))
+                notify(Translate('not_enough_money'))
             else
-                notify(_(reason) ~= reason and _(reason) or _('purchase_failed'))
+                notify(_(reason) ~= reason and _(reason) or Translate('purchase_failed'))
             end
         end
         cb(result or { ok = false })

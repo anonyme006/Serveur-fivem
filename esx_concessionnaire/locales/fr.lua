@@ -18,7 +18,7 @@ Locales['fr'] = {
     ['close'] = 'Fermer',
 }
 
-function _(str, ...)
+function Translate(str, ...)
     local locale = Locales[Config.Locale] or Locales['fr']
     if locale[str] then
         return string.format(locale[str], ...)
