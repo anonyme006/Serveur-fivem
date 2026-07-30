@@ -27,13 +27,13 @@ Config.Zones = {
     },
 }
 
--- Position de prévisualisation du véhicule
+-- Position de prévisualisation du véhicule (éloignée du point d'interaction)
 Config.Preview = {
-    coords = vector3(-44.25, -1098.15, 26.42),
-    heading = 70.0,
+    coords = vector3(-42.80, -1101.60, 26.42),
+    heading = 110.0,
     camera = {
-        coords = vector3(-47.8, -1101.9, 27.6),
-        pointAt = vector3(-44.25, -1098.15, 26.8),
+        coords = vector3(-46.90, -1104.80, 27.80),
+        pointAt = vector3(-42.80, -1101.60, 26.90),
         fov = 45.0,
     },
 }

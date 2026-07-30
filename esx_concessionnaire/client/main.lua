@@ -3,6 +3,7 @@ local previewVehicle = nil
 local previewCam = nil
 local currentZone = nil
 local selectedCategory = nil
+local isClosing = false
 
 local function notify(msg, nType)
     if lib and lib.notify then
@@ -29,19 +30,27 @@ local function formatMoney(amount)
 end
 
 local function deletePreview()
-    if previewVehicle and DoesEntityExist(previewVehicle) then
-        SetEntityAsMissionEntity(previewVehicle, true, true)
-        DeleteVehicle(previewVehicle)
+    if previewVehicle then
+        if DoesEntityExist(previewVehicle) then
+            SetEntityAsMissionEntity(previewVehicle, true, true)
+            SetEntityCollision(previewVehicle, false, false)
+            DeleteVehicle(previewVehicle)
+            if DoesEntityExist(previewVehicle) then
+                DeleteEntity(previewVehicle)
+            end
+        end
+        previewVehicle = nil
     end
-    previewVehicle = nil
 end
 
 local function destroyCamera()
     if previewCam then
-        RenderScriptCams(false, true, 400, true, true)
+        RenderScriptCams(false, false, 0, true, true)
         DestroyCam(previewCam, false)
         previewCam = nil
     end
+    ClearFocus()
+    RenderScriptCams(false, false, 0, true, true)
 end
 
 local function createCamera()
@@ -74,24 +83,42 @@ local function spawnPreview(model)
     end
 
     local c = Config.Preview.coords
-    previewVehicle = CreateVehicle(hash, c.x, c.y, c.z, Config.Preview.heading, false, false)
+    previewVehicle = CreateVehicle(hash, c.x + 0.0, c.y + 0.0, c.z + 0.0, Config.Preview.heading + 0.0, false, false)
+    SetEntityAsMissionEntity(previewVehicle, true, true)
     SetVehicleOnGroundProperly(previewVehicle)
     SetEntityInvincible(previewVehicle, true)
     SetVehicleDoorsLocked(previewVehicle, 2)
     FreezeEntityPosition(previewVehicle, true)
+    SetEntityCollision(previewVehicle, false, false)
+    SetEntityAlpha(previewVehicle, 210, false)
     SetVehicleNumberPlateText(previewVehicle, 'PREVIEW')
     SetModelAsNoLongerNeeded(hash)
 end
 
+local function releasePlayer()
+    local ped = PlayerPedId()
+    FreezeEntityPosition(ped, false)
+    ClearPedTasksImmediately(ped)
+    SetPlayerControl(PlayerId(), true, 0)
+    SetEveryoneIgnorePlayer(PlayerId(), false)
+    DisplayRadar(true)
+end
+
 local function closeShop()
-    if not isOpen then return end
+    if isClosing then return end
+    isClosing = true
+
     isOpen = false
     selectedCategory = nil
-    lib.hideContext()
-    lib.hideTextUI()
+
+    pcall(function() lib.hideContext() end)
+    pcall(function() lib.hideTextUI() end)
+
     deletePreview()
     destroyCamera()
-    DisplayRadar(true)
+    releasePlayer()
+
+    isClosing = false
 end
 
 local function getCategoryLabel(categoryId)
@@ -163,6 +190,7 @@ openVehicleActions = function(vehicle)
         id = 'esx_concessionnaire_vehicle',
         title = vehicle.name,
         menu = 'esx_concessionnaire_list',
+        onExit = closeShop,
         options = {
             {
                 title = Translate('buy'),
@@ -228,6 +256,7 @@ openVehicleList = function(categoryId, search)
         id = 'esx_concessionnaire_list',
         title = categoryId and getCategoryLabel(categoryId) or 'Résultats',
         menu = 'esx_concessionnaire_main',
+        onExit = closeShop,
         options = options,
     })
 
@@ -291,9 +320,7 @@ openCategoriesMenu = function()
         id = 'esx_concessionnaire_main',
         title = Translate('shop_title'),
         options = options,
-        onExit = function()
-            closeShop()
-        end,
+        onExit = closeShop,
     })
 
     lib.showContext('esx_concessionnaire_main')
