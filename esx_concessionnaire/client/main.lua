@@ -397,6 +397,19 @@ end)
 RegisterNetEvent('esx_concessionnaire:spawnPurchased', function(data)
     if not data or not data.model then return end
 
+    -- S'assurer que le menu/caméra sont bien fermés avant le spawn
+    if isOpen then
+        closeShop()
+    else
+        deletePreview()
+        destroyCamera()
+        DisplayRadar(true)
+    end
+
+    local ped = PlayerPedId()
+    ClearPedTasksImmediately(ped)
+    FreezeEntityPosition(ped, false)
+
     local hash = joaat(data.model)
     RequestModel(hash)
     local timeout = GetGameTimer() + 5000
@@ -406,15 +419,17 @@ RegisterNetEvent('esx_concessionnaire:spawnPurchased', function(data)
     if not HasModelLoaded(hash) then return end
 
     local c = data.coords
-    local vehicle = CreateVehicle(hash, c.x, c.y, c.z, data.heading or 0.0, true, false)
+    local vehicle = CreateVehicle(hash, c.x + 0.0, c.y + 0.0, c.z + 0.0, data.heading or 0.0, true, false)
     SetVehicleNumberPlateText(vehicle, data.plate or '')
     SetVehicleOnGroundProperly(vehicle)
     SetEntityAsMissionEntity(vehicle, true, true)
     SetVehicleHasBeenOwnedByPlayer(vehicle, true)
     SetVehicleNeedsToBeHotwired(vehicle, false)
+    SetVehicleDoorsLocked(vehicle, 1)
+    SetVehicleEngineOn(vehicle, false, true, false)
     SetModelAsNoLongerNeeded(hash)
 
-    TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
+    -- Ne pas téléporter / warp le joueur dans le véhicule (freeze bug)
     TriggerEvent('esx_concessionnaire:vehiclePurchased', vehicle, data.plate, data.model)
 end)
 
