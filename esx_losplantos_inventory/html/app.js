@@ -7,7 +7,6 @@
   const app = document.getElementById('app');
   const listEl = document.getElementById('itemList');
   const weightEl = document.getElementById('weightBar');
-  const actionsEl = document.getElementById('actions');
   const contextMenu = document.getElementById('contextMenu');
   const bannerImg = document.querySelector('.inventory__banner-img');
 
@@ -219,14 +218,6 @@
   function updateActionButtons() {
     const item = currentItem();
     const canRemove = item ? item.canRemove !== false : false;
-    actionsEl.querySelectorAll('button').forEach((btn) => {
-      const a = btn.dataset.action;
-      if (a === 'use') {
-        btn.disabled = !item;
-      } else {
-        btn.disabled = !item || !canRemove;
-      }
-    });
     contextMenu.querySelectorAll('button').forEach((btn) => {
       const a = btn.dataset.action;
       if (a === 'use') {
@@ -342,12 +333,6 @@
     app.classList.add('hidden');
     items = [];
   }
-
-  actionsEl.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-action]');
-    if (!btn || !open || btn.disabled) return;
-    runAction(btn.dataset.action);
-  });
 
   contextMenu.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-action]');

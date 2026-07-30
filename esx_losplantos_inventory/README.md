@@ -22,10 +22,10 @@ ensure esx_losplantos_inventory
 |--------|----------|
 | Ouvrir / fermer | **F2** (configurable) |
 | Naviguer | Flèches ↑ ↓ ou clic |
-| Utiliser | Entrée / double-clic / bouton **Utiliser** |
-| Donner | Bouton **Donner** / touche **G** / clic droit |
-| Échanger | Bouton **Échanger** / touche **E** (choisir joueur + quantité) |
-| Jeter | Bouton **Jeter** / touche **J** (choisir quantité) |
+| Utiliser | Entrée / double-clic / clic droit |
+| Donner | Touche **G** / clic droit |
+| Échanger | Touche **E** / clic droit (joueur + quantité) |
+| Jeter | Touche **J** / clic droit (quantité) |
 | Fermer | ESC / Backspace |
 
 Pour **Donner** et **Échanger**, un joueur doit être à moins de `Config.GiveDistance` (3 m par défaut). Un modal permet de choisir la **quantité** et le **joueur**.
