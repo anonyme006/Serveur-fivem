@@ -14,6 +14,19 @@ local function notify(msg)
     end
 end
 
+--- Safe interact prompt (avoids EndTextCommandDisplayHelp crash on build 3570+)
+local function showHelp(msg)
+    SetTextFont(4)
+    SetTextScale(0.42, 0.42)
+    SetTextColour(255, 255, 255, 230)
+    SetTextCentre(true)
+    SetTextDropshadow(1, 0, 0, 0, 200)
+    SetTextOutline()
+    BeginTextCommandDisplayText('STRING')
+    AddTextComponentSubstringPlayerName(msg)
+    EndTextCommandDisplayText(0.5, 0.90)
+end
+
 local function formatMoney(amount)
     local n = tonumber(amount) or 0
     if ESX and ESX.Math and ESX.Math.GroupDigits then
@@ -170,19 +183,17 @@ CreateThread(function()
                     local m = zone.marker
                     DrawMarker(
                         m.type,
-                        zone.coords.x, zone.coords.y, zone.coords.z - 1.0,
+                        zone.coords.x + 0.0, zone.coords.y + 0.0, zone.coords.z - 1.0,
                         0.0, 0.0, 0.0,
                         0.0, 0.0, 0.0,
-                        m.size.x, m.size.y, m.size.z,
+                        m.size.x + 0.0, m.size.y + 0.0, m.size.z + 0.0,
                         m.color.r, m.color.g, m.color.b, m.color.a,
-                        m.bobUpAndDown, m.faceCamera, 2, m.rotate, nil, nil, false
+                        m.bobUpAndDown == true, m.faceCamera == true, 2, m.rotate == true, nil, nil, false
                     )
 
                     if dist < zone.interactDistance then
                         nearbyZone = zone
-                        BeginTextCommandDisplayHelp('STRING')
-                        AddTextComponentSubstringPlayerName(Translate('press_open'))
-                        EndTextCommandDisplayHelp(0, false, true, -1)
+                        showHelp(Translate('press_open'))
 
                         if IsControlJustReleased(0, 38) then -- E
                             currentZone = zone
@@ -251,7 +262,7 @@ RegisterNUICallback('buy', function(data, cb)
             if reason == 'money' then
                 notify(Translate('not_enough_money'))
             else
-                notify(_(reason) ~= reason and _(reason) or Translate('purchase_failed'))
+                notify(Translate(reason) ~= reason and Translate(reason) or Translate('purchase_failed'))
             end
         end
         cb(result or { ok = false })
