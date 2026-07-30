@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventaire Los Plantos</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="hidden">
+    <aside class="inventory">
+      <header class="inventory__header">
+        <div class="inventory__banner">
+          <img src="assets/header.jpg" alt="Los Plantos" class="inventory__banner-img" />
+          <div class="inventory__logo" aria-hidden="true">Los Plantos</div>
+        </div>
+        <div class="inventory__weight" id="weightBar">INVENTAIRE 0.00 / 60 KG</div>
+      </header>
+
+      <ul class="inventory__list" id="itemList" role="listbox" aria-label="Inventaire"></ul>
+    </aside>
+
+    <div class="context-menu hidden" id="contextMenu">
+      <button type="button" data-action="use">Utiliser</button>
+      <button type="button" data-action="give">Donner</button>
+      <button type="button" data-action="trade">Échanger</button>
+      <button type="button" data-action="drop">Jeter</button>
+    </div>
+
+    <!-- Modal quantité + joueur proche -->
+    <div class="modal hidden" id="actionModal" role="dialog" aria-modal="true">
+      <div class="modal__panel">
+        <div class="modal__title" id="modalTitle">Action</div>
+        <div class="modal__item" id="modalItem">
+          <img id="modalIcon" src="img/default.svg" alt="" />
+          <div>
+            <div class="modal__item-label" id="modalLabel">Item</div>
+            <div class="modal__item-count" id="modalCount">x1</div>
+          </div>
+        </div>
+
+        <label class="modal__field">
+          <span>Quantité</span>
+          <div class="modal__qty">
+            <button type="button" id="qtyMinus" aria-label="Moins">−</button>
+            <input type="number" id="qtyInput" min="1" value="1" />
+            <button type="button" id="qtyPlus" aria-label="Plus">+</button>
+            <button type="button" id="qtyMax" class="modal__max">MAX</button>
+          </div>
+        </label>
+
+        <div class="modal__players hidden" id="playersBlock">
+          <div class="modal__field-label">Joueur à proximité</div>
+          <ul class="modal__player-list" id="playerList"></ul>
+          <div class="modal__hint" id="playersEmpty">Aucun joueur à proximité</div>
+        </div>
+
+        <div class="modal__buttons">
+          <button type="button" class="modal__cancel" id="modalCancel">Annuler</button>
+          <button type="button" class="modal__confirm" id="modalConfirm">Confirmer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
