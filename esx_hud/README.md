@@ -2,8 +2,9 @@
 
 HUD ESX minimaliste pour FiveM, inspiré d’un design clean :
 
-- **Barres status** (bas gauche) : santé (vert), faim (jaune), soif (bleu)
+- **Barres status** (sous la minimap) : santé (vert), faim (jaune), soif (bleu)
 - **Speedometer** (centré en bas, visible uniquement en véhicule) : vitesse, RPM, moteur, carburant, plaque
+- **Édition** : déplace le HUD où tu veux avec une commande
 
 ## Prérequis
 
@@ -35,7 +36,24 @@ ensure esx_hud
 | `Config.HideRadar` | Cacher la minimap GTA |
 | `Config.OffsetMinimap` | Remonter la minimap pour les barres en dessous |
 | `Config.MinimapOffsetY` | Décalage vertical de la minimap |
+| `Config.EditCommand` | Commande mode édition (défaut `edithud`) |
+| `Config.ResetCommand` | Commande reset positions (défaut `resethud`) |
+| `Config.DefaultPositions` | Positions par défaut (left/top en %) |
 | `Config.Status.hunger` / `thirst` | Noms des status `esx_status` |
+
+## Commandes
+
+| Commande | Action |
+|----------|--------|
+| `/edithud` | Active le mode édition : glisse les éléments à la souris |
+| `/resethud` | Remet les positions par défaut |
+
+En mode édition :
+- **Entrée** → sauvegarder
+- **Échap** → annuler
+- **R** → reset
+
+Les positions sont sauvegardées localement (KVP) par joueur.
 
 ## Fonctionnement
 

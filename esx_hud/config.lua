@@ -21,18 +21,18 @@ Config.Status = {
     thirst = 'thirst',
 }
 
--- Position des barres de status — sous la minimap
-Config.StatusPosition = {
-    bottom = '0.9%',
-    left = '1.55%',
-}
-
 -- Remonter la minimap pour laisser la place aux barres en dessous
 Config.OffsetMinimap = true
 -- Décalage vertical de la minimap (plus grand = plus haut)
 Config.MinimapOffsetY = 0.028
 
--- Position du speedometer (centré en bas)
-Config.VehiclePosition = {
-    bottom = '3.5%',
+-- Commandes
+Config.EditCommand = 'edithud'   -- /edithud → déplacer le HUD à la souris
+Config.ResetCommand = 'resethud' -- /resethud → positions par défaut
+
+-- Positions par défaut (pourcentages de l'écran : left / top)
+-- Utilisées si le joueur n'a pas encore déplacé le HUD
+Config.DefaultPositions = {
+    status = { left = 1.55, top = 97.6 },
+    vehicle = { left = 42.0, top = 82.0 },
 }

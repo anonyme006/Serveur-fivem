@@ -39,6 +39,13 @@
             const win = frame.contentWindow;
             win.postMessage({ action: 'setVisible', visible: true }, '*');
             win.postMessage({
+                action: 'setPositions',
+                positions: {
+                    status: { left: 1.55, top: 97.6 },
+                    vehicle: { left: 42.0, top: 82.0 },
+                }
+            }, '*');
+            win.postMessage({
                 action: 'updateStatus',
                 health: 92, hunger: 48, thirst: 55, armour: 0
             }, '*');

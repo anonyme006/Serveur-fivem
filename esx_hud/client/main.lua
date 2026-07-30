@@ -4,6 +4,24 @@ local hunger = 100
 local thirst = 100
 local isLoggedIn = false
 local vehicleHudVisible = false
+local editMode = false
+
+local KVP_KEY = 'esx_hud:positions'
+
+local function copyPositions(src)
+    return {
+        status = {
+            left = src.status.left,
+            top = src.status.top,
+        },
+        vehicle = {
+            left = src.vehicle.left,
+            top = src.vehicle.top,
+        },
+    }
+end
+
+local positions = copyPositions(Config.DefaultPositions)
 
 local function initESX()
     if GetResourceState('es_extended') ~= 'started' then
@@ -19,7 +37,6 @@ local function initESX()
         return true
     end
 
-    -- Fallback ancien ESX
     TriggerEvent('esx:getSharedObject', function(obj)
         ESX = obj
     end)
@@ -32,38 +49,91 @@ local function initESX()
     return ESX ~= nil
 end
 
+local function loadPositions()
+    local raw = GetResourceKvpString(KVP_KEY)
+    if not raw or raw == '' then
+        positions = copyPositions(Config.DefaultPositions)
+        return
+    end
+
+    local ok, decoded = pcall(json.decode, raw)
+    if ok and decoded and decoded.status and decoded.vehicle then
+        positions = {
+            status = {
+                left = tonumber(decoded.status.left) or Config.DefaultPositions.status.left,
+                top = tonumber(decoded.status.top) or Config.DefaultPositions.status.top,
+            },
+            vehicle = {
+                left = tonumber(decoded.vehicle.left) or Config.DefaultPositions.vehicle.left,
+                top = tonumber(decoded.vehicle.top) or Config.DefaultPositions.vehicle.top,
+            },
+        }
+    else
+        positions = copyPositions(Config.DefaultPositions)
+    end
+end
+
+local function savePositions(data)
+    if not data or not data.status or not data.vehicle then
+        return
+    end
+
+    positions = {
+        status = {
+            left = tonumber(data.status.left) or positions.status.left,
+            top = tonumber(data.status.top) or positions.status.top,
+        },
+        vehicle = {
+            left = tonumber(data.vehicle.left) or positions.vehicle.left,
+            top = tonumber(data.vehicle.top) or positions.vehicle.top,
+        },
+    }
+
+    SetResourceKvp(KVP_KEY, json.encode(positions))
+end
+
+local function notify(msg)
+    if ESX and ESX.ShowNotification then
+        ESX.ShowNotification(msg)
+    else
+        BeginTextCommandThefeedPost('STRING')
+        AddTextComponentSubstringPlayerName(msg)
+        EndTextCommandThefeedPostTicker(false, true)
+    end
+end
+
 local function setHudVisible(visible)
     SendNUIMessage({
         action = 'setVisible',
         visible = visible,
-        statusBottom = Config.StatusPosition.bottom,
-        statusLeft = Config.StatusPosition.left,
-        vehicleBottom = Config.VehiclePosition.bottom,
+    })
+end
+
+local function sendPositions()
+    SendNUIMessage({
+        action = 'setPositions',
+        positions = positions,
     })
 end
 
 local function hideDefaultHudComponents()
-    -- Santé, armure, argent, véhicule natif, etc.
-    HideHudComponentThisFrame(1)  -- Wanted stars
-    HideHudComponentThisFrame(2)  -- Weapon icon
-    HideHudComponentThisFrame(3)  -- Cash
-    HideHudComponentThisFrame(4)  -- MP cash
-    HideHudComponentThisFrame(6)  -- Vehicle name
-    HideHudComponentThisFrame(7)  -- Area name
-    HideHudComponentThisFrame(8)  -- Vehicle class
-    HideHudComponentThisFrame(9)  -- Street name
+    HideHudComponentThisFrame(1)
+    HideHudComponentThisFrame(2)
+    HideHudComponentThisFrame(3)
+    HideHudComponentThisFrame(4)
+    HideHudComponentThisFrame(6)
+    HideHudComponentThisFrame(7)
+    HideHudComponentThisFrame(8)
+    HideHudComponentThisFrame(9)
     DisplayRadar(not Config.HideRadar)
 end
 
--- Remonte la minimap pour dégager l'espace des barres status en dessous
 local function applyMinimapOffset()
     if not Config.OffsetMinimap then
         return
     end
 
     local offsetY = Config.MinimapOffsetY or 0.028
-
-    -- Refresh scaleform puis reposition
     local defaultAspectRatio = 1920 / 1080
     local resolutionX, resolutionY = GetActiveScreenResolution()
     local aspectRatio = resolutionX / resolutionY
@@ -162,31 +232,128 @@ local function refreshHungerThirst()
     end)
 end
 
+local function openEditMode()
+    if editMode or not isLoggedIn then
+        return
+    end
+
+    editMode = true
+    setHudVisible(true)
+    sendPositions()
+    sendStatus()
+    sendVehicle(true, {
+        speed = 96,
+        rpm = 60,
+        fuel = 75,
+        engine = 90,
+        plate = 'EDIT',
+    })
+
+    SetNuiFocus(true, true)
+    SetNuiFocusKeepInput(false)
+
+    SendNUIMessage({
+        action = 'editMode',
+        enabled = true,
+        positions = positions,
+    })
+
+    notify('Mode édition HUD — glisse les éléments, Entrée pour sauver')
+end
+
+local function closeEditMode()
+    if not editMode then
+        return
+    end
+
+    editMode = false
+    SetNuiFocus(false, false)
+
+    SendNUIMessage({
+        action = 'editMode',
+        enabled = false,
+    })
+
+    -- Masquer le speedo si on n'est pas en véhicule
+    local ped = PlayerPedId()
+    if GetVehiclePedIsIn(ped, false) == 0 then
+        sendVehicle(false)
+        vehicleHudVisible = false
+    end
+end
+
+local function resetHudPositions()
+    positions = copyPositions(Config.DefaultPositions)
+    DeleteResourceKvp(KVP_KEY)
+    sendPositions()
+    SendNUIMessage({
+        action = 'resetPositions',
+        defaults = Config.DefaultPositions,
+    })
+    notify('Positions HUD réinitialisées')
+end
+
+RegisterNUICallback('savePositions', function(data, cb)
+    if data and data.positions then
+        savePositions(data.positions)
+        notify('Positions HUD sauvegardées')
+    end
+    cb({ ok = true })
+end)
+
+RegisterNUICallback('closeEdit', function(_, cb)
+    closeEditMode()
+    cb({ ok = true })
+end)
+
+RegisterNUICallback('requestReset', function(_, cb)
+    resetHudPositions()
+    cb({ ok = true })
+end)
+
+RegisterCommand(Config.EditCommand, function()
+    if editMode then
+        closeEditMode()
+    else
+        openEditMode()
+    end
+end, false)
+
+RegisterCommand(Config.ResetCommand, function()
+    resetHudPositions()
+end, false)
+
 RegisterNetEvent('esx:playerLoaded', function()
     isLoggedIn = true
+    loadPositions()
     setHudVisible(true)
+    sendPositions()
     CreateThread(applyMinimapOffset)
 end)
 
 RegisterNetEvent('esx:onPlayerLogout', function()
     isLoggedIn = false
+    if editMode then
+        closeEditMode()
+    end
     setHudVisible(false)
     sendVehicle(false)
     vehicleHudVisible = false
 end)
 
--- Init
 CreateThread(function()
+    loadPositions()
+
     while not initESX() do
         Wait(500)
     end
 
-    -- Déjà connecté (restart ressource)
     local timeout = GetGameTimer() + 10000
     while GetGameTimer() < timeout do
         if ESX.PlayerLoaded or (ESX.GetPlayerData and ESX.GetPlayerData().job) then
             isLoggedIn = true
             setHudVisible(true)
+            sendPositions()
             applyMinimapOffset()
             break
         end
@@ -194,7 +361,6 @@ CreateThread(function()
     end
 end)
 
--- Faim / soif
 CreateThread(function()
     while true do
         if isLoggedIn then
@@ -206,7 +372,6 @@ CreateThread(function()
     end
 end)
 
--- Santé / status UI
 CreateThread(function()
     while true do
         if isLoggedIn then
@@ -218,17 +383,17 @@ CreateThread(function()
     end
 end)
 
--- Véhicule + masquage HUD natif
 CreateThread(function()
     while true do
         if isLoggedIn then
             hideDefaultHudComponents()
 
-            if Config.ShowVehicleHud then
+            if editMode then
+                Wait(100)
+            elseif Config.ShowVehicleHud then
                 local ped = PlayerPedId()
                 local vehicle = GetVehiclePedIsIn(ped, false)
 
-                -- Affiché uniquement dans un véhicule (toute place)
                 if vehicle ~= 0 then
                     local speedRaw = GetEntitySpeed(vehicle)
                     local speed = Config.SpeedUnit == 'mph'
@@ -265,14 +430,13 @@ CreateThread(function()
     end
 end)
 
--- Menu pause
 CreateThread(function()
     local wasPaused = false
 
     while true do
         Wait(200)
 
-        if not isLoggedIn then
+        if not isLoggedIn or editMode then
             goto continue
         end
 
@@ -283,6 +447,8 @@ CreateThread(function()
             if paused then
                 sendVehicle(false)
                 vehicleHudVisible = false
+            else
+                sendPositions()
             end
         end
 

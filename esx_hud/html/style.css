@@ -6,9 +6,6 @@
     --hud-white-dim: rgba(255, 255, 255, 0.35);
     --hud-glow: 0 0 8px rgba(255, 255, 255, 0.45);
     --bar-bg: rgba(0, 0, 0, 0.55);
-    --status-bottom: 0.9%;
-    --status-left: 1.55%;
-    --vehicle-bottom: 3.5%;
 }
 
 * {
@@ -33,8 +30,8 @@ html, body {
 /* ========== STATUS BARS ========== */
 .status-hud {
     position: absolute;
-    bottom: var(--status-bottom);
-    left: var(--status-left);
+    left: 1.55%;
+    top: 97.6%;
     display: flex;
     align-items: flex-end;
     gap: 6px;
@@ -85,19 +82,12 @@ html, body {
 /* ========== VEHICLE HUD ========== */
 .vehicle-hud {
     position: absolute;
-    bottom: var(--vehicle-bottom);
-    left: 50%;
-    transform: translateX(-50%);
+    left: 42%;
+    top: 82%;
     display: flex;
     align-items: flex-end;
     gap: 10px;
     z-index: 10;
-    animation: fadeIn 0.25s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translate(-50%, 8px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
 }
 
 .gauge {
@@ -123,7 +113,7 @@ html, body {
     inset: 0;
     width: 100%;
     height: 100%;
-    transform: rotate(135deg); /* départ ~7h, arc style HUD */
+    transform: rotate(135deg);
 }
 
 .gauge-track {
@@ -234,7 +224,6 @@ html, body {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-/* Alerte carburant bas */
 .gauge-fuel.low .gauge-progress {
     stroke: #e74c3c;
     filter: drop-shadow(0 0 4px rgba(231, 76, 60, 0.8));
@@ -249,7 +238,84 @@ html, body {
     filter: drop-shadow(0 0 4px rgba(230, 126, 34, 0.8));
 }
 
-/* Responsive léger */
+/* ========== EDIT MODE ========== */
+body.editing .status-hud,
+body.editing .vehicle-hud {
+    cursor: grab;
+    outline: 2px dashed rgba(255, 255, 255, 0.55);
+    outline-offset: 8px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    padding: 8px;
+    z-index: 100;
+}
+
+body.editing .status-hud.dragging,
+body.editing .vehicle-hud.dragging {
+    cursor: grabbing;
+    outline-color: rgba(46, 204, 113, 0.9);
+}
+
+body.editing .vehicle-hud {
+    /* Toujours visible en mode édition */
+}
+
+.edit-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+}
+
+.edit-panel {
+    position: absolute;
+    top: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: rgba(10, 12, 16, 0.82);
+    color: #fff;
+    padding: 14px 22px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    text-align: center;
+    min-width: 260px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.edit-panel strong {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
+}
+
+.edit-panel p {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-bottom: 10px;
+}
+
+.edit-panel ul {
+    list-style: none;
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.edit-panel kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    margin-right: 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-family: inherit;
+    font-size: 11px;
+}
+
 @media (max-width: 1280px) {
     .gauge-main { width: 124px; height: 124px; }
     .gauge-side { width: 60px; height: 60px; }
