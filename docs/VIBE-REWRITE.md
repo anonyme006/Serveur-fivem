@@ -1,71 +1,71 @@
 # Réécriture des scripts `vibe_*`
 
-Tous les modules ci-dessous sont des **réécritures originales** Qbox + Ox, inspirées des mécaniques du serveur de référence — pas des dumps.
+Réécritures originales Qbox + Ox (pas de dump). Lien dépôt : voir `LIEN-COMPLET.md`.
 
-## Modules livrés
-
-### Core
-| Ressource | Rôle | Commandes / usage |
-|-----------|------|-------------------|
-| `vibe_api` | Helpers joueur, money, jobs, meta SQL | exports serveur/client |
+## Core
+| Ressource | Rôle | Usage |
+|-----------|------|-------|
+| `vibe_api` | Helpers money/jobs/meta | exports |
 | `vibe_blips` | Blips carte | auto |
-| `vibe_loadscreen` | Écran de chargement | auto |
-| `vibe_spawnselector` | Choix de spawn NUI | auto au login |
-| `vibe_discord` | Logs webhook | exports `Log` |
+| `vibe_loadscreen` | Chargement | auto |
+| `vibe_spawnselector` | Spawn NUI | auto login |
+| `vibe_discord` | Webhooks | export `Log` |
 | `vibe_npc` | PNJ infos | ox_target |
-| `vibe_teleport` | TPM / points admin | `/tpm`, `/tp` |
-| `vibe_playerstats` | Faim / soif | sync auto |
-| `vibe_inventory_restrictions` | Limites armes / items job | hook ox_inventory |
-| `vibe_vehicle_restrictions` | Véhicules d’urgence | auto |
+| `vibe_teleport` | Admin TP | `/tpm` `/tp` |
+| `vibe_playerstats` | Faim / soif | auto |
+| `vibe_inventory_restrictions` | Limites items | hook |
+| `vibe_vehicle_restrictions` | Véhicules urgence | auto |
+| `vibe_sleep` | Repos | `/dormir` |
+| `vibe_panelv2` | Panel admin | `/panel` |
+| `vibe_race` | Course checkpoints | `/course` |
 
-### Civil / économie
-| Ressource | Rôle | Commandes |
-|-----------|------|-----------|
-| `vibe_garages` | Sortie véhicules | ox_target |
-| `vibe_concess` | Achat véhicules | ox_target |
-| `vibe_factures` | Factures joueur | `/facture`, `/mesfactures` |
-| `vibe_amende` | Amendes FDO | `/amende` |
-| `vibe_duty` | Prise de service | ox_target, `/duty` |
-| `vibe_permits` | Affichage permis | `/permis`, `/montrerpermis` |
-| `vibe_driving_school` | Code + permis | ox_target |
-| `vibe_farm` | Récolte / vente | ox_target |
-| `vibe_hunt` | Dépeçage | ox_target |
-| `vibe_sellfish` | Vente poisson | ox_target |
-| `vibe_gruppe6` | Tournées fourgon | ox_target |
+## Civil / économie
+| Ressource | Usage |
+|-----------|-------|
+| `vibe_garages` | ox_target |
+| `vibe_concess` | ox_target |
+| `vibe_factures` | `/facture` `/mesfactures` |
+| `vibe_amende` | `/amende` |
+| `vibe_duty` | `/duty` + target |
+| `vibe_permits` | `/permis` `/montrerpermis` |
+| `vibe_driving_school` | ox_target |
+| `vibe_farm` / `vibe_hunt` / `vibe_sellfish` | ox_target |
+| `vibe_gruppe6` | tournées fourgon |
+| `vibe_mechanic` | `/mecano` |
 
-### FDO
-| Ressource | Rôle | Commandes |
-|-----------|------|-----------|
-| `vibe_fdo` | Menottes, escorte, fouille, prison | `F6` / `/fdo` |
-| `vibe_dispatch` | Alertes 911 + exports | `/911` |
-| `vibe_lspdradar` | Radar vitesse | `/radar` |
-| `vibe_roadblock` | Cones / barrières / herses | `/barrage`, `/clearbarrage` |
-| `vibe_evidence` | Casiers preuves | ox_target |
+## FDO / EMS
+| Ressource | Usage |
+|-----------|-------|
+| `vibe_fdo` | `F6` menottes/escorte/fouille/prison |
+| `vibe_medicextract` | `F7` revive/heal/extract |
+| `vibe_dispatch` | `/911` |
+| `vibe_lspdradar` | `/radar` |
+| `vibe_roadblock` | `/barrage` |
+| `vibe_evidence` | casiers |
+| `vibe_bracelet` | `/bracelet` |
 
-### Illégal
+## Illégal
 | Ressource | Rôle |
 |-----------|------|
-| `vibe_crimi_weed` | Recolte → process → vente |
-| `vibe_crimi_pickpocket` | Vol PNJ |
-| `vibe_crimi_blackmarket` | Achat / revente illégale |
-| `vibe_crimi_carjack` | Crochetage véhicules |
-| `vibe_crimi_whitening` | Blanchiment |
-| `vibe_crimi_bankrobbery` | Fleeca (hack + coffre) |
+| `vibe_crimi_weed` | récolte → process → vente |
+| `vibe_crimi_methkitchen` | cuisine meth |
+| `vibe_crimi_pickpocket` | vol PNJ |
+| `vibe_crimi_deal` | deals PNJ |
+| `vibe_crimi_blackmarket` | marché noir |
+| `vibe_crimi_carjack` | crochetage |
+| `vibe_crimi_dismantler` | casse auto |
+| `vibe_crimi_whitening` | blanchiment |
+| `vibe_crimi_bankrobbery` | Fleeca |
 | `vibe_crimi_jewelry` | Vangelico |
-| `vibe_gangs` | Territoires + `/capture` |
+| `vibe_crimi_nitro` | nitro `LSHIFT` |
+| `vibe_gangs` | territoires `/capture` |
 
-## Items à ajouter
+## Items
 
-Fusionne `config/items_vibe.lua` dans `ox_inventory/data/items.lua`.
+Fusionner `config/items_vibe.lua` dans `ox_inventory/data/items.lua`.
 
-## Équilibrage prod recommandé
+## Prod
 
-- `vibe_crimi_bankrobbery` / `jewelry` : `MinCops = 2`
-- Cooldowns braquages déjà présents
-- Webhooks dans `vibe_discord/config.lua`
-- Catalogue `vibe_concess` : ajoute tes véhicules custom
-- Jobs police/EMS dans `vibe_api/config.lua`
-
-## Non réécrit (volontairement plus tard)
-
-Activités très spécifiques du serveur d’origine : casino UI, F1, lasergame, meth van complète, elections, billboards, etc. La base RP (légal + FDO + crimi principal) est couverte pour démarrer un serveur jouable.
+- Mettre `MinCops = 2` sur braquages
+- Remplir webhooks `vibe_discord`
+- Étendre le catalogue `vibe_concess`

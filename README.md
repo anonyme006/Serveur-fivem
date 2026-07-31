@@ -1,56 +1,45 @@
-# Serveur FiveM — scaffold type « Vibe / Qbox RP »
+# Serveur FiveM — Vibe RP (Qbox + Ox)
 
-Base de reconstruction d’un serveur RP **français** calqué sur une stack **Qbox + Ox**, avec inventaire des ressources du serveur de référence et stubs pour remplacer les scripts privés `vibe_*`.
+Réécriture complète d’un serveur RP FR type « Vibe » : framework **Qbox**, suite **Ox**, et **40+ scripts `vibe_*` originaux**.
 
-> Les scripts d’origine `vibe_*` sont privés : ce dépôt fournit une **réécriture jouable** (FDO, crimi, civil, économie) + la structure serveur. Les MLOs / véhicules / `lb-phone` restent à acheter.
+## Lien complet
 
-## Ce que contient ce dépôt
+| | URL |
+|---|-----|
+| **Branche (code)** | https://github.com/anonyme006/Serveur-fivem/tree/cursor/fivem-qbox-server-scaffold-cfc5 |
+| **Pull Request** | https://github.com/anonyme006/Serveur-fivem/pull/11 |
+| **ZIP téléchargeable** | https://github.com/anonyme006/Serveur-fivem/archive/refs/heads/cursor/fivem-qbox-server-scaffold-cfc5.zip |
 
-| Chemin | Contenu |
-|--------|---------|
-| `server.cfg` | Config FXServer prête à personnaliser |
-| `docs/ANALYSE-SERVEUR.md` | Analyse de la stack du serveur de référence |
-| `docs/INVENTAIRE-RESSOURCES.md` | Liste des ressources visibles |
-| `docs/EQUIVALENTS.md` | Remplacements OSS / payants des `vibe_*` |
-| `docs/GUIDE-INSTALL.md` | Installation pas à pas |
-| `scripts/install-opensource.sh` | Clone Ox + Qbox + voice + bob74_ipl |
-| `sql/init.sql` | Base MariaDB + tables custom stubs |
-| `resources/[vibe]/` | Suite complète réécrite (FDO, crimi, civil, économie…) |
-| `docs/VIBE-REWRITE.md` | Catalogue des modules vibe_* réécrits |
-| `config/items_vibe.lua` | Items à fusionner dans ox_inventory |
+Fichier dédié : [`LIEN-COMPLET.md`](LIEN-COMPLET.md)
 
-## Démarrage rapide
+## Installation rapide
 
 ```bash
-# 1. Cloner ce dépôt sur ta machine de jeu / VPS
-# 2. Installer les ressources open-source
-chmod +x scripts/install-opensource.sh
-./scripts/install-opensource.sh
-
-# 3. Créer la DB
+git clone -b cursor/fivem-qbox-server-scaffold-cfc5 https://github.com/anonyme006/Serveur-fivem.git
+cd Serveur-fivem
+chmod +x scripts/setup-complet.sh
+./scripts/setup-complet.sh
 mysql -u root -p < sql/init.sql
-
-# 4. Éditer server.cfg (licence CFX + MySQL)
-# 5. Lancer FXServer avec ce dossier comme server-data
+# Fusionner config/items_vibe.lua dans ox_inventory/data/items.lua
+# Éditer server.cfg (sv_licenseKey + MySQL)
+# Lancer FXServer sur ce dossier
 ```
 
-Détails : [`docs/GUIDE-INSTALL.md`](docs/GUIDE-INSTALL.md).
+Guide détaillé : [`docs/GUIDE-INSTALL.md`](docs/GUIDE-INSTALL.md)  
+Catalogue scripts : [`docs/VIBE-REWRITE.md`](docs/VIBE-REWRITE.md)
 
-## Stack cible
+## Contenu
 
-```
-FXServer → oxmysql → ox_lib / ox_target / ox_inventory / ox_doorlock
-         → pma-voice → qbx_core + modules qbx_*
-         → scripts standalone / phone / housing / jobs
-         → stubs vibe_* → maps → véhicules
-```
+- `server.cfg` + structure `resources/[ox|qbx|voice|vibe|maps|…]`
+- Install auto Ox / Qbox / pma-voice / bob74_ipl
+- Scripts vibe : FDO, EMS, mécano, concess, garages, crimi (weed/meth/braquages…), gangs, courses, panel admin…
+- SQL + items Ox
 
 ## Important
 
-- Achète les assets payants (`lb-phone`, `jg-*`, `rcore_*`, MLOs, voitures).
-- Ne dump / ne pirate pas un serveur existant.
-- Réécris les `vibe_*` à partir des stubs, ou remplace-les (voir `docs/EQUIVALENTS.md`).
+Les MLOs, véhicules custom, `lb-phone`, `jg-*`, `rcore_*` du serveur d’origine sont **payants** : à acheter séparément.  
+Les `vibe_*` ici sont des **réécritures**, pas des dumps.
 
 ## Licence
 
-Scaffold fourni tel quel pour usage personnel / éducatif. Les ressources tierces restent sous leurs licences respectives.
+Usage personnel / éducatif. Les ressources tierces restent sous leurs licences.
