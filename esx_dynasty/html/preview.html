@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dynasty 8 — Preview</title>
+  <style>
+    body { margin: 0; background: #1a1f27; }
+    iframe { border: 0; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <iframe id="frame" src="index.html"></iframe>
+  <script>
+    const demo = {
+      action: 'open',
+      view: new URLSearchParams(location.search).get('view') || 'company',
+      currency: '$',
+      locale: {},
+      playerPos: { x: -716.11, y: -272.96, z: 36.82, h: 30 },
+      data: {
+        player: {
+          name: 'Ashton Forbes',
+          identifier: 'char1:demo',
+          grade: 3,
+          grade_label: 'Patron',
+          job_label: 'Agent immobilier',
+        },
+        permissions: {
+          createProperty: true,
+          editProperty: true,
+          deleteProperty: true,
+          sellProperty: true,
+          rentProperty: true,
+          manageEmployees: true,
+          manageVehicles: true,
+          postNews: true,
+          manageBillboard: true,
+        },
+        news: [
+          { author: 'Mallory Black', type: 'normal', content: 'Expulsions en cours — contacts clients mis à jour.', created_at: new Date(Date.now() - 4 * 86400000).toISOString() },
+          { author: 'Mallory Black', type: 'urgent', content: 'Modèle | Loyer | Achat — grille tarifaire revue.', created_at: new Date(Date.now() - 14 * 86400000).toISOString() },
+          { author: 'Ashton Forbes', type: 'info', content: 'Commission validée $6000 sur Mirror Drive.', created_at: new Date(Date.now() - 60 * 86400000).toISOString() },
+        ],
+        billboard: { content: 'Dynasty 8 — nouvelles villas Mirror Park cette semaine.', updated_by: 'Ashton Forbes' },
+        employees: [
+          { identifier: 'a', name: 'Ashton Forbes', grade: 3, grade_label: 'Patron', online: true },
+          { identifier: 'b', name: 'Mallory Black', grade: 2, grade_label: 'Agent senior', online: false },
+        ],
+        vehicles: [
+          { model: 'baller2', label: 'Baller', minGrade: 0 },
+          { model: 'oracle2', label: 'Oracle XS', minGrade: 1 },
+          { model: 'rebla', label: 'Rebla GTS', minGrade: 3 },
+        ],
+        interiors: [
+          { id: 'apartment_mid', label: 'Appartement Moderne', type: 'appartement' },
+          { id: 'mansion', label: 'Villa de Luxe', type: 'maison' },
+          { id: 'mlo', label: 'MLO / Extérieur', type: 'mlo' },
+        ],
+        stats: { total: 3, agents: 2, online: 1, active: 2, keys: 4 },
+        properties: [
+          {
+            id: 1, label: 'A LOUER 30K', address: '1181 Mirror Drive West', description: 'Bel appartement meublé',
+            interior: 'apartment_modern7', property_type: 'appartement', status: 'location',
+            price_sale: 0, price_rent: 30000, owner: null, owner_name: null, renter: 'x', renter_name: 'NO33Z3SE',
+            entrance: { x: 0, y: 0, z: 0, h: 0 },
+            keys: [{ identifier: 'x', player_name: 'NO33Z3SE' }],
+          },
+          {
+            id: 2, label: 'MLO Mirror', address: '220 Rockford Hills', description: 'MLO extérieur',
+            interior: 'mlo', property_type: 'mlo', status: 'vente',
+            price_sale: 450000, price_rent: 5000, owner: null, owner_name: null,
+            entrance: { x: 1, y: 1, z: 1, h: 0 },
+            keys: [],
+          },
+          {
+            id: 3, label: 'Ferme Rustique 2', address: 'Route 68', description: '',
+            interior: 'farmhouse', property_type: 'maison', status: 'libre',
+            price_sale: 180000, price_rent: 2500, owner: null, owner_name: null,
+            entrance: { x: 2, y: 2, z: 2, h: 0 },
+            keys: [],
+          },
+        ],
+      },
+    };
+
+    const frame = document.getElementById('frame');
+    frame.addEventListener('load', () => {
+      frame.contentWindow.postMessage(demo, '*');
+    });
+
+    // Stub NUI callbacks in preview
+    window.addEventListener('message', () => {});
+  </script>
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynasty 8</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app" class="hidden">
+    <!-- ═══════════════ COMPANY PANEL ═══════════════ -->
+    <div id="companyPanel" class="panel company-panel hidden">
+      <header class="topbar">
+        <div class="topbar-left">
+          <span class="brand-mark">Dynasty Panel</span>
+          <span class="status-pill"><i class="dot"></i> <span data-i18n="connected">Connecté</span></span>
+        </div>
+        <div class="topbar-right">
+          <button class="ghost-btn" id="companyCloseBtn" data-i18n="close">Fermer (ESC)</button>
+          <span class="player-chip" id="companyPlayerName">—</span>
+        </div>
+      </header>
+
+      <div class="panel-body">
+        <aside class="sidebar">
+          <div class="side-brand">
+            <div class="side-logo">D8</div>
+            <div>
+              <div class="side-title">DYNASTY</div>
+              <div class="side-sub" id="companyJobLabel">Agent immobilier</div>
+            </div>
+          </div>
+
+          <nav class="side-nav" id="companyNav">
+            <button class="nav-item active" data-tab="dashboard">
+              <svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V7l8-4z"/></svg>
+              <span data-i18n="nav_dashboard">Tableau de Bord</span>
+            </button>
+            <button class="nav-item" data-tab="billboard">
+              <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              <span data-i18n="nav_billboard">Panneau d'Affichage</span>
+            </button>
+            <button class="nav-item" data-tab="employees">
+              <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c0-3 2.5-5 6-5s6 2 6 5M14 19c.3-2 1.8-3.5 4-3.5 1.2 0 2.2.4 3 1"/></svg>
+              <span data-i18n="nav_employees">Employés</span>
+            </button>
+            <button class="nav-item" data-tab="vehicles">
+              <svg viewBox="0 0 24 24"><path d="M4 14l1.5-5A3 3 0 0 1 8.4 7h7.2a3 3 0 0 1 2.9 2l1.5 5"/><path d="M4 14h16v3a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H10a2 2 0 0 1-4 0H5a1 1 0 0 1-1-1v-3z"/></svg>
+              <span data-i18n="nav_vehicles">Véhicules</span>
+            </button>
+            <button class="nav-item" data-tab="housing-link" id="openHousingFromCompany">
+              <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/></svg>
+              <span data-i18n="nav_housing">Logements</span>
+            </button>
+          </nav>
+
+          <button class="logout-btn" id="companyLogout">
+            <svg viewBox="0 0 24 24"><path d="M10 7V5a2 2 0 0 1 2-2h7v18h-7a2 2 0 0 1-2-2v-2"/><path d="M14 12H3m0 0l3-3m-3 3l3 3"/></svg>
+            <span data-i18n="logout">Déconnexion</span>
+          </button>
+        </aside>
+
+        <main class="content">
+          <!-- Dashboard -->
+          <section class="tab active" id="tab-dashboard">
+            <div class="page-head">
+              <div class="page-icon house">
+                <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/></svg>
+              </div>
+              <div>
+                <h1 id="dashTitle">Agent immobilier</h1>
+                <p data-i18n="company_subtitle">Tableau de bord de l'entreprise</p>
+              </div>
+            </div>
+
+            <h2 class="section-title" data-i18n="latest_news">Dernières Actualités</h2>
+            <div class="news-compose" id="newsCompose">
+              <select id="newsType">
+                <option value="normal">Normal</option>
+                <option value="urgent">Urgent</option>
+                <option value="info">Info</option>
+              </select>
+              <input type="text" id="newsInput" maxlength="500" placeholder="Écrire une actualité…" />
+              <button class="btn primary" id="postNewsBtn" data-i18n="post_news">Publier</button>
+            </div>
+            <div class="news-grid" id="newsGrid"></div>
+
+            <h2 class="section-title" data-i18n="business_tools">Outils Business</h2>
+            <div class="tools-grid">
+              <article class="tool-card">
+                <div class="tool-icon">
+                  <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.5-5 6-5s6 2 6 5"/></svg>
+                </div>
+                <h3 data-i18n="employees_tool">Gestion des employés</h3>
+                <p data-i18n="employees_tool_desc">Voir et gérer tous les employés de l'entreprise</p>
+                <button class="btn primary tool-go" data-goto="employees" data-i18n="access">Accéder</button>
+              </article>
+              <article class="tool-card">
+                <div class="tool-icon">
+                  <svg viewBox="0 0 24 24"><path d="M4 14l1.5-5A3 3 0 0 1 8.4 7h7.2a3 3 0 0 1 2.9 2l1.5 5"/><path d="M4 14h16v3a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H10a2 2 0 0 1-4 0H5a1 1 0 0 1-1-1v-3z"/></svg>
+                </div>
+                <h3 data-i18n="vehicles_tool">Flotte de véhicules</h3>
+                <p data-i18n="vehicles_tool_desc">Gérer les véhicules de l'entreprise</p>
+                <button class="btn primary tool-go" data-goto="vehicles" data-i18n="access">Accéder</button>
+              </article>
+              <article class="tool-card">
+                <div class="tool-icon accent">
+                  <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/></svg>
+                </div>
+                <h3 data-i18n="housing_tool">Gestion immobilière</h3>
+                <p data-i18n="housing_tool_desc">Créer, vendre et louer des logements</p>
+                <button class="btn primary" id="toolHousingBtn" data-i18n="access">Accéder</button>
+              </article>
+            </div>
+          </section>
+
+          <!-- Billboard -->
+          <section class="tab" id="tab-billboard">
+            <div class="page-head">
+              <div class="page-icon">
+                <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              </div>
+              <div>
+                <h1 data-i18n="billboard_title">Panneau d'affichage</h1>
+                <p data-i18n="billboard_desc">Messages visibles par les agents Dynasty</p>
+              </div>
+            </div>
+            <div class="billboard-card">
+              <textarea id="billboardInput" rows="10" maxlength="2000" placeholder="Nouveau message d'affichage…"></textarea>
+              <div class="billboard-meta">
+                <span id="billboardMeta">—</span>
+                <button class="btn primary" id="saveBillboardBtn" data-i18n="save">Enregistrer</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Employees -->
+          <section class="tab" id="tab-employees">
+            <div class="page-head row">
+              <div class="page-head-left">
+                <div class="page-icon">
+                  <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.5-5 6-5s6 2 6 5"/></svg>
+                </div>
+                <div>
+                  <h1 data-i18n="employees_title">Employés</h1>
+                  <p id="employeesCount">0 agents</p>
+                </div>
+              </div>
+              <button class="btn primary" id="hireBtn" data-i18n="hire">Recruter (joueur proche)</button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Nom</th>
+                    <th data-i18n="grade">Grade</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="employeesBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Vehicles -->
+          <section class="tab" id="tab-vehicles">
+            <div class="page-head row">
+              <div class="page-head-left">
+                <div class="page-icon">
+                  <svg viewBox="0 0 24 24"><path d="M4 14l1.5-5A3 3 0 0 1 8.4 7h7.2a3 3 0 0 1 2.9 2l1.5 5"/><path d="M4 14h16v3a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H10a2 2 0 0 1-4 0H5a1 1 0 0 1-1-1v-3z"/></svg>
+                </div>
+                <div>
+                  <h1 data-i18n="vehicles_title">Flotte Dynasty</h1>
+                  <p>Sortie depuis le garage de l'agence</p>
+                </div>
+              </div>
+              <button class="btn ghost" id="storeVehicleBtn" data-i18n="store_vehicle">Ranger le véhicule</button>
+            </div>
+            <div class="vehicle-grid" id="vehicleGrid"></div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- ═══════════════ HOUSING PANEL ═══════════════ -->
+    <div id="housingPanel" class="panel housing-panel hidden">
+      <div class="panel-body housing-body">
+        <aside class="sidebar housing-side">
+          <div class="side-brand housing-brand">
+            <div class="side-logo home">
+              <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/></svg>
+            </div>
+            <div>
+              <div class="side-title">Dynasty Housing</div>
+              <div class="side-sub">Immobilier</div>
+            </div>
+          </div>
+
+          <nav class="side-nav" id="housingNav">
+            <button class="nav-item active" data-hview="list">
+              <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/></svg>
+              <span data-i18n="properties">Propriétés</span>
+            </button>
+            <button class="nav-item" data-hview="search">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+              <span data-i18n="search">Recherche</span>
+            </button>
+            <button class="nav-item" data-hview="apartments">
+              <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/></svg>
+              <span data-i18n="apartments">Appartements</span>
+            </button>
+            <button class="nav-item accent" data-hview="create" id="navCreateProperty">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              <span data-i18n="add">Ajouter</span>
+            </button>
+          </nav>
+
+          <div class="side-bottom">
+            <button class="nav-item soft" id="backToCompany">
+              <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+              <span>Panel entreprise</span>
+            </button>
+            <button class="logout-btn" id="housingLogout">
+              <svg viewBox="0 0 24 24"><path d="M10 7V5a2 2 0 0 1 2-2h7v18h-7a2 2 0 0 1-2-2v-2"/><path d="M14 12H3m0 0l3-3m-3 3l3 3"/></svg>
+              <span data-i18n="logout">Déconnexion</span>
+            </button>
+          </div>
+        </aside>
+
+        <main class="content housing-content">
+          <div class="housing-toolbar">
+            <div class="stats-row" id="statsRow"></div>
+            <div class="filters-row">
+              <div class="search-box">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+                <input type="text" id="propertySearch" placeholder="Rechercher un bien…" />
+              </div>
+              <select id="sortPrice">
+                <option value="high">PRIX: Élevé → Bas</option>
+                <option value="low">PRIX: Bas → Élevé</option>
+              </select>
+              <select id="sortStatus">
+                <option value="all">STATUT: Tous</option>
+                <option value="libre">Libre</option>
+                <option value="vente">À vendre</option>
+                <option value="location">Location</option>
+                <option value="occupe">Occupé</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="housingListView" class="housing-view active">
+            <div class="property-grid" id="propertyGrid"></div>
+            <div class="empty-state hidden" id="propertyEmpty">Aucun logement trouvé</div>
+          </div>
+
+          <div id="housingCreateView" class="housing-view">
+            <div class="create-shell">
+              <div class="page-head">
+                <div class="page-icon accent">
+                  <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                </div>
+                <div>
+                  <h1 id="createTitle">Créer un logement</h1>
+                  <p>Définissez le bien, l'intérieur et les prix</p>
+                </div>
+              </div>
+
+              <form id="propertyForm" class="create-form">
+                <input type="hidden" id="editId" value="" />
+                <div class="form-grid">
+                  <label>
+                    <span>Nom du bien</span>
+                    <input type="text" id="fLabel" required maxlength="128" placeholder="Ex: A LOUER 30K" />
+                  </label>
+                  <label>
+                    <span>Adresse</span>
+                    <input type="text" id="fAddress" maxlength="255" placeholder="1181 Mirror Drive West" />
+                  </label>
+                  <label>
+                    <span>Intérieur</span>
+                    <select id="fInterior"></select>
+                  </label>
+                  <label>
+                    <span>Type</span>
+                    <select id="fType">
+                      <option value="appartement">Appartement</option>
+                      <option value="maison">Maison</option>
+                      <option value="motel">Motel</option>
+                      <option value="bureau">Bureau</option>
+                      <option value="entrepot">Entrepôt</option>
+                      <option value="mlo">MLO</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Statut</span>
+                    <select id="fStatus">
+                      <option value="libre">Libre</option>
+                      <option value="vente">À vendre</option>
+                      <option value="location">Location</option>
+                      <option value="occupe">Occupé</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Prix de vente</span>
+                    <input type="number" id="fSale" min="0" step="1" value="0" />
+                  </label>
+                  <label>
+                    <span>Loyer / semaine</span>
+                    <input type="number" id="fRent" min="0" step="1" value="0" />
+                  </label>
+                  <label class="full">
+                    <span>Description</span>
+                    <textarea id="fDesc" rows="3" maxlength="800" placeholder="Détails du bien…"></textarea>
+                  </label>
+                </div>
+
+                <div class="coords-box">
+                  <div class="coords-head">
+                    <strong>Position d'entrée</strong>
+                    <button type="button" class="btn ghost" id="useCurrentPosBtn">Position actuelle</button>
+                  </div>
+                  <div class="coords-grid">
+                    <label><span>X</span><input type="number" id="fX" step="0.01" required /></label>
+                    <label><span>Y</span><input type="number" id="fY" step="0.01" required /></label>
+                    <label><span>Z</span><input type="number" id="fZ" step="0.01" required /></label>
+                    <label><span>H</span><input type="number" id="fH" step="0.01" value="0" /></label>
+                  </div>
+                  <div class="coords-head garage-head">
+                    <strong>Garage (optionnel)</strong>
+                    <button type="button" class="btn ghost" id="useGaragePosBtn">Position garage</button>
+                    <button type="button" class="btn ghost danger-soft" id="clearGarageBtn">Effacer</button>
+                  </div>
+                  <div class="coords-grid">
+                    <label><span>X</span><input type="number" id="gX" step="0.01" /></label>
+                    <label><span>Y</span><input type="number" id="gY" step="0.01" /></label>
+                    <label><span>Z</span><input type="number" id="gZ" step="0.01" /></label>
+                    <label><span>H</span><input type="number" id="gH" step="0.01" /></label>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn ghost" id="cancelCreateBtn" data-i18n="cancel">Annuler</button>
+                  <button type="submit" class="btn primary" id="submitPropertyBtn" data-i18n="create">Créer</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Property detail modal -->
+    <div id="detailModal" class="modal hidden">
+      <div class="modal-card">
+        <header class="modal-head">
+          <div>
+            <span class="badge" id="detailBadge">—</span>
+            <h2 id="detailTitle">—</h2>
+            <p id="detailAddress">—</p>
+          </div>
+          <button class="icon-close" id="detailClose">×</button>
+        </header>
+        <div class="modal-body">
+          <div class="detail-prices">
+            <div><span>Vente</span><strong id="detailSale">—</strong></div>
+            <div><span>Location</span><strong id="detailRent">—</strong></div>
+          </div>
+          <p class="detail-desc" id="detailDesc"></p>
+          <div class="detail-meta">
+            <div><span>Propriétaire</span><strong id="detailOwner">—</strong></div>
+            <div><span>Locataire</span><strong id="detailRenter">—</strong></div>
+            <div><span>Intérieur</span><strong id="detailInterior">—</strong></div>
+            <div><span>Type</span><strong id="detailType">—</strong></div>
+          </div>
+          <div class="keys-block">
+            <h3>Clés</h3>
+            <ul id="keysList"></ul>
+          </div>
+        </div>
+        <footer class="modal-actions" id="detailActions"></footer>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
