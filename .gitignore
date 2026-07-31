@@ -5,8 +5,8 @@ db/
 *.log
 .fxserver/
 FXServer*
-run.sh
-run.cmd
+artifacts/run.sh
+artifacts/run.cmd
 
 # Secrets
 server.cfg.local
@@ -16,18 +16,7 @@ server.cfg.local
 # Install temp
 .tmp-install/
 
-# Cloned heavy resources (réinstallables via scripts/install-opensource.sh)
-resources/[ox]/oxmysql/
-resources/[ox]/ox_lib/
-resources/[ox]/ox_target/
-resources/[ox]/ox_doorlock/
-resources/[ox]/ox_inventory/
-resources/[voice]/pma-voice/
-resources/[qbx]/qbx_*/
-resources/[housing]/ps-*/
-resources/[standalone]/ps-adminmenu/
-resources/[standalone]/xsound/
-resources/[maps]/bob74_ipl/
+# Les deps open-source sont commitables (ZIP complet)
 
 # Binaries / streams lourds
 **/*.ytd

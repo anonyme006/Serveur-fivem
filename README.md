@@ -28,6 +28,17 @@ mysql -u root -p < sql/init.sql
 Guide détaillé : [`docs/GUIDE-INSTALL.md`](docs/GUIDE-INSTALL.md)  
 Catalogue scripts : [`docs/VIBE-REWRITE.md`](docs/VIBE-REWRITE.md)
 
+## Pack inclus (plus de dossiers vides)
+
+- `resources/[core]` chat, spawnmanager, sessionmanager, …
+- `resources/[ox]` oxmysql / ox_lib / ox_inventory / ox_target / ox_doorlock / ox_fuel (**releases buildées**)
+- `resources/[qbx]` qbx_core + police/EMS/garages/hud/…
+- `resources/[voice]/pma-voice`, `[maps]/bob74_ipl`, housing, banking, admin
+- `resources/[vibe]` 44 scripts custom
+- `start-server.sh` / `start-server.bat`
+
+Détail : [`docs/FICHIERS-MANQUANTS.md`](docs/FICHIERS-MANQUANTS.md)
+
 ## Contenu
 
 - `server.cfg` + structure `resources/[ox|qbx|voice|vibe|maps|…]`

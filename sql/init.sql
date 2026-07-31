@@ -1,5 +1,6 @@
 -- Base initiale pour un serveur Qbox + Ox
--- Adapte le nom de base si besoin.
+-- Usage: mysql -u root -p < sql/init.sql
+-- Puis:  bash sql/import-all.sh   (importe aussi sql/vendor/*.sql)
 
 CREATE DATABASE IF NOT EXISTS `fivem_qbox`
   CHARACTER SET utf8mb4
@@ -7,9 +8,8 @@ CREATE DATABASE IF NOT EXISTS `fivem_qbox`
 
 USE `fivem_qbox`;
 
--- Les tables Qbox / ox_inventory / ox_doorlock sont créées
--- automatiquement au premier démarrage des ressources, ou via
--- leurs fichiers SQL officiels (à importer après install-opensource.sh).
+-- Tables Qbox / ox_doorlock : voir sql/vendor/ (qbx_core.sql, ox_doorlock.sql, …)
+-- Certaines tables ox_inventory se créent au premier démarrage.
 
 -- Exemple de table custom pour les stubs vibe_*
 CREATE TABLE IF NOT EXISTS `vibe_player_meta` (
