@@ -35,7 +35,7 @@ export function Sidebar() {
   const content = (
     <>
       <div className="sidebar__top">
-        <BrandMark size={40} stacked className="sidebar__brand" />
+        <BrandMark size={48} className="sidebar__brand" />
         <div className={`sidebar__status ${serverStatus.online ? "is-online" : ""}`}>
           <span className="sidebar__status-dot" aria-hidden="true" />
           <span>Serveur {serverStatus.online ? "en ligne" : "hors ligne"}</span>

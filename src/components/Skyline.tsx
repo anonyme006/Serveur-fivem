@@ -2,36 +2,29 @@ export function Skyline({ className = "" }: { className?: string }) {
   return (
     <svg
       className={className}
-      viewBox="0 0 1440 320"
+      viewBox="0 0 1440 280"
       xmlns="http://www.w3.org/2000/svg"
       preserveAspectRatio="xMidYMax meet"
       aria-hidden="true"
     >
-      <defs>
-        <linearGradient id="skyGlow" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#e61e25" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#e61e25" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <rect width="1440" height="320" fill="url(#skyGlow)" opacity="0.4" />
-      <g fill="#0a0a0a" stroke="#e61e25" strokeWidth="1.2" opacity="0.95">
-        <path d="M0 320 V210 H40 V160 H70 V210 H110 V180 H150 V320 Z" />
-        <path d="M150 320 V150 H190 V110 H230 V150 H270 V190 H310 V320 Z" />
-        <path d="M320 320 V200 H350 V140 H390 V90 H420 V140 H460 V200 H490 V320 Z" />
-        <path d="M510 320 V170 H560 V120 H600 V80 H640 V120 H680 V170 H730 V320 Z" />
-        <path d="M740 320 V210 H780 V150 H820 V100 H860 V150 H900 V210 H940 V320 Z" />
-        <path d="M960 320 V180 H1000 V130 H1040 V180 H1080 V150 H1120 V220 H1160 V320 Z" />
-        <path d="M1170 320 V200 H1210 V160 H1250 V120 H1290 V160 H1330 V200 H1370 V320 Z" />
-        <path d="M1370 320 V230 H1400 V190 H1440 V320 Z" />
+      <g fill="#070304">
+        <path d="M0 280V188H28V150H52V188H78V165H118V280Z" />
+        <path d="M118 280V155H148V118H178V88H208V118H238V155H268V280Z" />
+        <path d="M268 280V170H298V130H338V95H368V130H408V170H438V280Z" />
+        <path d="M450 280V160H490V115H530V70H565V40H590V70H625V115H665V160H705V280Z" />
+        <path d="M720 280V175H760V125H800V85H840V125H880V175H920V280Z" />
+        <path d="M935 280V165H975V120H1015V155H1055V130H1095V185H1135V280Z" />
+        <path d="M1150 280V175H1190V140H1230V105H1270V140H1310V175H1350V280Z" />
+        <path d="M1350 280V195H1385V160H1440V280Z" />
       </g>
-      <g fill="#120507" opacity="0.9">
-        <rect x="55" y="175" width="6" height="10" />
-        <rect x="205" y="125" width="6" height="10" />
-        <rect x="400" y="105" width="6" height="10" />
-        <rect x="610" y="95" width="6" height="10" />
-        <rect x="830" y="115" width="6" height="10" />
-        <rect x="1055" y="145" width="6" height="10" />
-        <rect x="1265" y="135" width="6" height="10" />
+      <g fill="#e61e25" opacity="0.18">
+        <rect x="40" y="162" width="3" height="8" />
+        <rect x="190" y="100" width="3" height="8" />
+        <rect x="355" y="108" width="3" height="8" />
+        <rect x="575" y="52" width="3" height="8" />
+        <rect x="815" y="98" width="3" height="8" />
+        <rect x="1030" y="132" width="3" height="8" />
+        <rect x="1250" y="118" width="3" height="8" />
       </g>
     </svg>
   );

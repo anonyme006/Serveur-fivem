@@ -83,18 +83,28 @@ ul {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 55% at 50% 70%, rgba(140, 10, 18, 0.55), transparent 70%),
-    linear-gradient(180deg, #050505 0%, #1a0608 42%, #050505 100%);
+    radial-gradient(ellipse 95% 50% at 50% 58%, rgba(170, 12, 22, 0.55), transparent 72%),
+    linear-gradient(180deg, #030303 0%, #120406 48%, #050505 100%);
+}
+
+.skyline-bg::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38%;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85) 70%, #050505);
 }
 
 .skyline-bg__art {
   position: absolute;
   left: 50%;
-  bottom: 18%;
-  width: min(1200px, 140%);
+  bottom: 14%;
+  width: min(1500px, 165%);
   transform: translateX(-50%);
-  opacity: 0.9;
-  filter: drop-shadow(0 0 28px rgba(230, 30, 37, 0.35));
+  opacity: 0.95;
+  filter: drop-shadow(0 -8px 36px rgba(230, 30, 37, 0.28));
   animation: skyline-rise 1.4s ease-out both;
 }
 
@@ -104,7 +114,7 @@ ul {
     transform: translateX(-50%) translateY(24px);
   }
   to {
-    opacity: 0.9;
+    opacity: 0.95;
     transform: translateX(-50%) translateY(0);
   }
 }
