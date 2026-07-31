@@ -2,9 +2,9 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'vibe_neon_mecano'
-description 'Neon Mechanic — tout-en-un (réparations, custom, bipeur, dépannage)'
-version '1.1.0'
+name 'esx_neon_mecano'
+description 'Neon Mechanic ESX — réparations, custom, bipeur, dépannage (fichier unique)'
+version '2.0.0'
 
 shared_scripts {
     '@ox_lib/init.lua',
@@ -20,8 +20,7 @@ files {
 }
 
 dependencies {
+    'es_extended',
     'ox_lib',
     'ox_target',
-    'qbx_core',
-    'vibe_api',
 }

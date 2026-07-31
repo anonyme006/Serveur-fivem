@@ -232,7 +232,7 @@ return {
         },
     },
     ['mechanic'] = {
-        label = 'Neon Mechanic',
+        label = 'Mechanic',
         type = 'mechanic',
         defaultDuty = true,
         offDutyPay = false,
