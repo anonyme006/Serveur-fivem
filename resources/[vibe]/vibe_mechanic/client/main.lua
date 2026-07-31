@@ -21,31 +21,7 @@ local function repair()
     end
 end
 
-RegisterCommand('mecano', function()
-    if not isMech() then
-        exports.vibe_api:Notify('Mecano', 'Service mecano requis.', 'error')
-        return
-    end
-    lib.registerContext({
-        id = 'vibe_mech',
-        title = 'Mecano',
-        options = {
-            { title = 'Reparer le vehicule', icon = 'wrench', onSelect = repair },
-            {
-                title = 'Nettoyer',
-                icon = 'soap',
-                onSelect = function()
-                    local veh = cache.vehicle or GetClosestVehicle(GetEntityCoords(cache.ped), 4.0, 0, 71)
-                    if veh ~= 0 then
-                        SetVehicleDirtLevel(veh, 0.0)
-                        WashDecalsFromVehicle(veh, 1.0)
-                    end
-                end,
-            },
-        },
-    })
-    lib.showContext('vibe_mech')
-end, false)
+-- Menu principal géré par vibe_neon_mecano (/mecano, /neonmecano)
 
 CreateThread(function()
     for i, coords in ipairs(Config.Locations) do

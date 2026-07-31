@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Neon Bipeur</title>
+</head>
+<body>
+    <div id="pager" class="hidden">
+        <div class="pager-body">
+            <div class="pager-header">
+                <span class="led"></span>
+                <span class="brand">NEON MECHANIC</span>
+                <span class="led"></span>
+            </div>
+            <div class="pager-screen">
+                <div class="line code" id="code">DEP-000</div>
+                <div class="line msg" id="message">Panne signalée</div>
+                <div class="line sub" id="payout"></div>
+            </div>
+            <div class="pager-actions">
+                <button id="btn-accept">ACCEPTER</button>
+                <button id="btn-decline">REFUSER</button>
+            </div>
+            <button id="btn-close" class="close">✕</button>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

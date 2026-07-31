@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Share Tech Mono', monospace;
+    background: transparent;
+    overflow: hidden;
+}
+
+.hidden { display: none !important; }
+
+#pager {
+    position: fixed;
+    bottom: 18%;
+    right: 4%;
+    z-index: 9999;
+    animation: slideIn 0.35s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.pager-body {
+    position: relative;
+    width: 280px;
+    background: linear-gradient(145deg, #1a1a2e 0%, #0f0f1a 100%);
+    border: 2px solid #00fff2;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 0 24px rgba(0, 255, 242, 0.35), inset 0 0 20px rgba(0, 255, 242, 0.05);
+}
+
+.pager-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.brand {
+    color: #00fff2;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px #00fff2;
+}
+
+.led {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff0055;
+    box-shadow: 0 0 6px #ff0055;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.pager-screen {
+    background: #0a1628;
+    border: 1px solid #004466;
+    border-radius: 6px;
+    padding: 12px;
+    min-height: 90px;
+    margin-bottom: 12px;
+}
+
+.line { color: #7dffea; font-size: 13px; line-height: 1.5; }
+
+.line.code {
+    color: #00fff2;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.line.msg { color: #b8fff8; }
+
+.line.sub {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #ffd700;
+}
+
+.pager-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.pager-actions button {
+    flex: 1;
+    padding: 8px 4px;
+    border: 1px solid #00fff2;
+    background: rgba(0, 255, 242, 0.1);
+    color: #00fff2;
+    font-family: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.pager-actions button:hover {
+    background: rgba(0, 255, 242, 0.3);
+    box-shadow: 0 0 10px rgba(0, 255, 242, 0.4);
+}
+
+#btn-decline {
+    border-color: #ff4466;
+    color: #ff6688;
+    background: rgba(255, 68, 102, 0.1);
+}
+
+#btn-decline:hover {
+    background: rgba(255, 68, 102, 0.25);
+    box-shadow: 0 0 10px rgba(255, 68, 102, 0.4);
+}
+
+.close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #556;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.close:hover { color: #00fff2; }
+
+.beep-flash .pager-body {
+    animation: beepFlash 0.15s 3;
+}
+
+@keyframes beepFlash {
+    0%, 100% { box-shadow: 0 0 24px rgba(0, 255, 242, 0.35); }
+    50% { box-shadow: 0 0 40px rgba(255, 0, 85, 0.8); border-color: #ff0055; }
+}
