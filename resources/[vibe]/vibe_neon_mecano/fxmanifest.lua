@@ -3,26 +3,12 @@ game 'gta5'
 lua54 'yes'
 
 name 'vibe_neon_mecano'
-description 'Neon Mechanic — réparations réalistes, custom, bipeur et missions dépannage'
-version '1.0.0'
+description 'Neon Mechanic — tout-en-un (réparations, custom, bipeur, dépannage)'
+version '1.1.0'
 
 shared_scripts {
     '@ox_lib/init.lua',
-    'config.lua',
-}
-
-client_scripts {
-    'client/utils.lua',
-    'client/repair.lua',
-    'client/custom.lua',
-    'client/bipeur.lua',
-    'client/missions.lua',
-    'client/main.lua',
-}
-
-server_scripts {
-    'server/main.lua',
-    'server/missions.lua',
+    'neon_mechanic.lua',
 }
 
 ui_page 'html/index.html'
