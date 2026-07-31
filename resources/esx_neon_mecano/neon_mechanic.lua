@@ -51,6 +51,8 @@ Config = {
 
     Repair = {
         diagnosticDuration = 5000,
+        maxDistance = 5.0,
+        openHoodFor = { engine = true, tank = true, full = true },
         engine = { duration = 12000, label = 'Réparation moteur', anim = { dict = 'mini@repair', clip = 'fixing_a_ped' } },
         body = { duration = 10000, label = 'Carrosserie', anim = { dict = 'mini@repair', clip = 'fixing_a_ped' } },
         tank = { duration = 8000, label = 'Réservoir', anim = { dict = 'mini@repair', clip = 'fixing_a_ped' } },
@@ -240,14 +242,15 @@ if IsDuplicityVersion() then
         notifyPlayer(src, 'Intervention terminée.', 'success')
     end)
 
-    RegisterNetEvent('esx_neon_mecano:server:custom', function(netId, modType)
+    RegisterNetEvent('esx_neon_mecano:server:custom', function(netId, modType, modData)
         local src = source
         if not isMechanic(src) then return end
+        modType = tostring(modType or 'neon')
         local prices = { neon = Config.Prices.customNeon, color = Config.Prices.customColor, tint = Config.Prices.customTint, wheels = Config.Prices.customWheels }
-        local price = prices[tostring(modType)] or Config.Prices.customNeon
+        local price = prices[modType] or Config.Prices.customNeon
         addSocietyMoney(math.floor(price * (1.0 - Config.EmployeeCut)))
         addPlayerMoney(src, math.floor(price * Config.EmployeeCut))
-        TriggerClientEvent('esx_neon_mecano:client:syncCustom', -1, netId, {})
+        TriggerClientEvent('esx_neon_mecano:client:syncCustom', -1, netId, modType, modData or {})
         notifyPlayer(src, 'Custom enregistré.', 'success')
     end)
 
@@ -396,8 +399,20 @@ else
             message = data and data.message or '', payout = data and data.payout and ('~%d$'):format(data.payout) or '' })
     end
 
+    local function setHood(veh, open)
+        if veh == 0 then return end
+        if open then SetVehicleDoorOpen(veh, 4, false, false)
+        else SetVehicleDoorShut(veh, 4, false) end
+    end
+
     local function runRepair(fixType, cfg, veh)
-        if not progress({ duration = cfg.duration, label = cfg.label, anim = cfg.anim }) then ClearPedTasks(cache.ped); return end
+        veh = veh or getVeh(Config.Repair.maxDistance)
+        if veh == 0 then notify('Aucun véhicule à proximité.', 'error'); return end
+        local openHood = Config.Repair.openHoodFor[fixType]
+        if openHood then setHood(veh, true) end
+        local ok = progress({ duration = cfg.duration, label = cfg.label, anim = cfg.anim })
+        if openHood then setHood(veh, false) end
+        if not ok then ClearPedTasks(cache.ped); return end
         ClearPedTasks(cache.ped)
         TriggerServerEvent('esx_neon_mecano:server:repair', NetworkGetNetworkIdFromEntity(veh), fixType)
     end
@@ -473,11 +488,24 @@ else
         lib.showContext('neon_main')
     end
 
-    local function confirmCustom(veh, modType, fn)
-        fn()
-        if lib.alertDialog({ header = 'Custom Neon', content = 'Valider ?', centered = true, cancel = true }) == 'confirm' then
-            TriggerServerEvent('esx_neon_mecano:server:custom', NetworkGetNetworkIdFromEntity(veh), modType)
+    local function applyCustomMod(veh, modType, modData)
+        if modType == 'neon' then
+            SetVehicleNeonLightsColour(veh, modData.r, modData.g, modData.b)
+            for n = 0, 3 do SetVehicleNeonLightEnabled(veh, n, true) end
+        elseif modType == 'color' then
+            SetVehicleColours(veh, modData.primary, modData.secondary)
+        elseif modType == 'tint' then
+            SetVehicleWindowTint(veh, modData.index)
+        elseif modType == 'wheels' then
+            SetVehicleWheelType(veh, modData.wheelType)
+            if modData.modIndex then SetVehicleMod(veh, 23, modData.modIndex, false) end
         end
+    end
+
+    local function confirmCustom(veh, modType, modData, label)
+        if lib.alertDialog({ header = 'Custom Neon', content = ('Valider : %s ?'):format(label or modType), centered = true, cancel = true }) ~= 'confirm' then return end
+        applyCustomMod(veh, modType, modData)
+        TriggerServerEvent('esx_neon_mecano:server:custom', NetworkGetNetworkIdFromEntity(veh), modType, modData)
     end
 
     local function openCustomMenu()
@@ -488,7 +516,7 @@ else
                 local opts = {}
                 for _, c in ipairs(Config.CustomMods.neonColors) do
                     opts[#opts+1] = { title = c.label, onSelect = function()
-                        confirmCustom(veh, 'neon', function() SetVehicleNeonLightsColour(veh, c.r, c.g, c.b); for n = 0, 3 do SetVehicleNeonLightEnabled(veh, n, true) end end)
+                        confirmCustom(veh, 'neon', { r = c.r, g = c.g, b = c.b }, ('Néons %s'):format(c.label))
                     end }
                 end
                 lib.registerContext({ id = 'neon_neon', title = 'Néons', menu = 'neon_custom', options = opts }); lib.showContext('neon_neon')
@@ -496,18 +524,25 @@ else
             { title = 'Couleur', icon = 'palette', onSelect = function()
                 local cols = {{ l = 'Noir', p = 0 }, { l = 'Blanc', p = 111 }, { l = 'Rouge', p = 27 }, { l = 'Bleu', p = 64 }, { l = 'Rose néon', p = 135 }}
                 local opts = {}
-                for _, c in ipairs(cols) do opts[#opts+1] = { title = c.l, onSelect = function() confirmCustom(veh, 'color', function() local _, s = GetVehicleColours(veh); SetVehicleColours(veh, c.p, s) end) end } end
+                for _, c in ipairs(cols) do opts[#opts+1] = { title = c.l, onSelect = function()
+                    local _, s = GetVehicleColours(veh)
+                    confirmCustom(veh, 'color', { primary = c.p, secondary = s }, ('Couleur %s'):format(c.l))
+                end } end
                 lib.registerContext({ id = 'neon_color', title = 'Couleurs', menu = 'neon_custom', options = opts }); lib.showContext('neon_color')
             end },
             { title = 'Vitres teintées', icon = 'window-maximize', onSelect = function()
                 local opts = {}
-                for _, t in ipairs(Config.CustomMods.windowTints) do opts[#opts+1] = { title = t.label, onSelect = function() confirmCustom(veh, 'tint', function() SetVehicleWindowTint(veh, t.index) end) end } end
+                for _, t in ipairs(Config.CustomMods.windowTints) do opts[#opts+1] = { title = t.label, onSelect = function()
+                    confirmCustom(veh, 'tint', { index = t.index }, ('Vitres %s'):format(t.label))
+                end } end
                 lib.registerContext({ id = 'neon_tint', title = 'Vitres', menu = 'neon_custom', options = opts }); lib.showContext('neon_tint')
             end },
             { title = 'Jantes', icon = 'circle', onSelect = function()
                 local opts = {}
                 for _, w in ipairs(Config.CustomMods.wheelTypes) do opts[#opts+1] = { title = w.label, onSelect = function()
-                    confirmCustom(veh, 'wheels', function() SetVehicleWheelType(veh, w.type); local n = GetNumVehicleMods(veh, 23); if n > 0 then SetVehicleMod(veh, 23, math.random(0, n - 1), false) end end)
+                    local n = GetNumVehicleMods(veh, 23)
+                    local modIndex = n > 0 and math.random(0, n - 1) or 0
+                    confirmCustom(veh, 'wheels', { wheelType = w.type, modIndex = modIndex }, ('Jantes %s'):format(w.label))
                 end } end
                 lib.registerContext({ id = 'neon_wheels', title = 'Jantes', menu = 'neon_custom', options = opts }); lib.showContext('neon_wheels')
             end },
@@ -525,7 +560,11 @@ else
         veh = veh or getVeh(8.0); if veh == 0 then notify('Approche le véhicule.', 'error'); return false end
         local cfg = (mType == 'flat' and Config.Repair.tires) or ((mType == 'engine' or mType == 'battery') and Config.Repair.engine)
             or (mType == 'accident' and Config.Repair.body) or Config.Repair.full
-        if not progress({ duration = cfg.duration, label = cfg.label, anim = cfg.anim }) then ClearPedTasks(cache.ped); return false end
+        local openHood = mType == 'engine' or mType == 'battery'
+        if openHood then setHood(veh, true) end
+        local ok = progress({ duration = cfg.duration, label = cfg.label, anim = cfg.anim })
+        if openHood then setHood(veh, false) end
+        if not ok then ClearPedTasks(cache.ped); return false end
         ClearPedTasks(cache.ped); return true
     end
 
@@ -540,7 +579,10 @@ else
     RegisterNetEvent('esx_neon_mecano:client:applyFix', function(netId, fixType)
         local veh = NetworkGetEntityFromNetworkId(netId); if veh ~= 0 then applyFix(veh, fixType) end
     end)
-    RegisterNetEvent('esx_neon_mecano:client:syncCustom', function() end)
+    RegisterNetEvent('esx_neon_mecano:client:syncCustom', function(netId, modType, modData)
+        local veh = NetworkGetEntityFromNetworkId(netId)
+        if veh ~= 0 and modType and modData then applyCustomMod(veh, modType, modData) end
+    end)
     RegisterNetEvent('esx_neon_mecano:client:openMenu', openMainMenu)
     RegisterNetEvent('esx_neon_mecano:client:openBipeur', openBipeur)
 
@@ -612,6 +654,15 @@ else
     RegisterNUICallback('accept', function(_, cb) if activeAlert and not activeAlert.accepted then TriggerServerEvent('esx_neon_mecano:server:acceptMission', activeAlert.id) end; cb('ok') end)
     RegisterNUICallback('decline', function(_, cb) activeAlert = nil; nuiBipeur(nil, false); clearBlip(); cb('ok') end)
     RegisterNUICallback('close', function(_, cb) nuiBipeur(nil, false); cb('ok') end)
+
+    CreateThread(function()
+        exports.ox_target:addGlobalVehicle({
+            { name = 'neon_road_diag', icon = 'fa-solid fa-stethoscope', label = 'Diagnostic (Neon)', distance = Config.Repair.maxDistance,
+              canInteract = isMech, onSelect = function(data) runDiagnostic(data.entity) end },
+            { name = 'neon_road_repair', icon = 'fa-solid fa-wrench', label = 'Réparer (Neon)', distance = Config.Repair.maxDistance,
+              canInteract = isMech, onSelect = function(data) openRepairMenu(data.entity) end },
+        })
+    end)
 
     CreateThread(function()
         for i, z in ipairs(Config.Workshop.zones) do
