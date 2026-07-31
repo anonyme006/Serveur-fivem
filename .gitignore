@@ -1,0 +1,39 @@
+# FXServer / runtime
+artifacts/
+cache/
+db/
+*.log
+.fxserver/
+FXServer*
+artifacts/run.sh
+artifacts/run.cmd
+
+# Secrets
+server.cfg.local
+.env
+*.pem
+
+# Install temp
+.tmp-install/
+
+# Les deps open-source sont commitables (ZIP complet)
+
+# Binaries / streams lourds
+**/*.ytd
+**/*.ydr
+**/*.yft
+**/*.ycd
+**/*.ybn
+**/*.ymap
+**/*.ytyp
+**/*.awc
+**/*.rpf
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+node_modules/
+
