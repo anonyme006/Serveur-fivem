@@ -72,6 +72,10 @@ Config.Keys = {
     maxTempMinutes = 10080,
     -- Distance interaction porte habitation
     houseDistance = 2.5,
+    -- Donner automatiquement les clés
+    giveOnGarageTakeOut = true, -- pa_garage / ox_garage (sortie + fourrière)
+    giveOnPurchase = true,      -- esx_concessionnaire (+ hooks génériques)
+    notifyOnGive = true,        -- notification « clés reçues »
 }
 
 --[[--------------------------------------------------------------------------

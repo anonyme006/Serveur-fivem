@@ -68,22 +68,68 @@ exports('GiveKey', function(holderIdentifier, keyType, keyRef, ownerIdentifier, 
     )
 end)
 
---- Donner une clé véhicule au propriétaire à l'achat (hook concessionnaire)
-AddEventHandler('esx_core:keys:giveVehicleKey', function(src, plate, label)
+--- Crée une clé permanente si absente. Retourne true si créée, false si déjà présente / échec.
+---@param src number
+---@param plate string
+---@param label? string
+---@param notifyKey? string locale key (key_received, key_garage, key_purchase)
+---@return boolean created
+function Core.EnsureVehicleKey(src, plate, label, notifyKey)
     local id = Core.GetIdentifier(src)
-    if not id or not plate then return end
+    if not id or not plate then return false end
+
     plate = Core.NormalizePlate(plate)
+    if plate == '' then return false end
+
+    -- Sécurité : uniquement le propriétaire ESX
+    local cols = Config.Persistence.columns
+    local owned = MySQL.single.await(
+        ('SELECT 1 FROM `%s` WHERE `%s` = ? AND REPLACE(UPPER(`%s`), " ", "") = ? LIMIT 1'):format(
+            cols.table, cols.owner, cols.plate
+        ),
+        { id, plate }
+    )
+    if not owned then return false end
 
     local exists = MySQL.single.await(
         'SELECT id FROM esx_core_keys WHERE holder = ? AND key_type = ? AND key_ref = ? AND temporary = 0 LIMIT 1',
         { id, 'vehicle', plate }
     )
-    if exists then return end
 
-    MySQL.insert.await(
-        'INSERT INTO esx_core_keys (owner, holder, key_type, key_ref, label, temporary) VALUES (?, ?, ?, ?, ?, 0)',
-        { id, id, 'vehicle', plate, label or plate }
-    )
+    local created = false
+    if not exists then
+        MySQL.insert.await(
+            'INSERT INTO esx_core_keys (owner, holder, key_type, key_ref, label, temporary) VALUES (?, ?, ?, ?, ?, 0)',
+            { id, id, 'vehicle', plate, label or plate }
+        )
+        created = true
+    end
+
+    if Config.Keys.notifyOnGive and notifyKey then
+        TriggerClientEvent(
+            'esx_core:notify',
+            src,
+            Core.Locale(notifyKey, plate),
+            created and 'success' or 'inform'
+        )
+    elseif Config.Keys.notifyOnGive and created then
+        TriggerClientEvent('esx_core:notify', src, Core.Locale('key_received', plate), 'success')
+    end
+
+    return created
+end
+
+--- Donner une clé véhicule au propriétaire (hook concessionnaire / exports)
+AddEventHandler('esx_core:keys:giveVehicleKey', function(src, plate, label)
+    Core.EnsureVehicleKey(src, plate, label, 'key_purchase')
+end)
+
+exports('GiveVehicleKey', function(src, plate, label)
+    return Core.EnsureVehicleKey(src, plate, label, 'key_purchase')
+end)
+
+exports('EnsureVehicleKey', function(src, plate, label, notifyKey)
+    return Core.EnsureVehicleKey(src, plate, label, notifyKey)
 end)
 
 lib.callback.register('esx_core:keys:canLock', function(source, plate)

@@ -62,12 +62,27 @@ exports.esx_core:RegisterHouseDoor(houseId, coords, locked)
 exports.esx_core:ToggleVehicleLock()
 ```
 
-## Hook concessionnaire
+## Clés automatiques (garage + achat)
 
-Après un achat véhicule :
+Activé par défaut dans `Config.Keys` :
+
+| Option | Effet |
+|--------|--------|
+| `giveOnGarageTakeOut` | Clés données à la sortie `pa_garage` / fourrière (`ox_garage:registerSpawn`) |
+| `giveOnPurchase` | Clés données à l’achat `esx_concessionnaire` |
+| `notifyOnGive` | Notification joueur |
+
+### Hooks manuels (autres scripts)
 
 ```lua
+-- Serveur
+exports.esx_core:GiveVehicleKey(src, plate, label)
 TriggerEvent('esx_core:keys:giveVehicleKey', src, plate, label)
+
+-- Depuis le concessionnaire (giveKeys)
+pcall(function()
+    exports.esx_core:GiveVehicleKey(src, plate, model)
+end)
 ```
 
 ## Config importante
