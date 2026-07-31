@@ -21,7 +21,7 @@ local function repair()
     end
 end
 
--- Menu principal géré par vibe_neon_mecano (/mecano, /neonmecano)
+-- Menu principal géré par pa_bennys (/bennys, /mecano)
 
 CreateThread(function()
     for i, coords in ipairs(Config.Locations) do

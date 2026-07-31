@@ -2,13 +2,22 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'esx_neon_mecano'
-description 'Neon Mechanic ESX — réparations, custom, bipeur, dépannage (fichier unique)'
-version '2.1.0'
+name 'pa_bennys'
+description "Benny's ESX — réparations, custom, bipeur, missions dépannage"
+version '1.0.0'
+author 'PA Scripts'
 
 shared_scripts {
     '@ox_lib/init.lua',
-    'neon_mechanic.lua',
+    'config.lua',
+}
+
+client_scripts {
+    'client/main.lua',
+}
+
+server_scripts {
+    'server/main.lua',
 }
 
 ui_page 'html/index.html'
