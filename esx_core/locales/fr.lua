@@ -69,4 +69,7 @@ Locales['fr'] = {
 
     -- Carte
     map_hint = 'Carte',
+
+    -- Offroad
+    offroad_slow = 'Terrain difficile (%s) — adhérence réduite',
 }

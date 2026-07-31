@@ -157,24 +157,83 @@ Config.Map = {
 --[[--------------------------------------------------------------------------
     Alertes essence / faim / soif
 ---------------------------------------------------------------------------]]
-Config.Alerts = {
-    fuel = {
-        enabled = true,
-        -- Seuil (%)
-        threshold = 15,
-        -- Cooldown entre alertes (ms)
-        cooldown = 90000,
-        -- Ressource carburant : 'auto' | 'ox_fuel' | 'LegacyFuel' | 'native'
-        resource = 'auto',
+--[[--------------------------------------------------------------------------
+    Offroad — adhérence / vitesse réduite sur sable, boue, herbe, etc.
+---------------------------------------------------------------------------]]
+Config.Offroad = {
+    enabled = true,
+    -- Notifier quand on entre sur un sol difficile
+    notify = true,
+    -- Intervalle de check (ms) — bas = plus réactif
+    interval = 150,
+    -- Classes GTA exemptées (9 = Off-road, 8 = Motos, 13 = Cycles, 14 = Bateaux, 15 = Hélicos, 16 = Avions)
+    exemptClasses = {
+        [8] = true,  -- motos
+        [9] = true,  -- off-road (Léger pénalité via offroadMultiplier)
+        [13] = true, -- vélos
+        [14] = true,
+        [15] = true,
+        [16] = true,
+        [21] = true, -- trains
     },
-    needs = {
-        enabled = true,
-        -- Seuil (valeur esx_status typique 0–1000000, on normalise en %)
-        hungerThreshold = 20,
-        thirstThreshold = 20,
-        cooldown = 120000,
-        -- Noms des status esx_status
-        hunger = 'hunger',
-        thirst = 'thirst',
+    -- Les vrais 4x4 (classe 9) gardent une partie de la traction
+    offroadClassMultiplier = 0.85, -- 1.0 = aucune pénalité, 0.0 = pénalité pleine
+    -- Modèles whitelist (aucun effet) — hash ou nom
+    whitelist = {
+        -- 'sandking', 'trophytruck',
+    },
+    -- Modèles plus pénalisés (berlines, supersport) — hash ou nom → multiplicateur extra (0.5 = encore plus lent)
+    softMultiplier = {
+        -- ['adder'] = 0.7,
+    },
+    --[[
+        Surfaces (GetVehicleWheelSurfaceMaterial)
+        traction  = couple moteur (0.0–1.0), 1 = normal
+        maxKmh    = vitesse max plafonnée (nil = pas de plafond dédié)
+        grip      = true → SetVehicleReduceGrip
+        label     = texte notif
+    ]]
+    surfaces = {
+        -- Sable
+        [9]  = { traction = 0.45, maxKmh = 55,  grip = true,  label = 'sable' },
+        [10] = { traction = 0.55, maxKmh = 65,  grip = true,  label = 'sable' },
+        [11] = { traction = 0.40, maxKmh = 45,  grip = true,  label = 'sable mouillé' },
+        [12] = { traction = 0.50, maxKmh = 60,  grip = true,  label = 'piste sable' },
+        [13] = { traction = 0.30, maxKmh = 35,  grip = true,  label = 'sable' },
+        [14] = { traction = 0.28, maxKmh = 30,  grip = true,  label = 'sable profond' },
+        [15] = { traction = 0.25, maxKmh = 28,  grip = true,  label = 'sable profond' },
+        -- Neige / glace
+        [16] = { traction = 0.35, maxKmh = 50,  grip = true,  label = 'glace' },
+        [17] = { traction = 0.45, maxKmh = 70,  grip = true,  label = 'verglas' },
+        [18] = { traction = 0.40, maxKmh = 50,  grip = true,  label = 'neige' },
+        [19] = { traction = 0.50, maxKmh = 60,  grip = true,  label = 'neige' },
+        [20] = { traction = 0.30, maxKmh = 35,  grip = true,  label = 'neige profonde' },
+        -- Herbe
+        [21] = { traction = 0.70, maxKmh = 90,  grip = false, label = 'herbe' },
+        [22] = { traction = 0.60, maxKmh = 75,  grip = false, label = 'herbe haute' },
+        -- Graviers
+        [23] = { traction = 0.65, maxKmh = 80,  grip = false, label = 'gravier' },
+        [24] = { traction = 0.55, maxKmh = 70,  grip = false, label = 'gravier' },
+        [25] = { traction = 0.45, maxKmh = 55,  grip = true,  label = 'gravier profond' },
+        [26] = { traction = 0.60, maxKmh = 75,  grip = false, label = 'gravier' },
+        -- Terre / boue / marécage
+        [27] = { traction = 0.55, maxKmh = 70,  grip = false, label = 'terre' },
+        [28] = { traction = 0.40, maxKmh = 45,  grip = true,  label = 'boue' },
+        [29] = { traction = 0.35, maxKmh = 40,  grip = true,  label = 'boue' },
+        [30] = { traction = 0.30, maxKmh = 35,  grip = true,  label = 'boue molle' },
+        [31] = { traction = 0.25, maxKmh = 30,  grip = true,  label = 'boue' },
+        [32] = { traction = 0.22, maxKmh = 25,  grip = true,  label = 'boue profonde' },
+        [33] = { traction = 0.28, maxKmh = 30,  grip = true,  label = 'marécage' },
+        [34] = { traction = 0.20, maxKmh = 22,  grip = true,  label = 'marécage' },
+        [35] = { traction = 0.50, maxKmh = 65,  grip = false, label = 'terre' },
+        [36] = { traction = 0.55, maxKmh = 70,  grip = false, label = 'argile' },
+        [37] = { traction = 0.35, maxKmh = 40,  grip = true,  label = 'argile molle' },
+        -- Divers (sols meubles fréquents)
+        [40] = { traction = 0.50, maxKmh = 60,  grip = false, label = 'terrain' },
+        [41] = { traction = 0.45, maxKmh = 55,  grip = true,  label = 'terrain' },
+        [46] = { traction = 0.40, maxKmh = 50,  grip = true,  label = 'sable' },
+        [47] = { traction = 0.35, maxKmh = 40,  grip = true,  label = 'sable' },
+        [48] = { traction = 0.45, maxKmh = 55,  grip = true,  label = 'sable' },
     },
 }
+

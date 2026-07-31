@@ -25,6 +25,7 @@ client_scripts {
     'client/wallet.lua',
     'client/cover.lua',
     'client/used_parking.lua',
+    'client/offroad.lua',
 }
 
 server_scripts {

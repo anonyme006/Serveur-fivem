@@ -39,6 +39,7 @@ ensure esx_core
 | **Occasions** | Parking Strawberry — **E** acheter, **G** mettre en vente |
 | **Carte Échap** | Prop carte + anim quand le menu pause est ouvert |
 | **Alertes** | Essence basse, faim / soif (seuils dans `config.lua`) |
+| **Offroad** | Sable / boue / herbe / gravier → couple et vitesse réduits |
 
 ## Raccourcis
 
@@ -61,6 +62,14 @@ exports.esx_core:RegisterHouseDoor(houseId, coords, locked)
 -- Client
 exports.esx_core:ToggleVehicleLock()
 ```
+
+## Offroad
+
+Sur sable, boue, herbe haute, gravier, neige… le véhicule perd de l’adhérence et de la vitesse (`Config.Offroad`).
+
+- Les **4x4** (classe 9) sont moins pénalisés (`offroadClassMultiplier`)
+- Motos / bateaux / air = exemptés
+- Ajuste `Config.Offroad.surfaces` pour chaque type de sol
 
 ## Clés automatiques (garage + achat)
 
