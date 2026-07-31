@@ -126,16 +126,24 @@
       grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">${t('no_news', 'Aucune actualité')}</div>`;
       return;
     }
-    grid.innerHTML = news.slice(0, 9).map((n) => `
+    const typeLabel = {
+      normal: t('news_type_normal', 'Normal'),
+      urgent: t('news_type_urgent', 'Urgent'),
+      info: t('news_type_info', 'Info'),
+    };
+    grid.innerHTML = news.slice(0, 9).map((n) => {
+      const typ = n.type || 'normal';
+      return `
       <article class="news-card">
         <div class="news-top">
           <span class="news-author">${escapeHtml(n.author || '—')}</span>
-          <span class="tag ${escapeHtml(n.type || 'normal')}">${escapeHtml(n.type || 'normal')}</span>
+          <span class="tag ${escapeHtml(typ)}">${escapeHtml(typeLabel[typ] || typ)}</span>
         </div>
         <div class="news-body">${escapeHtml(n.content || '')}</div>
         <div class="news-time">${timeAgo(n.created_at)}</div>
       </article>
-    `).join('');
+    `;
+    }).join('');
   }
 
   function renderEmployees() {
@@ -310,6 +318,7 @@
     });
     document.getElementById('housingListView').classList.toggle('active', view !== 'create');
     document.getElementById('housingCreateView').classList.toggle('active', view === 'create');
+    document.querySelector('.housing-toolbar')?.classList.toggle('hidden', view === 'create');
 
     if (view === 'apartments') {
       state.filterType = 'appartement';
@@ -666,25 +675,33 @@
     }
   });
 
+  function openFromMessage(msg) {
+    state.locale = msg.locale || {};
+    state.currency = msg.currency || '$';
+    state.data = msg.data;
+    state.playerPos = msg.playerPos || null;
+    applyI18n();
+    fillInteriors();
+    if (msg.view === 'housing' || msg.view === 'create') {
+      setVisible('housing');
+      renderStats();
+      if (msg.view === 'create') {
+        setHousingView('create');
+      } else {
+        setHousingView('list');
+        renderProperties();
+      }
+    } else {
+      setVisible('company');
+      renderCompany();
+      setCompanyTab('dashboard');
+    }
+  }
+
   window.addEventListener('message', (event) => {
     const msg = event.data || {};
     if (msg.action === 'open') {
-      state.locale = msg.locale || {};
-      state.currency = msg.currency || '$';
-      state.data = msg.data;
-      state.playerPos = msg.playerPos || null;
-      applyI18n();
-      fillInteriors();
-      if (msg.view === 'housing') {
-        setVisible('housing');
-        renderStats();
-        setHousingView('list');
-        renderProperties();
-      } else {
-        setVisible('company');
-        renderCompany();
-        setCompanyTab('dashboard');
-      }
+      openFromMessage(msg);
     } else if (msg.action === 'close') {
       app.classList.add('hidden');
       companyPanel.classList.add('hidden');
@@ -692,4 +709,53 @@
       detailModal.classList.add('hidden');
     }
   });
+
+  // Preview standalone: /index.html?demo=company|housing|create
+  try {
+    const demoView = new URLSearchParams(location.search).get('demo');
+    if (demoView) {
+      const DEMO = {
+        player: { name: 'Ashton Forbes', identifier: 'char1:demo', grade: 3, grade_label: 'Patron', job_label: 'Agent immobilier' },
+        permissions: { createProperty: true, editProperty: true, deleteProperty: true, sellProperty: true, rentProperty: true, manageEmployees: true, manageVehicles: true, postNews: true, manageBillboard: true },
+        locale: { news_type_normal: 'Normal', news_type_urgent: 'Urgent', news_type_info: 'Info', create_property: 'Créer un logement', create: 'Créer', free: 'Libre', for_sale: 'À vendre', for_rent: 'Location', occupied: 'Occupé', rent_week: '/sem', owner: 'Propriétaire', keys: 'Clés' },
+        playerPos: { x: -716.11, y: -272.96, z: 36.82, h: 30 },
+        news: [
+          { author: 'Mallory Black', type: 'normal', content: 'Expulsions en cours — contacts clients mis à jour.', created_at: '2026-07-27T10:00:00Z' },
+          { author: 'Mallory Black', type: 'urgent', content: 'Modèle | Loyer | Achat — grille tarifaire revue.', created_at: '2026-07-17T10:00:00Z' },
+          { author: 'Ashton Forbes', type: 'info', content: 'Commission validée $6000 sur Mirror Drive.', created_at: '2026-05-31T10:00:00Z' },
+        ],
+        billboard: { content: 'Dynasty 8 — nouvelles villas Mirror Park cette semaine.', updated_by: 'Ashton Forbes' },
+        employees: [
+          { identifier: 'a', name: 'Ashton Forbes', grade: 3, grade_label: 'Patron', online: true },
+          { identifier: 'b', name: 'Mallory Black', grade: 2, grade_label: 'Agent senior', online: false },
+        ],
+        vehicles: [
+          { model: 'baller2', label: 'Baller', minGrade: 0 },
+          { model: 'oracle2', label: 'Oracle XS', minGrade: 1 },
+          { model: 'rebla', label: 'Rebla GTS', minGrade: 3 },
+        ],
+        interiors: [
+          { id: 'apartment_mid', label: 'Appartement Moderne', type: 'appartement' },
+          { id: 'apartment_modern7', label: 'Appartement Moderne 7', type: 'appartement' },
+          { id: 'mansion', label: 'Villa de Luxe', type: 'maison' },
+          { id: 'farmhouse', label: 'Ferme Rustique', type: 'maison' },
+          { id: 'mlo', label: 'MLO / Extérieur', type: 'mlo' },
+        ],
+        stats: { total: 3, agents: 2, online: 1, active: 2, keys: 4 },
+        properties: [
+          { id: 1, label: 'A LOUER 30K', address: '1181 Mirror Drive West', description: 'Bel appartement meublé', interior: 'apartment_modern7', property_type: 'appartement', status: 'location', price_sale: 0, price_rent: 30000, owner: null, owner_name: null, renter: 'x', renter_name: 'NO33Z3SE', entrance: { x: 0, y: 0, z: 0, h: 0 }, keys: [{ identifier: 'x', player_name: 'NO33Z3SE' }] },
+          { id: 2, label: 'MLO Mirror', address: '220 Rockford Hills', description: 'MLO extérieur', interior: 'mlo', property_type: 'mlo', status: 'vente', price_sale: 450000, price_rent: 5000, owner: null, owner_name: null, entrance: { x: 1, y: 1, z: 1, h: 0 }, keys: [] },
+          { id: 3, label: 'Ferme Rustique 2', address: 'Route 68', description: '', interior: 'farmhouse', property_type: 'maison', status: 'libre', price_sale: 180000, price_rent: 2500, owner: null, owner_name: null, entrance: { x: 2, y: 2, z: 2, h: 0 }, keys: [] },
+        ],
+      };
+      openFromMessage({
+        action: 'open',
+        view: demoView,
+        currency: '$',
+        locale: DEMO.locale,
+        playerPos: DEMO.playerPos,
+        data: DEMO,
+      });
+    }
+  } catch (_) { /* ignore */ }
 })();

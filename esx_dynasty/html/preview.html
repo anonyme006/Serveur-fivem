@@ -11,11 +11,18 @@
 <body>
   <iframe id="frame" src="index.html"></iframe>
   <script>
+    const params = new URLSearchParams(location.search);
     const demo = {
       action: 'open',
-      view: new URLSearchParams(location.search).get('view') || 'company',
+      view: params.get('view') || 'company',
       currency: '$',
-      locale: {},
+      locale: {
+        news_type_normal: 'Normal',
+        news_type_urgent: 'Urgent',
+        news_type_info: 'Info',
+        create_property: 'Créer un logement',
+        create: 'Créer',
+      },
       playerPos: { x: -716.11, y: -272.96, z: 36.82, h: 30 },
       data: {
         player: {
@@ -86,6 +93,16 @@
     const frame = document.getElementById('frame');
     frame.addEventListener('load', () => {
       frame.contentWindow.postMessage(demo, '*');
+      if (params.get('view') === 'create') {
+        setTimeout(() => {
+          // open housing then switch to create form
+          frame.contentWindow.postMessage({ ...demo, view: 'housing' }, '*');
+          setTimeout(() => {
+            const btn = frame.contentDocument.getElementById('navCreateProperty');
+            if (btn) btn.click();
+          }, 200);
+        }, 100);
+      }
     });
 
     // Stub NUI callbacks in preview
