@@ -1,0 +1,47 @@
+# FXServer / runtime
+artifacts/
+cache/
+db/
+*.log
+.fxserver/
+FXServer*
+run.sh
+run.cmd
+
+# Secrets
+server.cfg.local
+.env
+*.pem
+
+# Install temp
+.tmp-install/
+
+# Cloned heavy resources (réinstallables via scripts/install-opensource.sh)
+resources/[ox]/oxmysql/
+resources/[ox]/ox_lib/
+resources/[ox]/ox_target/
+resources/[ox]/ox_doorlock/
+resources/[ox]/ox_inventory/
+resources/[voice]/pma-voice/
+resources/[qbx]/qbx_*/
+resources/[housing]/ps-*/
+resources/[standalone]/ps-adminmenu/
+resources/[standalone]/xsound/
+resources/[maps]/bob74_ipl/
+
+# Binaries / streams lourds
+**/*.ytd
+**/*.ydr
+**/*.yft
+**/*.ycd
+**/*.ybn
+**/*.ymap
+**/*.ytyp
+**/*.awc
+**/*.rpf
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
