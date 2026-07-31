@@ -117,6 +117,24 @@ Config.Locations = {
         label = 'Commander des marchandises',
         icon = 'fas fa-clipboard-list',
     },
+
+    -- Pointeuse (prise / fin de service employés)
+    clockIn = {
+        coords = vector3(-43.30, -1749.90, 29.42),
+        size = vector3(0.6, 0.6, 1.0),
+        rotation = 0.0,
+        label = 'Pointeuse',
+        icon = 'fas fa-clock',
+    },
+
+    -- APU — caisse automatique (clients, magasin sans employé en service)
+    apu = {
+        coords = vector3(-46.90, -1758.90, 29.42),
+        size = vector3(0.8, 0.6, 1.0),
+        rotation = 320.0,
+        label = 'Caisse automatique (APU)',
+        icon = 'fas fa-desktop',
+    },
 }
 
 -- =============================================================================
@@ -294,4 +312,13 @@ Config.Notifications = {
     employeeHired   = 'Employé recruté.',
     employeeFired   = 'Employé licencié.',
     gradeUpdated    = 'Grade mis à jour.',
+    clockInSuccess  = 'Prise de service enregistrée. Bon travail !',
+    clockOutSuccess = 'Fin de service enregistrée.',
+    notOnDuty       = 'Vous devez pointer à la pointeuse pour prendre votre service.',
+    alreadyOnDuty   = 'Vous êtes déjà en service.',
+    notClockedIn    = 'Vous n\'êtes pas en service.',
+    apuUnavailable  = 'Caisse automatique indisponible — un employé est en service. Passez en caisse.',
+    shopClosed      = 'Magasin fermé — aucun employé en service. Utilisez la caisse automatique (APU).',
+    apuPurchaseSuccess = 'Paiement APU accepté — $%d. Merci de votre visite !',
+    apuEmptyCart    = 'Votre panier est vide.',
 }

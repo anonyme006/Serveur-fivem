@@ -131,6 +131,7 @@ local SalesHistory = {}     -- Historique ventes (persisté MySQL)
 local ActiveDelivery = nil  -- { orderId, items, orderedBy, vehicleNetId }
 local DeliveryCooldown = 0
 local Statistics = { totalSales = 0, totalRevenue = 0, itemsSold = {} }
+local OnDuty = {}           -- Employés en service { [source] = { identifier, name, clockIn } }
 
 -- =============================================================================
 -- UTILITAIRES
@@ -176,6 +177,93 @@ end
 
 local function GetShelfKey(shelfId, item)
     return shelfId .. '_' .. item
+end
+
+-- =============================================================================
+-- POINTEUSE — PRISE / FIN DE SERVICE
+-- =============================================================================
+local function GetOnDutyCount()
+    local count = 0
+    for _ in pairs(OnDuty) do count = count + 1 end
+    return count
+end
+
+local function SyncDutyState()
+    GlobalState.ltdOnDutyCount = GetOnDutyCount()
+end
+
+---@param source number
+---@return boolean
+local function IsOnDuty(source)
+    return OnDuty[source] ~= nil
+end
+
+---@param source number
+---@return boolean isEmployee
+---@return number grade
+---@return boolean onDuty
+local function IsEmployeeOnDuty(source)
+    local isEmp, grade = IsEmployee(source)
+    return isEmp, grade, isEmp and IsOnDuty(source)
+end
+
+local function ClockIn(source)
+    local isEmp, grade = IsEmployee(source)
+    if not isEmp then
+        Notify(source, Config.Notifications.noJob, 'error')
+        return false
+    end
+    if IsOnDuty(source) then
+        Notify(source, Config.Notifications.alreadyOnDuty, 'error')
+        return false
+    end
+    if not IsNearCoords(source, Config.Locations.clockIn.coords, Config.InteractDistance) then
+        Notify(source, Config.Notifications.tooFar, 'error')
+        return false
+    end
+
+    local player = GetPlayer(source)
+    OnDuty[source] = {
+        identifier = GetIdentifier(player),
+        name = GetPlayerName(source),
+        clockIn = os.time(),
+        grade = grade,
+    }
+
+    Player(source).state:set('ltdOnDuty', true, true)
+    SyncDutyState()
+    Notify(source, Config.Notifications.clockInSuccess, 'success')
+    return true
+end
+
+local function ClockOut(source)
+    if not IsOnDuty(source) then
+        Notify(source, Config.Notifications.notClockedIn, 'error')
+        return false
+    end
+
+    OnDuty[source] = nil
+    Player(source).state:set('ltdOnDuty', false, true)
+    SyncDutyState()
+    Notify(source, Config.Notifications.clockOutSuccess, 'success')
+    return true
+end
+
+--- Vérifie qu'un employé est en service pour les actions métier
+---@param source number
+---@return boolean
+---@return number grade
+local function RequireOnDuty(source)
+    local isEmp, grade = IsEmployee(source)
+    if not isEmp then
+        Notify(source, Config.Notifications.noJob, 'error')
+        return false, grade
+    end
+    if not IsOnDuty(source) then
+        Notify(source, Config.Notifications.notOnDuty, 'error')
+        return false, grade
+    end
+    return true, grade
 end
 
 local function InitStock()
@@ -247,7 +335,7 @@ local function InitDatabase()
             quantity INT DEFAULT 1,
             amount INT NOT NULL,
             payment_type VARCHAR(20) DEFAULT 'cash',
-            sale_type ENUM('shelf', 'register') DEFAULT 'shelf',
+            sale_type ENUM('shelf', 'register', 'apu') DEFAULT 'shelf',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ]])
@@ -340,13 +428,78 @@ end
 -- Vérifier si le joueur est employé
 lib.callback.register('ltd:server:isEmployee', function(source)
     local isEmp, grade = IsEmployee(source)
-    return { isEmployee = isEmp, grade = grade }
+    return {
+        isEmployee = isEmp,
+        grade = grade,
+        onDuty = isEmp and IsOnDuty(source),
+        onDutyCount = GetOnDutyCount(),
+    }
+end)
+
+-- Pointeuse — statut service
+lib.callback.register('ltd:server:getDutyStatus', function(source)
+    local isEmp, grade = IsEmployee(source)
+    local dutyData = OnDuty[source]
+    local onDutyList = {}
+    for src, data in pairs(OnDuty) do
+        onDutyList[#onDutyList + 1] = {
+            id = src,
+            name = data.name,
+            grade = data.grade,
+            since = data.clockIn,
+        }
+    end
+    return {
+        isEmployee = isEmp,
+        onDuty = isEmp and IsOnDuty(source) or false,
+        onDutyCount = GetOnDutyCount(),
+        onDutyList = onDutyList,
+        clockInTime = dutyData and dutyData.clockIn or nil,
+    }
+end)
+
+lib.callback.register('ltd:server:clockIn', function(source)
+    return ClockIn(source)
+end)
+
+lib.callback.register('ltd:server:clockOut', function(source)
+    if not IsNearCoords(source, Config.Locations.clockIn.coords, Config.InteractDistance) then
+        Notify(source, Config.Notifications.tooFar, 'error')
+        return false
+    end
+    return ClockOut(source)
+end)
+
+-- Catalogue APU (tous les articles des rayons + stock)
+lib.callback.register('ltd:server:getApuCatalog', function(source)
+    if not IsNearCoords(source, Config.Locations.apu.coords, Config.InteractDistance) then
+        return nil
+    end
+    if GetOnDutyCount() > 0 then
+        return { unavailable = true, reason = Config.Notifications.apuUnavailable }
+    end
+
+    local catalog = {}
+    for shelfId, shelf in pairs(Config.Shelves) do
+        for _, entry in ipairs(shelf.items) do
+            local key = GetShelfKey(shelfId, entry.item)
+            catalog[#catalog + 1] = {
+                shelfId = shelfId,
+                shelfLabel = shelf.label,
+                item = entry.item,
+                label = entry.label,
+                price = entry.price,
+                stock = ShelfStock[key] or 0,
+            }
+        end
+    end
+    return { unavailable = false, items = catalog }
 end)
 
 -- Obtenir le stock réserve
 lib.callback.register('ltd:server:getStoreStock', function(source)
-    local isEmp = IsEmployee(source)
-    if not isEmp then return nil end
+    local ok, grade = RequireOnDuty(source)
+    if not ok or not HasPermission(grade, 'canStock') then return nil end
     if not IsNearCoords(source, Config.Locations.stockroom.coords, Config.InteractDistance) then
         return nil
     end
@@ -371,11 +524,8 @@ end)
 
 -- Remplir un rayon depuis la réserve
 lib.callback.register('ltd:server:fillShelf', function(source, shelfId, item, quantity)
-    local isEmp, grade = IsEmployee(source)
-    if not isEmp or not HasPermission(grade, 'canStock') then
-        Notify(source, Config.Notifications.noJob, 'error')
-        return false
-    end
+    local ok, grade = RequireOnDuty(source)
+    if not ok or not HasPermission(grade, 'canStock') then return false end
 
     local shelf = Config.Shelves[shelfId]
     if not shelf then return false end
@@ -405,8 +555,13 @@ lib.callback.register('ltd:server:fillShelf', function(source, shelfId, item, qu
     return true
 end)
 
--- Achat client depuis un rayon
+-- Achat client depuis un rayon (uniquement si un employé est en service)
 lib.callback.register('ltd:server:buyFromShelf', function(source, shelfId, item, quantity, paymentType)
+    if GetOnDutyCount() == 0 then
+        Notify(source, Config.Notifications.shopClosed, 'error')
+        return false
+    end
+
     local shelf = Config.Shelves[shelfId]
     if not shelf then return false end
     if not IsNearCoords(source, shelf.coords, Config.InteractDistance) then
@@ -457,13 +612,107 @@ lib.callback.register('ltd:server:buyFromShelf', function(source, shelfId, item,
     return true
 end)
 
--- Encaisser un client à la caisse
-lib.callback.register('ltd:server:chargeCustomer', function(source, targetId, amount, paymentType)
-    local isEmp, grade = IsEmployee(source)
-    if not isEmp or not HasPermission(grade, 'canRegister') then
-        Notify(source, Config.Notifications.noJob, 'error')
+-- Achat via APU (caisse automatique — magasin sans employé en service)
+lib.callback.register('ltd:server:buyFromApu', function(source, cart, paymentType)
+    if GetOnDutyCount() > 0 then
+        Notify(source, Config.Notifications.apuUnavailable, 'error')
         return false
     end
+
+    if not IsNearCoords(source, Config.Locations.apu.coords, Config.InteractDistance) then
+        Notify(source, Config.Notifications.tooFar, 'error')
+        return false
+    end
+
+    if type(cart) ~= 'table' or #cart == 0 then
+        Notify(source, Config.Notifications.apuEmptyCart, 'error')
+        return false
+    end
+
+    paymentType = paymentType == 'bank' and 'bank' or 'cash'
+
+    local player = GetPlayer(source)
+    if not player then return false end
+
+    -- Validation du panier côté serveur
+    local totalPrice = 0
+    local validatedCart = {}
+
+    for _, entry in ipairs(cart) do
+        local shelfId = entry.shelfId
+        local item = entry.item
+        local quantity = math.floor(tonumber(entry.quantity) or 0)
+
+        if quantity <= 0 or quantity > 20 then return false end
+
+        local shelf = Config.Shelves[shelfId]
+        if not shelf then return false end
+
+        local itemConfig = GetShelfItemConfig(shelfId, item)
+        if not itemConfig then return false end
+
+        local key = GetShelfKey(shelfId, item)
+        local available = ShelfStock[key] or 0
+        if available < quantity then
+            Notify(source, string.format('%s — stock insuffisant.', itemConfig.label), 'error')
+            return false
+        end
+
+        if not exports.ox_inventory:CanCarryItem(source, item, quantity) then
+            Notify(source, 'Inventaire plein.', 'error')
+            return false
+        end
+
+        totalPrice = totalPrice + (itemConfig.price * quantity)
+        validatedCart[#validatedCart + 1] = {
+            shelfId = shelfId,
+            item = item,
+            quantity = quantity,
+            price = itemConfig.price,
+            label = itemConfig.label,
+            key = key,
+        }
+    end
+
+    if totalPrice <= 0 then return false end
+
+    if not HasMoney(player, totalPrice, paymentType) then
+        Notify(source, Config.Notifications.notEnoughMoney, 'error')
+        return false
+    end
+
+    RemoveMoney(player, totalPrice, paymentType)
+
+    for _, entry in ipairs(validatedCart) do
+        exports.ox_inventory:AddItem(source, entry.item, entry.quantity)
+        ShelfStock[entry.key] = (ShelfStock[entry.key] or 0) - entry.quantity
+    end
+
+    AddSocietyMoney(totalPrice)
+
+    local identifier = GetIdentifier(player)
+    for _, entry in ipairs(validatedCart) do
+        LogSale('apu', identifier, entry.item, entry.quantity, entry.price * entry.quantity, paymentType, 'apu')
+    end
+
+    -- Ticket de caisse APU
+    local receiptMetadata = {
+        description = string.format('LTD Grove APU — $%d — %s', totalPrice, os.date('%d/%m/%Y %H:%M')),
+        amount = totalPrice,
+        date = os.date('%d/%m/%Y %H:%M'),
+        seller = 'APU',
+    }
+    exports.ox_inventory:AddItem(source, Config.ReceiptItem, 1, receiptMetadata)
+
+    SaveStockToDB()
+    Notify(source, string.format(Config.Notifications.apuPurchaseSuccess, totalPrice), 'success')
+    return true
+end)
+
+-- Encaisser un client à la caisse
+lib.callback.register('ltd:server:chargeCustomer', function(source, targetId, amount, paymentType)
+    local ok, grade = RequireOnDuty(source)
+    if not ok or not HasPermission(grade, 'canRegister') then return false end
 
     if not IsNearCoords(source, Config.Locations.register.coords, Config.InteractDistance) then
         Notify(source, Config.Notifications.tooFar, 'error')
@@ -518,8 +767,8 @@ end)
 
 -- Historique des ventes
 lib.callback.register('ltd:server:getSalesHistory', function(source)
-    local isEmp, grade = IsEmployee(source)
-    if not isEmp then return nil end
+    local ok = RequireOnDuty(source)
+    if not ok then return nil end
 
     local rows = MySQL.query.await(
         'SELECT * FROM ltd_grove_sales ORDER BY created_at DESC LIMIT 50'
@@ -529,8 +778,8 @@ end)
 
 -- Compte société
 lib.callback.register('ltd:server:getSocietyBalance', function(source)
-    local isEmp, grade = IsEmployee(source)
-    if not isEmp or grade < Config.BossMinGrade then return nil end
+    local ok, grade = RequireOnDuty(source)
+    if not ok or grade < Config.BossMinGrade then return nil end
     if not IsNearCoords(source, Config.Locations.boss.coords, Config.InteractDistance) then
         return nil
     end
@@ -539,8 +788,8 @@ end)
 
 -- Dépôt société
 lib.callback.register('ltd:server:depositSociety', function(source, amount)
-    local isEmp, grade = IsEmployee(source)
-    if not isEmp or grade < Config.BossMinGrade then return false end
+    local ok, grade = RequireOnDuty(source)
+    if not ok or grade < Config.BossMinGrade then return false end
     if not IsNearCoords(source, Config.Locations.boss.coords, Config.InteractDistance) then
         return false
     end
@@ -562,8 +811,8 @@ end)
 
 -- Retrait société
 lib.callback.register('ltd:server:withdrawSociety', function(source, amount)
-    local isEmp, grade = IsEmployee(source)
-    if not isEmp or grade < Config.BossMinGrade then return false end
+    local ok, grade = RequireOnDuty(source)
+    if not ok or grade < Config.BossMinGrade then return false end
     if not IsNearCoords(source, Config.Locations.boss.coords, Config.InteractDistance) then
         return false
     end
@@ -584,8 +833,8 @@ end)
 
 -- Statistiques
 lib.callback.register('ltd:server:getStatistics', function(source)
-    local isEmp, grade = IsEmployee(source)
-    if not isEmp or grade < Config.BossMinGrade then return nil end
+    local ok, grade = RequireOnDuty(source)
+    if not ok or grade < Config.BossMinGrade then return nil end
 
     local totalRevenue = MySQL.scalar.await('SELECT COALESCE(SUM(amount), 0) FROM ltd_grove_sales') or 0
     local totalSales = MySQL.scalar.await('SELECT COUNT(*) FROM ltd_grove_sales') or 0
@@ -605,8 +854,8 @@ end)
 
 -- Employés (ESX)
 lib.callback.register('ltd:server:getEmployees', function(source)
-    local isEmp, grade = IsEmployee(source)
-    if not isEmp or grade < Config.BossMinGrade then return nil end
+    local ok, grade = RequireOnDuty(source)
+    if not ok or grade < Config.BossMinGrade then return nil end
 
     if Framework.type == 'esx' then
         local rows = MySQL.query.await(
@@ -709,11 +958,8 @@ end)
 -- LIVRAISONS
 -- =============================================================================
 lib.callback.register('ltd:server:orderDelivery', function(source, catalogIndex)
-    local isEmp, grade = IsEmployee(source)
-    if not isEmp or not HasPermission(grade, 'canDelivery') then
-        Notify(source, Config.Notifications.noJob, 'error')
-        return false
-    end
+    local ok, grade = RequireOnDuty(source)
+    if not ok or not HasPermission(grade, 'canDelivery') then return false end
 
     if not IsNearCoords(source, Config.Locations.deliveryOrder.coords, Config.InteractDistance) then
         Notify(source, Config.Notifications.tooFar, 'error')
@@ -755,11 +1001,8 @@ lib.callback.register('ltd:server:orderDelivery', function(source, catalogIndex)
 end)
 
 lib.callback.register('ltd:server:validateDelivery', function(source)
-    local isEmp, grade = IsEmployee(source)
-    if not isEmp or not HasPermission(grade, 'canDelivery') then
-        Notify(source, Config.Notifications.noJob, 'error')
-        return false
-    end
+    local ok, grade = RequireOnDuty(source)
+    if not ok or not HasPermission(grade, 'canDelivery') then return false end
 
     if not IsNearCoords(source, Config.Locations.deliveryValidate.coords, Config.DeliveryValidateDistance) then
         Notify(source, Config.Notifications.tooFar, 'error')
@@ -816,8 +1059,18 @@ AddEventHandler('onResourceStart', function(resourceName)
     Wait(500)
     LoadStockFromDB()
     RegisterStash()
+    SyncDutyState()
 
     print('^2[LTD-Grove]^7 Ressource démarrée — Framework: ' .. (Config.Framework or 'inconnu'))
+end)
+
+-- Fin de service automatique à la déconnexion
+AddEventHandler('playerDropped', function()
+    local source = source
+    if OnDuty[source] then
+        OnDuty[source] = nil
+        SyncDutyState()
+    end
 end)
 
 AddEventHandler('onResourceStop', function(resourceName)
