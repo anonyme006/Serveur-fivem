@@ -123,24 +123,33 @@ local function getSocietyAccount(jobName)
     if not jobName or Config.ExcludedJobs[jobName] then return nil end
 
     local accountName = Config.SocietyPrefix .. jobName
-    local result = MySQL.single.await(
-        'SELECT name, label, money FROM addon_account_data WHERE account_name = ? LIMIT 1',
-        { accountName }
-    )
 
-    -- Fallback: try addon_account + data join variants
-    if not result then
-        result = MySQL.single.await([[
-            SELECT a.name, a.label, d.money
-            FROM addon_account a
-            LEFT JOIN addon_account_data d ON d.account_name = a.name
-            WHERE a.name = ?
-            LIMIT 1
-        ]], { accountName })
-    end
+    -- addon_account_data: account_name, money, owner (pas de name/label)
+    -- addon_account: name, label, shared
+    local result = MySQL.single.await([[
+        SELECT a.name, a.label, COALESCE(d.money, 0) AS money
+        FROM addon_account a
+        LEFT JOIN addon_account_data d
+            ON d.account_name = a.name AND (d.owner IS NULL OR d.owner = '')
+        WHERE a.name = ?
+        LIMIT 1
+    ]], { accountName })
 
     if not result then
-        -- Soft create display even without addonaccount (money 0)
+        -- Compte société non déclaré dans addon_account
+        local dataOnly = MySQL.single.await(
+            'SELECT account_name, money FROM addon_account_data WHERE account_name = ? LIMIT 1',
+            { accountName }
+        )
+        if dataOnly then
+            return {
+                name = accountName,
+                label = jobName,
+                money = tonumber(dataOnly.money) or 0,
+                exists = true,
+            }
+        end
+
         return {
             name = accountName,
             label = jobName,
@@ -158,22 +167,34 @@ local function getSocietyAccount(jobName)
 end
 
 local function setSocietyMoney(accountName, amount)
-    MySQL.update.await(
-        'UPDATE addon_account_data SET money = ? WHERE account_name = ?',
+    local affected = MySQL.update.await(
+        'UPDATE addon_account_data SET money = ? WHERE account_name = ? AND (owner IS NULL OR owner = \'\')',
         { amount, accountName }
     )
+    if not affected or affected < 1 then
+        MySQL.insert.await(
+            'INSERT INTO addon_account_data (account_name, money, owner) VALUES (?, ?, NULL)',
+            { accountName, amount }
+        )
+    end
 end
 
 local function addSocietyMoney(accountName, amount)
-    MySQL.update.await(
-        'UPDATE addon_account_data SET money = money + ? WHERE account_name = ?',
+    local affected = MySQL.update.await(
+        'UPDATE addon_account_data SET money = money + ? WHERE account_name = ? AND (owner IS NULL OR owner = \'\')',
         { amount, accountName }
     )
+    if not affected or affected < 1 then
+        MySQL.insert.await(
+            'INSERT INTO addon_account_data (account_name, money, owner) VALUES (?, ?, NULL)',
+            { accountName, amount }
+        )
+    end
 end
 
 local function removeSocietyMoney(accountName, amount)
     MySQL.update.await(
-        'UPDATE addon_account_data SET money = money - ? WHERE account_name = ? AND money >= ?',
+        'UPDATE addon_account_data SET money = money - ? WHERE account_name = ? AND (owner IS NULL OR owner = \'\') AND money >= ?',
         { amount, accountName, amount }
     )
 end
