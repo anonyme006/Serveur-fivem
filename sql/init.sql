@@ -32,3 +32,17 @@ CREATE TABLE IF NOT EXISTS `vibe_invoices` (
   KEY `idx_to` (`to_citizenid`),
   KEY `idx_paid` (`paid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `vibe_gruppe6_points` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `point_type` VARCHAR(32) NOT NULL,
+  `label` VARCHAR(128) NOT NULL,
+  `x` DOUBLE NOT NULL,
+  `y` DOUBLE NOT NULL,
+  `z` DOUBLE NOT NULL,
+  `enabled` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_type` (`point_type`),
+  KEY `idx_enabled` (`enabled`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

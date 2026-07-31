@@ -19,4 +19,5 @@ return {
     ['fish_salmon'] = { label = 'Saumon', weight = 260, stack = true, close = true },
     ['driver_license'] = { label = 'Permis de conduire', weight = 10, stack = false, close = true },
     ['radio'] = { label = 'Radio', weight = 400, stack = false, close = true },
+    ['money_bag'] = { label = 'Sac de billets', weight = 2500, stack = false, close = true },
 }

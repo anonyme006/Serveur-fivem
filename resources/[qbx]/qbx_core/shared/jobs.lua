@@ -327,6 +327,23 @@ return {
             },
         },
     },
+    ['gruppe6'] = {
+        label = 'Gruppe 6',
+        defaultDuty = false,
+        offDutyPay = false,
+        grades = {
+            [0] = {
+                name = 'Agent',
+                payment = 50
+            },
+            [1] = {
+                name = 'Superviseur',
+                isboss = true,
+                bankAuth = true,
+                payment = 100
+            },
+        },
+    },
     ['vineyard'] = {
         label = 'Vineyard',
         defaultDuty = true,
