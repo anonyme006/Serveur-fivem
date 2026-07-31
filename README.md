@@ -2,7 +2,7 @@
 
 Base de reconstruction d’un serveur RP **français** calqué sur une stack **Qbox + Ox**, avec inventaire des ressources du serveur de référence et stubs pour remplacer les scripts privés `vibe_*`.
 
-> Les scripts `vibe_*` / `vice_*` et la majorité des MLOs / véhicules du serveur d’origine sont **privés ou payants**. Ce dépôt ne les contient pas. Il te donne la structure, l’ordre de démarrage, les équivalents, et des stubs à étendre.
+> Les scripts d’origine `vibe_*` sont privés : ce dépôt fournit une **réécriture jouable** (FDO, crimi, civil, économie) + la structure serveur. Les MLOs / véhicules / `lb-phone` restent à acheter.
 
 ## Ce que contient ce dépôt
 
@@ -15,7 +15,9 @@ Base de reconstruction d’un serveur RP **français** calqué sur une stack **Q
 | `docs/GUIDE-INSTALL.md` | Installation pas à pas |
 | `scripts/install-opensource.sh` | Clone Ox + Qbox + voice + bob74_ipl |
 | `sql/init.sql` | Base MariaDB + tables custom stubs |
-| `resources/[vibe]/` | Stubs jouables (API, spawn, garages, factures, weed, loadscreen) |
+| `resources/[vibe]/` | Suite complète réécrite (FDO, crimi, civil, économie…) |
+| `docs/VIBE-REWRITE.md` | Catalogue des modules vibe_* réécrits |
+| `config/items_vibe.lua` | Items à fusionner dans ox_inventory |
 
 ## Démarrage rapide
 

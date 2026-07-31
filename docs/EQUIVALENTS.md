@@ -44,4 +44,4 @@ Si tu dois réécrire du `vibe_*`, commence par cet ordre :
 5. Un premier circuit crimi (`vibe_crimi_weed` ou `vibe_crimi_pickpocket`)
 6. Le reste progressivement
 
-Les stubs dans `resources/[vibe]/` sont des squelettes Lua Qbox/Ox prêts à étendre — pas des clones fonctionnels du serveur original.
+Les modules dans `resources/[vibe]/` sont maintenant des **réécritures jouables**. Détail : `docs/VIBE-REWRITE.md`.

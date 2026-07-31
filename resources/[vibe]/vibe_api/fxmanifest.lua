@@ -3,13 +3,14 @@ game 'gta5'
 lua54 'yes'
 
 name 'vibe_api'
-author 'local-scaffold'
-description 'Pont API commun pour les ressources vibe_* (stub)'
-version '0.1.0'
+author 'vibe-rewrite'
+description 'API commune des ressources vibe_*'
+version '1.0.0'
 
 shared_scripts {
     '@ox_lib/init.lua',
     'config.lua',
+    'shared/jobs.lua',
 }
 
 server_scripts {

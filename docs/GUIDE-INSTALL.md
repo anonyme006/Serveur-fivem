@@ -42,14 +42,12 @@ set mysql_connection_string "mysql://USER:PASS@127.0.0.1/fivem_qbox?charset=utf8
 sv_licenseKey "ta_cle"
 ```
 
-## 4. Items ox_inventory pour les stubs
+## 4. Items ox_inventory pour les vibe_*
 
-Dans `ox_inventory/data/items.lua`, ajoute par exemple :
+Fusionne le contenu de `config/items_vibe.lua` dans `ox_inventory/data/items.lua`
+(weed, black_money, lockpick, goldchain, farm, fish, permis, etc.).
 
-```lua
-['weed_leaf'] = { label = 'Feuille de cannabis', weight = 50, stack = true },
-['weed_bag']  = { label = 'Pochon de weed', weight = 100, stack = true },
-```
+Catalogue des scripts : `docs/VIBE-REWRITE.md`.
 
 ## 5. Contenu payant / maps / véhicules
 

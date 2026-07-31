@@ -1,10 +1,22 @@
 Config = {}
 
--- Préfixe des événements / exports
 Config.Namespace = 'vibe'
-
--- Locale
 Config.Locale = 'fr'
+Config.Debug = false
 
--- Debug console
-Config.Debug = true
+-- Jobs FDO / EMS reconnus par les scripts vibe
+Config.PoliceJobs = {
+    police = true,
+    sheriff = true,
+    fbi = true,
+}
+
+Config.EmsJobs = {
+    ambulance = true,
+    ems = true,
+}
+
+Config.MechanicJobs = {
+    mechanic = true,
+    bennys = true,
+}
