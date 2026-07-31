@@ -10,13 +10,63 @@ local function notify(src, msg, nType)
     TriggerClientEvent('esx_dynasty:notify', src, msg, nType or 'inform')
 end
 
+local function vecToTable(v)
+    if not v then return nil end
+    if type(v) == 'vector3' or type(v) == 'vector4' then
+        return { x = v.x + 0.0, y = v.y + 0.0, z = v.z + 0.0 }
+    end
+    if type(v) == 'table' and v.x then
+        return { x = v.x + 0.0, y = v.y + 0.0, z = v.z + 0.0, h = v.h }
+    end
+    return nil
+end
+
+local InteriorAliases = {
+    apartment_low = 'apt_low',
+    apartment_mid = 'apt_mid',
+    apartment_high = 'apt_high_dellperro',
+    apartment_modern7 = 'apt_modern_1',
+    mansion = 'house_franklin',
+    farmhouse = 'house_madrazo',
+    office = 'office_arcadius',
+    warehouse = 'warehouse_medium',
+}
+
 local function getInterior(id)
+    id = InteriorAliases[id] or id
     for i = 1, #Config.Interiors do
         if Config.Interiors[i].id == id then
             return Config.Interiors[i]
         end
     end
     return Config.Interiors[1]
+end
+
+local function serializeInterior(it)
+    if not it then return nil end
+    local ipls = it.ipl
+    if type(ipls) == 'string' then ipls = { ipls } end
+    return {
+        id = it.id,
+        label = it.label,
+        description = it.description or '',
+        type = it.type,
+        tier = it.tier or 'mid',
+        image = it.image,
+        entry = vecToTable(it.entry),
+        heading = it.heading or 0.0,
+        stash = vecToTable(it.stash),
+        wardrobe = vecToTable(it.wardrobe),
+        ipl = ipls,
+        isMlo = it.entry == nil or it.type == 'mlo',
+    }
+end
+
+local function parsePoint(p)
+    if type(p) ~= 'table' then return nil end
+    local x, y, z = tonumber(p.x), tonumber(p.y), tonumber(p.z)
+    if not x or not y or not z then return nil end
+    return { x = x + 0.0, y = y + 0.0, z = z + 0.0, h = (tonumber(p.h) or 0) + 0.0 }
 end
 
 local function isEmployee(xPlayer)
@@ -86,7 +136,7 @@ local function ensureTables()
             `label` VARCHAR(128) NOT NULL,
             `address` VARCHAR(255) NOT NULL DEFAULT '',
             `description` TEXT NULL,
-            `interior` VARCHAR(64) NOT NULL DEFAULT 'apartment_mid',
+            `interior` VARCHAR(64) NOT NULL DEFAULT 'apt_mid',
             `property_type` VARCHAR(32) NOT NULL DEFAULT 'appartement',
             `status` VARCHAR(32) NOT NULL DEFAULT 'libre',
             `price_sale` INT NOT NULL DEFAULT 0,
@@ -306,13 +356,7 @@ local function buildPanelPayload(xPlayer)
 
     local interiors = {}
     for i = 1, #Config.Interiors do
-        local it = Config.Interiors[i]
-        interiors[#interiors + 1] = {
-            id = it.id,
-            label = it.label,
-            type = it.type,
-            image = it.image,
-        }
+        interiors[#interiors + 1] = serializeInterior(Config.Interiors[i])
     end
 
     return {
@@ -396,15 +440,19 @@ ESX.RegisterServerCallback('esx_dynasty:createProperty', function(source, cb, da
         return
     end
 
-    local interior = data.interior or 'apartment_mid'
+    local interior = data.interior or 'apt_mid'
     if not getInterior(interior) then
         cb({ ok = false, error = Translate('invalid_data') })
         return
     end
 
     local status = data.status or 'libre'
-    local e = data.entrance
-    local g = data.garage
+    local e = parsePoint(data.entrance)
+    local g = parsePoint(data.garage)
+    if not e then
+        cb({ ok = false, error = Translate('invalid_data') })
+        return
+    end
 
     local id = MySQL.insert.await([[
         INSERT INTO dynasty_properties
@@ -421,8 +469,8 @@ ESX.RegisterServerCallback('esx_dynasty:createProperty', function(source, cb, da
         status,
         tonumber(data.price_sale) or 0,
         tonumber(data.price_rent) or 0,
-        e.x + 0.0, e.y + 0.0, e.z + 0.0, (e.h or 0) + 0.0,
-        g and g.x or nil, g and g.y or nil, g and g.z or nil, g and (g.h or 0) or nil,
+        e.x, e.y, e.z, e.h,
+        g and g.x or nil, g and g.y or nil, g and g.z or nil, g and g.h or nil,
         xPlayer.identifier,
     })
 
@@ -453,10 +501,23 @@ ESX.RegisterServerCallback('esx_dynasty:updateProperty', function(source, cb, da
         return
     end
 
-    local e = data.entrance or Properties[id].entrance
-    local g = data.garage
-    if g == false then g = nil end
-    if g == nil and data.clear_garage then g = nil end
+    local e = parsePoint(data.entrance) or Properties[id].entrance
+    local g = parsePoint(data.garage)
+    if data.clear_garage then
+        g = nil
+    elseif not g then
+        g = Properties[id].garage
+    end
+
+    local locked = Properties[id].locked and 1 or 0
+    if data.locked ~= nil then
+        locked = (data.locked == false or data.locked == 0) and 0 or 1
+    end
+
+    if data.interior and not getInterior(data.interior) then
+        cb({ ok = false, error = Translate('invalid_data') })
+        return
+    end
 
     MySQL.update.await([[
         UPDATE dynasty_properties SET
@@ -475,9 +536,9 @@ ESX.RegisterServerCallback('esx_dynasty:updateProperty', function(source, cb, da
         data.status or Properties[id].status,
         tonumber(data.price_sale) or Properties[id].price_sale,
         tonumber(data.price_rent) or Properties[id].price_rent,
-        e.x + 0.0, e.y + 0.0, e.z + 0.0, (e.h or 0) + 0.0,
+        e.x, e.y, e.z, e.h or 0.0,
         g and g.x or nil, g and g.y or nil, g and g.z or nil, g and (g.h or 0) or nil,
-        data.locked == false and 0 or 1,
+        locked,
         id,
     })
 
@@ -485,6 +546,51 @@ ESX.RegisterServerCallback('esx_dynasty:updateProperty', function(source, cb, da
     Properties[id] = rowToProperty(row)
     TriggerClientEvent('esx_dynasty:syncProperties', -1, Properties)
     cb({ ok = true, property = Properties[id], message = Translate('property_updated') })
+end)
+
+ESX.RegisterServerCallback('esx_dynasty:updatePoints', function(source, cb, data)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if not hasPermission(xPlayer, 'editProperty') then
+        cb({ ok = false, error = Translate('no_permission') })
+        return
+    end
+
+    local id = tonumber(data and data.id)
+    if not id or not Properties[id] then
+        cb({ ok = false, error = Translate('invalid_data') })
+        return
+    end
+
+    local prop = Properties[id]
+    local entrance = parsePoint(data.entrance) or prop.entrance
+    local garage = prop.garage
+
+    if data.clear_garage then
+        garage = nil
+    elseif data.garage ~= nil then
+        garage = parsePoint(data.garage)
+        if data.garage and not garage then
+            cb({ ok = false, error = Translate('invalid_data') })
+            return
+        end
+    end
+
+    MySQL.update.await([[
+        UPDATE dynasty_properties SET
+            entrance_x = ?, entrance_y = ?, entrance_z = ?, entrance_h = ?,
+            garage_x = ?, garage_y = ?, garage_z = ?, garage_h = ?
+        WHERE id = ?
+    ]], {
+        entrance.x, entrance.y, entrance.z, entrance.h or 0.0,
+        garage and garage.x or nil, garage and garage.y or nil,
+        garage and garage.z or nil, garage and (garage.h or 0) or nil,
+        id,
+    })
+
+    local row = MySQL.single.await('SELECT * FROM dynasty_properties WHERE id = ?', { id })
+    Properties[id] = rowToProperty(row)
+    TriggerClientEvent('esx_dynasty:syncProperties', -1, Properties)
+    cb({ ok = true, property = Properties[id], message = Translate('points_updated') })
 end)
 
 ESX.RegisterServerCallback('esx_dynasty:deleteProperty', function(source, cb, data)
@@ -765,19 +871,25 @@ ESX.RegisterServerCallback('esx_dynasty:canEnter', function(source, cb, property
         return
     end
 
-    local interior = getInterior(prop.interior)
+    local interior = serializeInterior(getInterior(prop.interior))
     if not interior or not interior.entry then
         cb({ ok = false, mlo = true })
         return
     end
 
+    local payload = {
+        ok = true,
+        interior = interior,
+        bucket = InsideBucketBase + id,
+    }
+
     if not prop.locked then
-        cb({ ok = true, interior = interior, bucket = InsideBucketBase + id })
+        cb(payload)
         return
     end
 
     if hasKey(id, xPlayer.identifier) or hasPermission(xPlayer, 'editProperty') then
-        cb({ ok = true, interior = interior, bucket = InsideBucketBase + id })
+        cb(payload)
         return
     end
 

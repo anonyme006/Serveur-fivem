@@ -227,9 +227,91 @@
   function fillInteriors() {
     const sel = document.getElementById('fInterior');
     const interiors = (state.data && state.data.interiors) || [];
-    sel.innerHTML = interiors.map((i) =>
-      `<option value="${escapeHtml(i.id)}" data-type="${escapeHtml(i.type)}">${escapeHtml(i.label)}</option>`
-    ).join('');
+    const groups = {};
+    interiors.forEach((i) => {
+      const key = i.type || 'autre';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(i);
+    });
+    const order = ['appartement', 'maison', 'motel', 'bureau', 'entrepot', 'mlo'];
+    const labels = {
+      appartement: 'Appartements',
+      maison: 'Maisons',
+      motel: 'Motels',
+      bureau: 'Bureaux',
+      entrepot: 'Entrepôts',
+      mlo: 'MLO',
+      autre: 'Autres',
+    };
+    let html = '';
+    order.forEach((key) => {
+      if (!groups[key] || !groups[key].length) return;
+      html += `<optgroup label="${escapeHtml(labels[key] || key)}">`;
+      groups[key].forEach((i) => {
+        const desc = i.description ? ` — ${i.description}` : '';
+        html += `<option value="${escapeHtml(i.id)}" data-type="${escapeHtml(i.type)}" data-desc="${escapeHtml(i.description || '')}">${escapeHtml(i.label)}${i.tier ? ` [${escapeHtml(i.tier)}]` : ''}</option>`;
+      });
+      html += '</optgroup>';
+      delete groups[key];
+    });
+    Object.keys(groups).forEach((key) => {
+      html += `<optgroup label="${escapeHtml(labels[key] || key)}">`;
+      groups[key].forEach((i) => {
+        html += `<option value="${escapeHtml(i.id)}" data-type="${escapeHtml(i.type)}" data-desc="${escapeHtml(i.description || '')}">${escapeHtml(i.label)}</option>`;
+      });
+      html += '</optgroup>';
+    });
+    sel.innerHTML = html;
+    updateInteriorHint();
+  }
+
+  function updateInteriorHint() {
+    const opt = document.getElementById('fInterior').selectedOptions[0];
+    const hint = document.getElementById('interiorHint');
+    if (!hint) return;
+    if (opt && opt.dataset.desc) {
+      hint.textContent = opt.dataset.desc;
+    } else {
+      hint.textContent = t('interior_info', 'Choisissez un intérieur natif GTA / IPL');
+    }
+  }
+
+  function applyPointToForm(type, point) {
+    if (!point) return;
+    if (type === 'entrance') {
+      document.getElementById('fX').value = Number(point.x).toFixed(2);
+      document.getElementById('fY').value = Number(point.y).toFixed(2);
+      document.getElementById('fZ').value = Number(point.z).toFixed(2);
+      document.getElementById('fH').value = Number(point.h || 0).toFixed(2);
+    } else if (type === 'garage') {
+      document.getElementById('gX').value = Number(point.x).toFixed(2);
+      document.getElementById('gY').value = Number(point.y).toFixed(2);
+      document.getElementById('gZ').value = Number(point.z).toFixed(2);
+      document.getElementById('gH').value = Number(point.h || 0).toFixed(2);
+    }
+  }
+
+  function applyDraft(draft) {
+    if (!draft) return;
+    if (draft.id) document.getElementById('editId').value = draft.id;
+    if (draft.label != null) document.getElementById('fLabel').value = draft.label;
+    if (draft.address != null) document.getElementById('fAddress').value = draft.address;
+    if (draft.interior) document.getElementById('fInterior').value = draft.interior;
+    if (draft.property_type) document.getElementById('fType').value = draft.property_type;
+    if (draft.status) document.getElementById('fStatus').value = draft.status;
+    if (draft.price_sale != null) document.getElementById('fSale').value = draft.price_sale;
+    if (draft.price_rent != null) document.getElementById('fRent').value = draft.price_rent;
+    if (draft.description != null) document.getElementById('fDesc').value = draft.description;
+    if (draft.entrance) applyPointToForm('entrance', draft.entrance);
+    if (draft.garage) applyPointToForm('garage', draft.garage);
+    if (draft.clear_garage) {
+      ['gX', 'gY', 'gZ', 'gH'].forEach((id) => { document.getElementById(id).value = ''; });
+    }
+    updateInteriorHint();
+    if (draft.id) {
+      document.getElementById('createTitle').textContent = t('edit_property', 'Modifier le logement');
+      document.getElementById('submitPropertyBtn').textContent = t('update', 'Mettre à jour');
+    }
   }
 
   function renderStats() {
@@ -375,6 +457,7 @@
     if (!p) return;
     state.selectedProperty = p;
     const perms = (state.data && state.data.permissions) || {};
+    const interiorMeta = ((state.data && state.data.interiors) || []).find((i) => i.id === p.interior);
 
     document.getElementById('detailBadge').textContent = statusLabel(p.status);
     document.getElementById('detailBadge').className = `badge ${statusBadgeClass(p.status)}`;
@@ -385,8 +468,27 @@
     document.getElementById('detailDesc').textContent = p.description || '';
     document.getElementById('detailOwner').textContent = p.owner_name || '—';
     document.getElementById('detailRenter').textContent = p.renter_name || '—';
-    document.getElementById('detailInterior').textContent = p.interior || '—';
+    document.getElementById('detailInterior').textContent = interiorMeta
+      ? `${interiorMeta.label}${interiorMeta.description ? ` — ${interiorMeta.description}` : ''}`
+      : (p.interior || '—');
     document.getElementById('detailType').textContent = p.property_type || '—';
+
+    const fmt = (pt) => pt
+      ? `${Number(pt.x).toFixed(2)}, ${Number(pt.y).toFixed(2)}, ${Number(pt.z).toFixed(2)} (H ${Number(pt.h || 0).toFixed(1)})`
+      : '—';
+
+    let summary = document.getElementById('detailCoords');
+    if (!summary) {
+      summary = document.createElement('div');
+      summary.id = 'detailCoords';
+      summary.className = 'coords-summary';
+      const meta = document.querySelector('.detail-meta');
+      if (meta) meta.after(summary);
+    }
+    summary.innerHTML = `
+      <div><span>Entrée</span><strong>${escapeHtml(fmt(p.entrance))}</strong></div>
+      <div><span>Garage</span><strong>${escapeHtml(fmt(p.garage))}</strong></div>
+    `;
 
     const keysList = document.getElementById('keysList');
     const keys = p.keys || [];
@@ -402,6 +504,8 @@
     const actions = document.getElementById('detailActions');
     actions.innerHTML = `
       ${perms.editProperty ? `<button class="btn ghost" id="actEdit">${t('edit_property', 'Modifier')}</button>` : ''}
+      ${perms.editProperty ? `<button class="btn primary" id="actEntrance">${t('edit_entrance', 'Modifier entrée')}</button>` : ''}
+      ${perms.editProperty ? `<button class="btn primary" id="actGarage">${t('edit_garage', 'Modifier garage')}</button>` : ''}
       ${perms.sellProperty ? `<button class="btn primary" id="actSell">${t('sell_to_player', 'Vendre (proche)')}</button>` : ''}
       ${perms.rentProperty ? `<button class="btn primary" id="actRent">${t('rent_to_player', 'Louer (proche)')}</button>` : ''}
       ${perms.sellProperty ? `<button class="btn ghost" id="actKeys">${t('give_keys', 'Donner clés')}</button>` : ''}
@@ -584,32 +688,37 @@
     const pos = await nui('getPlayerPos');
     if (pos && pos.x != null) {
       state.playerPos = pos;
-      document.getElementById('fX').value = Number(pos.x).toFixed(2);
-      document.getElementById('fY').value = Number(pos.y).toFixed(2);
-      document.getElementById('fZ').value = Number(pos.z).toFixed(2);
-      document.getElementById('fH').value = Number(pos.h || 0).toFixed(2);
+      applyPointToForm('entrance', pos);
     }
   });
 
   document.getElementById('useGaragePosBtn').addEventListener('click', async () => {
     const pos = await nui('getPlayerPos');
-    if (pos && pos.x != null) {
-      document.getElementById('gX').value = Number(pos.x).toFixed(2);
-      document.getElementById('gY').value = Number(pos.y).toFixed(2);
-      document.getElementById('gZ').value = Number(pos.z).toFixed(2);
-      document.getElementById('gH').value = Number(pos.h || 0).toFixed(2);
-    }
+    if (pos && pos.x != null) applyPointToForm('garage', pos);
   });
 
   document.getElementById('clearGarageBtn').addEventListener('click', () => {
     ['gX', 'gY', 'gZ', 'gH'].forEach((id) => { document.getElementById(id).value = ''; });
   });
 
+  async function requestPlacePoint(type) {
+    const draft = collectForm();
+    await nui('placePoint', {
+      type,
+      draft,
+      propertyId: draft.id ? Number(draft.id) : null,
+    });
+  }
+
+  document.getElementById('placeEntranceBtn').addEventListener('click', () => requestPlacePoint('entrance'));
+  document.getElementById('placeGarageBtn').addEventListener('click', () => requestPlacePoint('garage'));
+
   document.getElementById('cancelCreateBtn').addEventListener('click', () => setHousingView('list'));
 
   document.getElementById('fInterior').addEventListener('change', () => {
     const opt = document.getElementById('fInterior').selectedOptions[0];
     if (opt && opt.dataset.type) document.getElementById('fType').value = opt.dataset.type;
+    updateInteriorHint();
   });
 
   document.getElementById('propertyForm').addEventListener('submit', async (e) => {
@@ -634,6 +743,12 @@
     if (e.target.id === 'actEdit') {
       detailModal.classList.add('hidden');
       fillForm(p);
+    } else if (e.target.id === 'actEntrance') {
+      detailModal.classList.add('hidden');
+      await nui('placePoint', { type: 'entrance', propertyId: p.id, draft: null });
+    } else if (e.target.id === 'actGarage') {
+      detailModal.classList.add('hidden');
+      await nui('placePoint', { type: 'garage', propertyId: p.id, draft: null });
     } else if (e.target.id === 'actSell') {
       const res = await nui('sellProperty', { id: p.id });
       if (res.ok) { detailModal.classList.add('hidden'); await refreshData(); }
@@ -685,11 +800,22 @@
     if (msg.view === 'housing' || msg.view === 'create') {
       setVisible('housing');
       renderStats();
-      if (msg.view === 'create') {
+
+      const resumeDraft = msg.resumeDraft;
+      const resumeId = msg.resumePropertyId;
+      const placed = msg.placedPoint;
+      const placedType = msg.placedPointType;
+
+      if (resumeDraft || (placed && !resumeId) || msg.view === 'create') {
         setHousingView('create');
+        if (resumeDraft) applyDraft(resumeDraft);
+        if (placed && placedType) applyPointToForm(placedType, placed);
       } else {
         setHousingView('list');
         renderProperties();
+        if (resumeId) {
+          setTimeout(() => openDetail(Number(resumeId)), 50);
+        }
       }
     } else {
       setVisible('company');
@@ -735,17 +861,18 @@
           { model: 'rebla', label: 'Rebla GTS', minGrade: 3 },
         ],
         interiors: [
-          { id: 'apartment_mid', label: 'Appartement Moderne', type: 'appartement' },
-          { id: 'apartment_modern7', label: 'Appartement Moderne 7', type: 'appartement' },
-          { id: 'mansion', label: 'Villa de Luxe', type: 'maison' },
-          { id: 'farmhouse', label: 'Ferme Rustique', type: 'maison' },
-          { id: 'mlo', label: 'MLO / Extérieur', type: 'mlo' },
+          { id: 'apt_low', label: 'Appartement Bas de Gamme', type: 'appartement', tier: 'low', description: 'Petit studio GTA (Low End Apartment)' },
+          { id: 'apt_mid', label: 'Appartement Moyen Standing', type: 'appartement', tier: 'mid', description: 'Appartement Mid-End' },
+          { id: 'apt_modern_1', label: 'Appartement Moderne 1', type: 'appartement', tier: 'high', description: 'Eclipse Towers — Modern' },
+          { id: 'house_franklin', label: 'Maison Franklin', type: 'maison', tier: 'high', description: 'Villa Vinewood Hills' },
+          { id: 'motel', label: 'Chambre Motel', type: 'motel', tier: 'low', description: 'Motel classique' },
+          { id: 'mlo', label: 'MLO / Extérieur', type: 'mlo', tier: 'special', description: 'Pas de téléport' },
         ],
         stats: { total: 3, agents: 2, online: 1, active: 2, keys: 4 },
         properties: [
-          { id: 1, label: 'A LOUER 30K', address: '1181 Mirror Drive West', description: 'Bel appartement meublé', interior: 'apartment_modern7', property_type: 'appartement', status: 'location', price_sale: 0, price_rent: 30000, owner: null, owner_name: null, renter: 'x', renter_name: 'NO33Z3SE', entrance: { x: 0, y: 0, z: 0, h: 0 }, keys: [{ identifier: 'x', player_name: 'NO33Z3SE' }] },
+          { id: 1, label: 'A LOUER 30K', address: '1181 Mirror Drive West', description: 'Bel appartement meublé', interior: 'apt_modern_1', property_type: 'appartement', status: 'location', price_sale: 0, price_rent: 30000, owner: null, owner_name: null, renter: 'x', renter_name: 'NO33Z3SE', entrance: { x: 0, y: 0, z: 0, h: 0 }, keys: [{ identifier: 'x', player_name: 'NO33Z3SE' }] },
           { id: 2, label: 'MLO Mirror', address: '220 Rockford Hills', description: 'MLO extérieur', interior: 'mlo', property_type: 'mlo', status: 'vente', price_sale: 450000, price_rent: 5000, owner: null, owner_name: null, entrance: { x: 1, y: 1, z: 1, h: 0 }, keys: [] },
-          { id: 3, label: 'Ferme Rustique 2', address: 'Route 68', description: '', interior: 'farmhouse', property_type: 'maison', status: 'libre', price_sale: 180000, price_rent: 2500, owner: null, owner_name: null, entrance: { x: 2, y: 2, z: 2, h: 0 }, keys: [] },
+          { id: 3, label: 'Ferme Rustique 2', address: 'Route 68', description: '', interior: 'house_madrazo', property_type: 'maison', status: 'libre', price_sale: 180000, price_rent: 2500, owner: null, owner_name: null, entrance: { x: 2, y: 2, z: 2, h: 0 }, keys: [] },
         ],
       };
       openFromMessage({

@@ -713,16 +713,51 @@ html, body {
 .form-grid input, .form-grid select, .form-grid textarea,
 .coords-grid input { width: 100%; }
 
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+}
 .coords-box {
   margin-top: 16px;
   padding-top: 14px;
   border-top: 1px solid var(--line);
+}
+.coords-hint {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+.coords-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.coords-summary div {
+  background: rgba(0,0,0,0.18);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+.coords-summary span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
 }
 .coords-head {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 .coords-head strong { color: var(--text); font-size: 13px; }
 .garage-head { margin-top: 14px; }

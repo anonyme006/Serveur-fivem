@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `dynasty_properties` (
     `label` VARCHAR(128) NOT NULL,
     `address` VARCHAR(255) NOT NULL DEFAULT '',
     `description` TEXT NULL,
-    `interior` VARCHAR(64) NOT NULL DEFAULT 'apartment_mid',
+    `interior` VARCHAR(64) NOT NULL DEFAULT 'apt_mid',
     `property_type` VARCHAR(32) NOT NULL DEFAULT 'appartement',
     `status` VARCHAR(32) NOT NULL DEFAULT 'libre',
     `price_sale` INT NOT NULL DEFAULT 0,

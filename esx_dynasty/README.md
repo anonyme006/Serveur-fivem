@@ -46,11 +46,11 @@ Aussi accessible via le marker à l’agence Dynasty 8 (Rockford Hills) — touc
 ### Panel logements
 - Grille de biens (statut, prix, adresse, propriétaire, clés)
 - Stats, recherche, tris prix / statut
-- **Création de logement** : nom, adresse, intérieur, type, prix vente/loyer, position actuelle
-- Modification / suppression
-- Vente ou location au joueur proche
-- Gestion des clés
-- Entrée / sortie d’intérieur (shells configurés)
+- **Création de logement** avec **intérieurs GTA réels** (Low/Mid/High, Eclipse Towers IPL, villas, motel, bureaux, entrepôts, MLO)
+- **Modification des points à tout moment** : bouton « Définir sur place » (ferme le panel, place-toi, **E** pour valider, Retour pour annuler)
+- Depuis la fiche d’un bien : **Modifier entrée** / **Modifier garage** sans tout réécrire
+- Vente ou location au joueur proche, gestion des clés
+- Entrée / sortie d’intérieur avec chargement IPL automatique
 
 ## Grades
 

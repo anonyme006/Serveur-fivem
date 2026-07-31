@@ -7,9 +7,11 @@ local isOpen = false
 local openView = nil -- 'company' | 'housing'
 local Properties = {}
 local PropertyBlips = {}
-local currentInside = nil -- { id, entrance }
+local currentInside = nil -- { id, entrance, ipls }
 local companyVehicle = nil
 local textUIShown = false
+local placingPoint = nil -- { type, draft, propertyId, resumeView }
+local loadedIpls = {}
 
 local function notify(msg, nType)
     if lib and lib.notify then
@@ -38,11 +40,42 @@ end
 
 local function showTextUI(text)
     if lib and lib.showTextUI then
-        if not textUIShown then
-            lib.showTextUI(text)
-            textUIShown = true
+        lib.showTextUI(text)
+        textUIShown = true
+    end
+end
+
+local function loadInteriorIpls(ipls)
+    if type(ipls) == 'string' then ipls = { ipls } end
+    if type(ipls) ~= 'table' then return {} end
+    local loaded = {}
+    for i = 1, #ipls do
+        local name = ipls[i]
+        if name and name ~= '' then
+            RequestIpl(name)
+            loaded[#loaded + 1] = name
         end
     end
+    return loaded
+end
+
+local function unloadInteriorIpls(ipls)
+    if type(ipls) ~= 'table' then return end
+    for i = 1, #ipls do
+        if ipls[i] then RemoveIpl(ipls[i]) end
+    end
+end
+
+local function getPlayerPoint()
+    local ped = PlayerPedId()
+    local coords = GetEntityCoords(ped)
+    local heading = GetEntityHeading(ped)
+    return {
+        x = coords.x + 0.0,
+        y = coords.y + 0.0,
+        z = coords.z + 0.0,
+        h = heading + 0.0,
+    }
 end
 
 local function closeUI()
@@ -54,7 +87,7 @@ local function closeUI()
     hideTextUI()
 end
 
-local function openUI(view)
+local function openUI(view, extra)
     if isOpen then return end
     local cbName = view == 'housing' and 'esx_dynasty:getHousingData' or 'esx_dynasty:getCompanyData'
 
@@ -68,21 +101,131 @@ local function openUI(view)
         openView = view
         SetNuiFocus(true, true)
 
-        local ped = PlayerPedId()
-        local coords = GetEntityCoords(ped)
-        local heading = GetEntityHeading(ped)
-
-        SendNUIMessage({
+        local pos = getPlayerPoint()
+        local payload = {
             action = 'open',
             view = view,
             data = data,
             locale = Locales[Config.Locale] or Locales['fr'],
             currency = Config.Currency,
-            playerPos = { x = coords.x, y = coords.y, z = coords.z, h = heading },
+            playerPos = pos,
             statuses = Config.Statuses,
-        })
+        }
+        if extra then
+            for k, v in pairs(extra) do
+                payload[k] = v
+            end
+        end
+        SendNUIMessage(payload)
     end)
 end
+
+local function resumeAfterPlacement(point, cancelled)
+    local ctx = placingPoint
+    placingPoint = nil
+    hideTextUI()
+
+    if cancelled or not ctx then
+        if ctx and ctx.resumeView then
+            openUI(ctx.resumeView or 'housing', {
+                resumeDraft = ctx.draft,
+                resumePropertyId = ctx.propertyId,
+                placedPoint = nil,
+                placedPointType = ctx.type,
+                placementCancelled = true,
+            })
+        end
+        return
+    end
+
+    -- Mise à jour immédiate d'un bien existant
+    if ctx.propertyId and not cancelled then
+        local payload = { id = ctx.propertyId }
+        if ctx.type == 'entrance' then
+            payload.entrance = point
+        elseif ctx.type == 'garage' then
+            payload.garage = point
+        elseif ctx.type == 'clear_garage' then
+            payload.clear_garage = true
+        end
+
+        ESX.TriggerServerCallback('esx_dynasty:updatePoints', function(result)
+            if result and result.ok then
+                notify(result.message or Translate('points_updated'), 'success')
+            elseif result and result.error then
+                notify(result.error, 'error')
+            end
+            openUI('housing', {
+                resumeDraft = ctx.draft,
+                resumePropertyId = ctx.propertyId,
+                placedPoint = point,
+                placedPointType = ctx.type,
+            })
+        end, payload)
+        return
+    end
+
+    -- Reprise du formulaire création / édition
+    openUI(ctx.resumeView or 'housing', {
+        resumeDraft = ctx.draft,
+        resumePropertyId = ctx.propertyId,
+        placedPoint = point,
+        placedPointType = ctx.type,
+    })
+end
+
+local function startPointPlacement(pointType, draft, propertyId)
+    if placingPoint then return end
+
+    closeUI()
+    Wait(150)
+
+    placingPoint = {
+        type = pointType,
+        draft = draft,
+        propertyId = propertyId,
+        resumeView = 'housing',
+        startedAt = GetGameTimer(),
+    }
+
+    local label = pointType == 'garage'
+        and Translate('place_garage_help')
+        or Translate('place_entrance_help')
+    showTextUI(label)
+    notify(label, 'inform')
+end
+
+CreateThread(function()
+    while true do
+        if placingPoint then
+            Wait(0)
+            local cfg = Config.PointPlacement or {}
+            local timeout = cfg.timeoutMs or 120000
+            local helpKey = cfg.helpKey or 38
+            local cancelKey = cfg.cancelKey or 177
+
+            showTextUI(
+                placingPoint.type == 'garage'
+                    and Translate('place_garage_help')
+                    or Translate('place_entrance_help')
+            )
+
+            if (GetGameTimer() - placingPoint.startedAt) > timeout then
+                notify(Translate('place_cancelled'), 'error')
+                resumeAfterPlacement(nil, true)
+            elseif IsControlJustReleased(0, cancelKey) then
+                notify(Translate('place_cancelled'), 'inform')
+                resumeAfterPlacement(nil, true)
+            elseif IsControlJustReleased(0, helpKey) then
+                local point = getPlayerPoint()
+                notify(Translate('place_saved'), 'success')
+                resumeAfterPlacement(point, false)
+            end
+        else
+            Wait(400)
+        end
+    end
+end)
 
 local function isDynasty()
     local data = ESX.GetPlayerData()
@@ -155,10 +298,19 @@ local function enterProperty(id)
 
         local prop = Properties[id]
         local interior = result.interior
+        if not interior or not interior.entry then
+            notify(Translate('enter_denied'), 'error')
+            return
+        end
+
         local ped = PlayerPedId()
 
         DoScreenFadeOut(400)
         while not IsScreenFadedOut() do Wait(0) end
+
+        local ipls = loadInteriorIpls(interior.ipl)
+        loadedIpls = ipls
+        Wait(100)
 
         TriggerServerEvent('esx_dynasty:setBucket', result.bucket)
         SetEntityCoords(ped, interior.entry.x, interior.entry.y, interior.entry.z, false, false, false, false)
@@ -172,6 +324,7 @@ local function enterProperty(id)
                 y = interior.entry.y,
                 z = interior.entry.z,
             },
+            ipls = ipls,
         }
 
         Wait(300)
@@ -186,6 +339,9 @@ local function exitProperty()
 
     DoScreenFadeOut(400)
     while not IsScreenFadedOut() do Wait(0) end
+
+    unloadInteriorIpls(currentInside.ipls or loadedIpls)
+    loadedIpls = {}
 
     TriggerServerEvent('esx_dynasty:setBucket', 0)
     SetEntityCoords(ped, entrance.x, entrance.y, entrance.z, false, false, false, false)
@@ -204,10 +360,36 @@ RegisterNUICallback('close', function(_, cb)
 end)
 
 RegisterNUICallback('getPlayerPos', function(_, cb)
-    local ped = PlayerPedId()
-    local coords = GetEntityCoords(ped)
-    local heading = GetEntityHeading(ped)
-    cb({ x = coords.x, y = coords.y, z = coords.z, h = heading })
+    cb(getPlayerPoint())
+end)
+
+RegisterNUICallback('placePoint', function(data, cb)
+    local pointType = data and data.type or 'entrance'
+    if pointType ~= 'entrance' and pointType ~= 'garage' then
+        cb({ ok = false })
+        return
+    end
+    cb({ ok = true })
+    CreateThread(function()
+        Wait(50)
+        startPointPlacement(pointType, data and data.draft or nil, tonumber(data and data.propertyId))
+    end)
+end)
+
+RegisterNUICallback('updatePoints', function(data, cb)
+    ESX.TriggerServerCallback('esx_dynasty:updatePoints', function(result)
+        cb(result or { ok = false })
+        if result and result.ok then
+            notify(result.message or Translate('points_updated'), 'success')
+        elseif result and result.error then
+            notify(result.error, 'error')
+        end
+    end, data)
+end)
+
+RegisterNUICallback('previewInterior', function(data, cb)
+    -- Info only: interiors are applied on enter
+    cb({ ok = true, id = data and data.id })
 end)
 
 RegisterNUICallback('switchView', function(data, cb)
@@ -504,6 +686,11 @@ end
 
 CreateThread(function()
     while true do
+        if placingPoint then
+            Wait(400)
+            goto continue
+        end
+
         local sleep = 1000
         local ped = PlayerPedId()
         local coords = GetEntityCoords(ped)
@@ -593,6 +780,7 @@ CreateThread(function()
         end
 
         Wait(sleep)
+        ::continue::
     end
 end)
 
@@ -615,6 +803,7 @@ end)
 AddEventHandler('onResourceStop', function(res)
     if res ~= GetCurrentResourceName() then return end
     if currentInside then
+        unloadInteriorIpls(currentInside.ipls or loadedIpls)
         TriggerServerEvent('esx_dynasty:setBucket', 0)
     end
     clearPropertyBlips()

@@ -281,9 +281,10 @@
                     <span>Adresse</span>
                     <input type="text" id="fAddress" maxlength="255" placeholder="1181 Mirror Drive West" />
                   </label>
-                  <label>
-                    <span>Intérieur</span>
+                  <label class="full">
+                    <span>Intérieur (GTA réel)</span>
                     <select id="fInterior"></select>
+                    <small id="interiorHint" class="field-hint">Choisissez un intérieur natif GTA / IPL</small>
                   </label>
                   <label>
                     <span>Type</span>
@@ -320,8 +321,10 @@
                 </div>
 
                 <div class="coords-box">
+                  <p class="coords-hint" id="coordsHint">Placez-vous devant la porte puis validez sur place. Vous pouvez modifier ces points à tout moment.</p>
                   <div class="coords-head">
-                    <strong>Position d'entrée</strong>
+                    <strong>Position d'entrée (porte extérieure)</strong>
+                    <button type="button" class="btn primary" id="placeEntranceBtn">Définir sur place</button>
                     <button type="button" class="btn ghost" id="useCurrentPosBtn">Position actuelle</button>
                   </div>
                   <div class="coords-grid">
@@ -332,7 +335,8 @@
                   </div>
                   <div class="coords-head garage-head">
                     <strong>Garage (optionnel)</strong>
-                    <button type="button" class="btn ghost" id="useGaragePosBtn">Position garage</button>
+                    <button type="button" class="btn primary" id="placeGarageBtn">Définir sur place</button>
+                    <button type="button" class="btn ghost" id="useGaragePosBtn">Position actuelle</button>
                     <button type="button" class="btn ghost danger-soft" id="clearGarageBtn">Effacer</button>
                   </div>
                   <div class="coords-grid">
