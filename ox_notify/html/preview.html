@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview — ox_notify</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        body {
+            background:
+                radial-gradient(ellipse at 30% 40%, rgba(40, 50, 70, 0.45), transparent 55%),
+                linear-gradient(160deg, #1a1d24 0%, #0d0f12 50%, #151820 100%);
+        }
+
+        .preview-ui {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        .preview-ui button {
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #eee;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .preview-ui button:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .hint {
+            position: fixed;
+            bottom: 18px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 12px;
+            letter-spacing: 0.03em;
+        }
+
+        /* Fond type jeu pour juger le contraste */
+        .game-mock {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.35)),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect fill='%232a3140' width='120' height='120'/%3E%3Cpath d='M0 60h120M60 0v120' stroke='%23384356' stroke-width='1'/%3E%3C/svg%3E");
+            opacity: 0.55;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-mock" aria-hidden="true"></div>
+
+    <div class="preview-ui">
+        <button type="button" id="btn-photo">Reproduire la photo</button>
+        <button type="button" id="btn-success">Succès</button>
+        <button type="button" id="btn-info">Info</button>
+        <button type="button" id="btn-clear">Effacer</button>
+    </div>
+
+    <div id="notify-root" class="notify-root" data-position="left" data-vertical="center" aria-live="polite"></div>
+
+    <p class="hint">Aperçu navigateur — style ox_lib notify (photo)</p>
+
+    <script src="script.js"></script>
+    <script>
+        const P = window.__notifyPreview;
+
+        function photoStack() {
+            P.clearAll();
+            const base = {
+                duration: 60000,
+                showDuration: true,
+                position: 'left',
+                vertical: 'center',
+            };
+            P.notify({
+                ...base,
+                title: 'Station pleine',
+                description: 'Xero | Strawberry Avenue est à capacité maximale (3000L)',
+                type: 'error',
+                color: '#E74C3C',
+            });
+            P.notify({
+                ...base,
+                title: 'Station pleine',
+                description: 'Xero | Great Ocean est à capacité maximale (3000L)',
+                type: 'error',
+                color: '#E74C3C',
+            });
+            P.notify({
+                ...base,
+                title: 'Livraison terminée',
+                description: 'Plus de barils ou arrêt manuel',
+                type: 'success',
+                color: '#F1C40F',
+            });
+        }
+
+        document.getElementById('btn-photo').onclick = photoStack;
+        document.getElementById('btn-success').onclick = () => P.notify({
+            title: 'Livraison terminée',
+            description: 'Plus de barils ou arrêt manuel',
+            type: 'success',
+            color: '#F1C40F',
+            duration: 5000,
+            showDuration: true,
+        });
+        document.getElementById('btn-info').onclick = () => P.notify({
+            title: 'Information',
+            description: 'Notification inform de test',
+            type: 'inform',
+            color: '#3498DB',
+            duration: 5000,
+            showDuration: true,
+        });
+        document.getElementById('btn-clear').onclick = () => P.clearAll();
+
+        photoStack();
+    </script>
+</body>
+</html>
