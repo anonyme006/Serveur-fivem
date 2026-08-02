@@ -1,0 +1,5 @@
+return {
+    authorizedHelicopters = {
+        [`polmav`] = true,
+    },
+}
