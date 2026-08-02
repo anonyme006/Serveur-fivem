@@ -42,12 +42,12 @@ set mysql_connection_string "mysql://USER:PASS@127.0.0.1/fivem_qbox?charset=utf8
 sv_licenseKey "ta_cle"
 ```
 
-## 4. Items ox_inventory pour les vibe_*
+## 4. Items ox_inventory pour les rr_*
 
-Fusionne le contenu de `config/items_vibe.lua` dans `ox_inventory/data/items.lua`
+Fusionne le contenu de `config/items_reroll.lua` dans `ox_inventory/data/items.lua`
 (weed, black_money, lockpick, goldchain, farm, fish, permis, etc.).
 
-Catalogue des scripts : `docs/VIBE-REWRITE.md`.
+Catalogue des scripts : `docs/REROLL-REWRITE.md`.
 
 ## 5. Contenu payant / maps / véhicules
 
@@ -67,9 +67,9 @@ Puis `ensure` via les groupes déjà présents dans `server.cfg` (`ensure [maps]
 2. Création de personnage Qbox
 3. Inventaire + target
 4. Voice
-5. `vibe_spawnselector` + `vibe_garages`
+5. `rr_spawnselector` + `rr_garages` + `rr_deathscreen`
 6. Un job légal (taxi Qbox)
-7. Stub weed
+7. Circuit weed (`rr_crimi_weed`)
 8. Ensuite seulement : phone, housing, dizaines de MLO
 
 ## 7. txAdmin

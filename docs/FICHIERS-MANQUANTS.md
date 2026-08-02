@@ -12,7 +12,7 @@ Si tu avais téléchargé le ZIP trop tôt, ces éléments étaient absents :
 | Housing / banking / admin / xsound | Inclus |
 | `config/server-icon.png` | Inclus |
 | `start-server.sh` / `start-server.bat` | Inclus |
-| Items vibe fusionnés dans ox_inventory | Inclus |
+| Items reroll fusionnés dans ox_inventory | Inclus |
 | SQL vendor Qbox / doorlock | `sql/vendor/` |
 
 Toujours **hors repo** (normaux) :

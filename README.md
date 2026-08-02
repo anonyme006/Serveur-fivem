@@ -1,55 +1,48 @@
-# Serveur FiveM — Vibe RP (Qbox + Ox)
+# Serveur FiveM — RE ROLL (Qbox + Ox)
 
-Réécriture complète d’un serveur RP FR type « Vibe » : framework **Qbox**, suite **Ox**, et **40+ scripts `vibe_*` originaux**.
+Pack serveur RP FR inspiré de l’ambiance **RE ROLL** : framework **Qbox**, suite **Ox**, et **45 scripts `rr_*` originaux** (FDO, EMS, crimi, civil, mort cinématique…).
+
+> Ce n’est **pas** le serveur officiel RE ROLL ni un dump. C’est une base légale open-source + scripts custom réécrits, thème dark/rouge.
 
 ## Lien complet
 
 | | URL |
 |---|-----|
-| **Branche (code)** | https://github.com/anonyme006/Serveur-fivem/tree/cursor/fivem-qbox-server-scaffold-cfc5 |
-| **Pull Request** | https://github.com/anonyme006/Serveur-fivem/pull/11 |
-| **ZIP téléchargeable** | https://github.com/anonyme006/Serveur-fivem/archive/refs/heads/cursor/fivem-qbox-server-scaffold-cfc5.zip |
+| **Branche** | https://github.com/anonyme006/Serveur-fivem/tree/cursor/qbox-reroll-server-f159 |
+| **ZIP** | https://github.com/anonyme006/Serveur-fivem/archive/refs/heads/cursor/qbox-reroll-server-f159.zip |
 
 Fichier dédié : [`LIEN-COMPLET.md`](LIEN-COMPLET.md)
 
 ## Installation rapide
 
 ```bash
-git clone -b cursor/fivem-qbox-server-scaffold-cfc5 https://github.com/anonyme006/Serveur-fivem.git
+git clone -b cursor/qbox-reroll-server-f159 https://github.com/anonyme006/Serveur-fivem.git
 cd Serveur-fivem
 chmod +x scripts/setup-complet.sh
 ./scripts/setup-complet.sh
 mysql -u root -p < sql/init.sql
-# Fusionner config/items_vibe.lua dans ox_inventory/data/items.lua
+# Fusionner config/items_reroll.lua dans ox_inventory/data/items.lua
 # Éditer server.cfg (sv_licenseKey + MySQL)
 # Lancer FXServer sur ce dossier
 ```
 
-Guide détaillé : [`docs/GUIDE-INSTALL.md`](docs/GUIDE-INSTALL.md)  
-Catalogue scripts : [`docs/VIBE-REWRITE.md`](docs/VIBE-REWRITE.md)
+Guide : [`docs/GUIDE-INSTALL.md`](docs/GUIDE-INSTALL.md)  
+Catalogue scripts : [`docs/REROLL-REWRITE.md`](docs/REROLL-REWRITE.md)
 
-## Pack inclus (plus de dossiers vides)
+## Pack inclus
 
-- `resources/[core]` chat, spawnmanager, sessionmanager, …
-- `resources/[ox]` oxmysql / ox_lib / ox_inventory / ox_target / ox_doorlock / ox_fuel (**releases buildées**)
-- `resources/[qbx]` qbx_core + police/EMS/garages/hud/…
+- `resources/[core]` — chat, spawnmanager, sessionmanager…
+- `resources/[ox]` — oxmysql / ox_lib / ox_inventory / ox_target / ox_doorlock / ox_fuel
+- `resources/[qbx]` — qbx_core + police / EMS / garages / HUD…
 - `resources/[voice]/pma-voice`, `[maps]/bob74_ipl`, housing, banking, admin
-- `resources/[vibe]` 44 scripts custom
+- `resources/[reroll]` — 45 scripts custom (`rr_*`)
+- Loadscreen + spawn + deathscreen thème **RE ROLL**
 - `start-server.sh` / `start-server.bat`
-
-Détail : [`docs/FICHIERS-MANQUANTS.md`](docs/FICHIERS-MANQUANTS.md)
-
-## Contenu
-
-- `server.cfg` + structure `resources/[ox|qbx|voice|vibe|maps|…]`
-- Install auto Ox / Qbox / pma-voice / bob74_ipl
-- Scripts vibe : FDO, EMS, mécano, concess, garages, crimi (weed/meth/braquages…), gangs, courses, panel admin…
-- SQL + items Ox
 
 ## Important
 
-Les MLOs, véhicules custom, `lb-phone`, `jg-*`, `rcore_*` du serveur d’origine sont **payants** : à acheter séparément.  
-Les `vibe_*` ici sont des **réécritures**, pas des dumps.
+Les MLOs, véhicules custom, `lb-phone`, `jg-*`, `rcore_*` premium sont **payants** : à acheter séparément.  
+Les `rr_*` sont des **réécritures**, pas des dumps d’un serveur existant.
 
 ## Licence
 

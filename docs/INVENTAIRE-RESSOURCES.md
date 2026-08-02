@@ -42,6 +42,6 @@ Nombreux `bzzz_*` (nourriture, trees, lights, emergency, etc.), `qua_generalprop
 
 `bati701`, `bati901`, `apoliceuc_pack`, `ag_ppredator_pack`, `Diablo`, `Diablo2`, `Diablo3`, `dominator645`, `elegyrh6`, `elegyrh7`, `JMBearcat`, `polmav`, `sentgtr`, `rapidgt5`, `supergts`, `ubermacht_vorstand`, `zr250`, `zr380p`, `zr390`, packs audio (`sheavas-audio`, `voitures_audio`, `coquettev-audio`, …)
 
-## Custom privé `vibe_*` / `vice_*`
+## Custom privé `rr_*` / `vice_*`
 
 Voir `docs/ANALYSE-SERVEUR.md` — à réécrire, pas à copier.

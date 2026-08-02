@@ -9,8 +9,8 @@
 | `[phone]` | lb-phone et dépendances |
 | `[housing]` | ps-housing, ps-realtor, shells |
 | `[jobs]` | Jobs légaux (EMS, mécano, taxi, …) |
-| `[crimi]` | Scripts illégaux non-vibe (ou futurs modules) |
-| `[vibe]` | Scripts custom du serveur (stubs fournis) |
+| `[crimi]` | Scripts illégaux non-reroll (ou futurs modules) |
+| `[reroll]` | Scripts custom du serveur (stubs fournis) |
 | `[standalone]` | HUD, admin, xsound, utils |
 | `[maps]` | MLO / mapdata / IPL |
 | `[vehicles]` | Packs véhicules |

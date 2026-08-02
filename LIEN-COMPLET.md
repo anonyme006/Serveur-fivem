@@ -1,29 +1,27 @@
-# Lien complet du serveur
+# Lien complet du serveur RE ROLL (Qbox)
 
-## Dépôt GitHub (branche complète)
+## Dépôt GitHub
 
-**Code source (navigateur)**  
-https://github.com/anonyme006/Serveur-fivem/tree/cursor/fivem-qbox-server-scaffold-cfc5
-
-**Pull Request**  
-https://github.com/anonyme006/Serveur-fivem/pull/11
+**Code source**  
+https://github.com/anonyme006/Serveur-fivem/tree/cursor/qbox-reroll-server-f159
 
 **Téléchargement ZIP**  
-https://github.com/anonyme006/Serveur-fivem/archive/refs/heads/cursor/fivem-qbox-server-scaffold-cfc5.zip
+https://github.com/anonyme006/Serveur-fivem/archive/refs/heads/cursor/qbox-reroll-server-f159.zip
 
 **Clone Git**
 ```bash
-git clone -b cursor/fivem-qbox-server-scaffold-cfc5 https://github.com/anonyme006/Serveur-fivem.git
+git clone -b cursor/qbox-reroll-server-f159 https://github.com/anonyme006/Serveur-fivem.git
 cd Serveur-fivem
 chmod +x scripts/setup-complet.sh
 ./scripts/setup-complet.sh
 ```
 
-## Contenu inclus
+## Contenu
 
-- Structure FXServer + `server.cfg`
+- Structure FXServer + `server.cfg` (Qbox + Ox)
 - Install automatique Ox / Qbox / pma-voice / bob74_ipl
-- **40+ ressources `vibe_*` réécrites** (FDO, EMS, mécano, crimi, civil, admin…)
+- **45 ressources `rr_*`** (FDO, EMS, mécano, crimi, civil, deathscreen…)
+- Thème RE ROLL (loadscreen, spawn, mort)
 - SQL, items Ox, documentation FR
 
 ## Après le clone
@@ -31,8 +29,8 @@ chmod +x scripts/setup-complet.sh
 1. Installer les [artifacts FXServer](https://runtime.fivem.net/artifacts/fivem/)
 2. Lancer `./scripts/setup-complet.sh`
 3. Importer `sql/init.sql`
-4. Fusionner `config/items_vibe.lua` dans `ox_inventory/data/items.lua`
+4. Fusionner `config/items_reroll.lua` dans `ox_inventory/data/items.lua`
 5. Remplir `sv_licenseKey` + MySQL dans `server.cfg`
 6. Démarrer le serveur
 
-Catalogue scripts : [`docs/VIBE-REWRITE.md`](docs/VIBE-REWRITE.md)
+Catalogue : [`docs/REROLL-REWRITE.md`](docs/REROLL-REWRITE.md)

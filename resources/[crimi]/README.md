@@ -1,3 +1,3 @@
 # [crimi]
 
-Scripts illégaux externes (hors `resources/[vibe]/vibe_crimi_*` déjà fournis).
+Scripts illégaux externes (hors `resources/[reroll]/rr_crimi_*` déjà fournis).

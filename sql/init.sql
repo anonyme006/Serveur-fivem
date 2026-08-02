@@ -11,8 +11,8 @@ USE `fivem_qbox`;
 -- Tables Qbox / ox_doorlock : voir sql/vendor/ (qbx_core.sql, ox_doorlock.sql, …)
 -- Certaines tables ox_inventory se créent au premier démarrage.
 
--- Exemple de table custom pour les stubs vibe_*
-CREATE TABLE IF NOT EXISTS `vibe_player_meta` (
+-- Exemple de table custom pour les stubs rr_*
+CREATE TABLE IF NOT EXISTS `rr_player_meta` (
   `citizenid` VARCHAR(50) NOT NULL,
   `stats` LONGTEXT NULL,
   `permits` LONGTEXT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `vibe_player_meta` (
   PRIMARY KEY (`citizenid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `vibe_invoices` (
+CREATE TABLE IF NOT EXISTS `rr_invoices` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `from_citizenid` VARCHAR(50) NOT NULL,
   `to_citizenid` VARCHAR(50) NOT NULL,

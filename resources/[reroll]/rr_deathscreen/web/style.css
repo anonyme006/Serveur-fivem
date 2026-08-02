@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&display=swap');
+
+:root {
+  --red: #e61e25;
+  --text: #f5f5f5;
+  --muted: #9a9a9a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Rajdhani', sans-serif;
+  color: var(--text);
+  background: transparent;
+  overflow: hidden;
+}
+
+.hidden { display: none !important; }
+
+#app {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 45%, rgba(155, 18, 24, 0.35), transparent 65%),
+    linear-gradient(180deg, rgba(5, 5, 5, 0.55), rgba(5, 5, 5, 0.82));
+  animation: pulse 3.2s ease-in-out infinite alternate;
+}
+
+.frame {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 92vw);
+  text-align: center;
+  padding: 2rem 1.5rem;
+  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.8rem, 8vw, 4.2rem);
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.brand .roll { color: var(--red); }
+
+h1 {
+  margin-top: 0.55rem;
+  font-size: clamp(1.15rem, 3vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sub {
+  margin-top: 0.55rem;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.timer {
+  margin: 1.5rem auto 1.1rem;
+  display: grid;
+  gap: 0.15rem;
+}
+
+#clock {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.4rem;
+  letter-spacing: 0.08em;
+  color: var(--red);
+}
+
+.timer small {
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid rgba(230, 30, 37, 0.55);
+  background: rgba(230, 30, 37, 0.12);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.75rem 1.4rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+  background: rgba(230, 30, 37, 0.28);
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  from { opacity: 0.85; }
+  to { opacity: 1; }
+}

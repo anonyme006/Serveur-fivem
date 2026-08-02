@@ -33,14 +33,14 @@ import json, shutil, sys, urllib.request, zipfile
 from pathlib import Path
 repo, dest, tmp = sys.argv[1], Path(sys.argv[2]), Path(sys.argv[3])
 api = f'https://api.github.com/repos/{repo}/releases/latest'
-req = urllib.request.Request(api, headers={'User-Agent': 'vibe-setup'})
+req = urllib.request.Request(api, headers={'User-Agent': 'reroll-setup'})
 with urllib.request.urlopen(req, timeout=60) as r:
     data = json.load(r)
 assets = data.get('assets') or []
 if not assets:
     raise SystemExit(f'no assets for {repo}')
 url = assets[0]['browser_download_url']
-req = urllib.request.Request(url, headers={'User-Agent': 'vibe-setup'})
+req = urllib.request.Request(url, headers={'User-Agent': 'reroll-setup'})
 with urllib.request.urlopen(req, timeout=120) as r:
     content = r.read()
 work = tmp / repo.replace('/', '_')
@@ -101,18 +101,18 @@ if [[ ! -f "$ROOT/resources/[core]/chat/fxmanifest.lua" ]]; then
   cp -a "$TMP/cfx-server-data/resources/[system]/hardcap" "$CORE/"
 fi
 
-# Re-merge vibe items if inventory reinstalled
-if [[ -f "$ROOT/config/items_vibe.lua" && -f "$ROOT/resources/[ox]/ox_inventory/data/items.lua" ]]; then
-  if ! grep -q 'VIBE CUSTOM ITEMS' "$ROOT/resources/[ox]/ox_inventory/data/items.lua"; then
-    echo "==> Fusion items vibe dans ox_inventory"
+# Re-merge reroll items if inventory reinstalled
+if [[ -f "$ROOT/config/items_reroll.lua" && -f "$ROOT/resources/[ox]/ox_inventory/data/items.lua" ]]; then
+  if ! grep -q 'REROLL CUSTOM ITEMS' "$ROOT/resources/[ox]/ox_inventory/data/items.lua"; then
+    echo "==> Fusion items reroll dans ox_inventory"
     python3 - <<'PY'
 from pathlib import Path
 items_path = Path('resources/[ox]/ox_inventory/data/items.lua')
-vibe = Path('config/items_vibe.lua').read_text()
-body = vibe[vibe.find('return {')+len('return {'):].rsplit('}',1)[0].strip()
+reroll = Path('config/items_reroll.lua').read_text()
+body = reroll[reroll.find('return {')+len('return {'):].rsplit('}',1)[0].strip()
 text = items_path.read_text(encoding='utf-8')
 idx = text.rfind('}')
-items_path.write_text(text[:idx] + "\n\t-- VIBE CUSTOM ITEMS\n" + body + "\n" + text[idx:], encoding='utf-8')
+items_path.write_text(text[:idx] + "\n\t-- REROLL CUSTOM ITEMS\n" + body + "\n" + text[idx:], encoding='utf-8')
 PY
   fi
 fi
