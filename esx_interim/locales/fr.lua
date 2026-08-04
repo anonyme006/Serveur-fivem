@@ -1,0 +1,25 @@
+Locales = Locales or {}
+
+Locales['fr'] = {
+    ['agency_title'] = 'Pôle Emploi',
+    ['already_working'] = 'Vous avez déjà une mission en cours. Terminez-la ou annulez-la.',
+    ['job_locked'] = 'Ce métier est encore verrouillé.',
+    ['job_started'] = 'Métier choisi : %s. Rendez-vous au dépôt (GPS).',
+    ['job_stopped'] = 'Vous avez quitté votre métier intérim.',
+    ['no_job'] = 'Vous n\'avez pas de métier intérim actif.',
+    ['vehicle_spawned'] = 'Véhicule de service sorti. Bon courage !',
+    ['vehicle_blocked'] = 'L\'emplacement du véhicule est obstrué.',
+    ['go_to_point'] = 'Rendez-vous au point marqué sur le GPS.',
+    ['mission_done'] = 'Mission terminée. +$%s',
+    ['run_complete'] = 'Tournée terminée ! Retournez au dépôt ou recommencez.',
+    ['ore_collected'] = 'Minerai collecté (%s/%s). Vendez à la joaillerie.',
+    ['ore_sold'] = 'Vente effectuée : +$%s (%sx minerais)',
+    ['need_ores'] = 'Vous n\'avez aucun minerai à vendre.',
+    ['too_far'] = 'Trop loin du point d\'intervention.',
+    ['cancelled'] = 'Mission annulée.',
+    ['start_run'] = 'Commencer une tournée',
+    ['stop_job'] = 'Quitter le métier intérim',
+    ['return_vehicle'] = 'Ranger le véhicule',
+    ['dump_trash'] = 'Décharger à la déchetterie',
+    ['sell_ores'] = 'Vendre les minerais',
+}
