@@ -237,3 +237,55 @@ Config.Offroad = {
     },
 }
 
+
+--[[--------------------------------------------------------------------------
+    Météo & heure synchronisées (tous les joueurs)
+---------------------------------------------------------------------------]]
+Config.Weather = {
+    enabled = true,
+    -- Changer la météo automatiquement
+    dynamic = true,
+    -- Intervalle entre changements (minutes réelles)
+    changeMinutes = 20,
+    -- Transition douce (secondes côté client)
+    transitionSeconds = 45.0,
+    -- Météo de départ (nil = tirage aléatoire)
+    startWeather = 'CLEAR',
+    -- Blackout (lumières ville)
+    blackout = false,
+    -- Notifier les joueurs au changement
+    notifyPlayers = false,
+    -- Groupes ESX autorisés pour /weather /time /blackout
+    adminGroups = { admin = true, superadmin = true, god = true },
+    -- Pondération des types (plus haut = plus fréquent)
+    types = {
+        CLEAR = 25,
+        EXTRASUNNY = 20,
+        CLOUDS = 15,
+        OVERCAST = 10,
+        FOGGY = 6,
+        CLEARING = 5,
+        RAIN = 8,
+        THUNDER = 4,
+        SMOG = 3,
+        NEUTRAL = 2,
+        SNOW = 1,
+        BLIZZARD = 0,
+        SNOWLIGHT = 1,
+        XMAS = 0,
+        HALLOWEEN = 0,
+    },
+}
+
+Config.Time = {
+    enabled = true,
+    -- Heure de départ
+    hour = 12,
+    minute = 0,
+    -- Secondes réelles pour avancer d'1 minute in-game (2 ≈ journée en ~48 min)
+    realSecondsPerGameMinute = 2,
+    -- Geler l'heure (événements)
+    freeze = false,
+    -- Sync périodique forcée (ms)
+    syncInterval = 30000,
+}

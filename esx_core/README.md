@@ -40,6 +40,7 @@ ensure esx_core
 | **Carte Échap** | Prop carte + anim quand le menu pause est ouvert |
 | **Alertes** | Essence basse, faim / soif (seuils dans `config.lua`) |
 | **Offroad** | Sable / boue / herbe / gravier → couple et vitesse réduits |
+| **Météo sync** | Même météo & heure pour tous + rotation dynamique |
 
 ## Raccourcis
 
@@ -61,6 +62,24 @@ exports.esx_core:RegisterHouseDoor(houseId, coords, locked)
 
 -- Client
 exports.esx_core:ToggleVehicleLock()
+```
+
+## Météo synchronisée
+
+Tous les joueurs partagent la même météo et la même heure (`Config.Weather` / `Config.Time`).
+
+| Commande | Description |
+|----------|-------------|
+| `/weather [TYPE]` | FORCE météo (CLEAR, RAIN, THUNDER…) |
+| `/time [h] [m]` | Force l’heure |
+| `/blackout [on/off]` | Coupe les lumières de la ville |
+| `/freezetime` | Gele / dégèle l’heure |
+
+```lua
+exports.esx_core:SetWeather('RAIN')
+exports.esx_core:SetTime(21, 30)
+exports.esx_core:SetBlackout(true)
+exports.esx_core:FreezeTime(true)
 ```
 
 ## Offroad

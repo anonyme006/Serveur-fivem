@@ -72,4 +72,17 @@ Locales['fr'] = {
 
     -- Offroad
     offroad_slow = 'Terrain difficile (%s) — adhérence réduite',
+
+    -- Météo / heure
+    weather_changed = 'Météo : %s',
+    weather_set = 'Météo définie : %s',
+    weather_usage = 'Usage : /weather [%s]',
+    weather_denied = 'Permission refusée.',
+    time_changed = 'Heure : %s',
+    time_set = 'Heure définie : %s',
+    time_usage = 'Usage : /time [heure] [minute]',
+    time_frozen = 'Heure gelée.',
+    time_unfrozen = 'Heure dégelée.',
+    blackout_on = 'Blackout activé.',
+    blackout_off = 'Blackout désactivé.',
 }
