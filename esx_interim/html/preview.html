@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pôle Emploi - Preview</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="app">
+        <div class="panel">
+            <header class="header">
+                <div class="logo">
+                    <span class="logo-mark" aria-hidden="true">e</span>
+                    <span class="logo-text">Pôle emploi</span>
+                </div>
+                <p class="slogan" id="slogan">Changez votre avenir avec nous !</p>
+            </header>
+
+            <ul class="job-list" id="jobList" role="listbox" aria-label="Métiers intérim">
+                <li class="job-item" role="option">
+                    <div class="lock-spacer"></div>
+                    <span class="job-label">Electricien</span>
+                </li>
+                <li class="job-item" role="option">
+                    <div class="lock-spacer"></div>
+                    <span class="job-label">Éboueur</span>
+                </li>
+                <li class="job-item selected" role="option" aria-selected="true">
+                    <div class="lock-spacer"></div>
+                    <span class="job-label">Plombier</span>
+                </li>
+                <li class="job-item" role="option">
+                    <div class="lock-spacer"></div>
+                    <span class="job-label">Joaillier<span class="job-sub">(Mineur)</span></span>
+                </li>
+                <li class="job-item" role="option">
+                    <div class="lock-spacer"></div>
+                    <span class="job-label">Livreur de Journaux</span>
+                </li>
+            </ul>
+
+            <button type="button" class="confirm" id="confirmBtn">
+                Choisir ce nouveau métier
+            </button>
+        </div>
+    </div>
+</body>
+</html>
