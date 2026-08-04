@@ -72,10 +72,45 @@ Config.Keys = {
     maxTempMinutes = 10080,
     -- Distance interaction porte habitation
     houseDistance = 2.5,
-    -- Donner automatiquement les clés
-    giveOnGarageTakeOut = true, -- pa_garage / ox_garage (sortie + fourrière)
+    -- Donner automatiquement les clés (DB + item)
+    giveOnGarageTakeOut = true, -- assure la clé DB ; item seulement si perdu (voir inventory.giveMissingOnGarage)
     giveOnPurchase = true,      -- esx_concessionnaire (+ hooks génériques)
     notifyOnGive = true,        -- notification « clés reçues »
+
+    --[[ Inventaire : la clé devient un item (ox_inventory ou ESX) ]]
+    inventory = {
+        enabled = true,
+        item = 'vehicle_key',
+        -- À l'achat du véhicule → ajoute l'item dans l'inventaire
+        giveItemOnPurchase = true,
+        -- À la sortie garage : si le proprio n'a plus l'item, le redonner (false = doit racheter au serrurier)
+        giveMissingOnGarage = false,
+        -- Verrouillage : exiger l'item (ou une clé DB temporaire). false = proprio owned_vehicles suffit
+        requireItemToLock = true,
+        -- Inventaire cible : 'auto' | 'ox' | 'esx'
+        system = 'auto',
+    },
+}
+
+--[[--------------------------------------------------------------------------
+    Serrurier — racheter / dupliquer une clé de véhicule owned
+---------------------------------------------------------------------------]]
+Config.KeyShop = {
+    enabled = true,
+    label = 'Serrurier',
+    price = 750,
+    account = 'bank', -- 'bank' | 'money'
+    -- Nombre max de clés item en inventaire par plaque
+    maxKeysPerPlate = 3,
+    blip = { enabled = true, sprite = 186, color = 5, scale = 0.75 },
+    -- Point(s) d'achat
+    locations = {
+        {
+            coords = vec3(170.12, -1799.45, 29.32),
+            heading = 140.0,
+            ped = 's_m_m_autoshop_01', -- nil = marker seulement
+        },
+    },
 }
 
 --[[--------------------------------------------------------------------------

@@ -36,7 +36,7 @@ lib.callback.register('esx_core:cover:put', function(source, plate, coords, prop
 
     local allowed = false
     if Core.HasKey then
-        allowed = Core.HasKey(xPlayer.identifier, 'vehicle', plate)
+        allowed = Core.HasKey(xPlayer.identifier, 'vehicle', plate, source)
     end
     if not allowed then
         local cols = Config.Persistence.columns
@@ -80,7 +80,7 @@ lib.callback.register('esx_core:cover:remove', function(source, plate)
 
     local allowed = entry.owner == xPlayer.identifier
     if not allowed and Core.HasKey then
-        allowed = Core.HasKey(xPlayer.identifier, 'vehicle', plate)
+        allowed = Core.HasKey(xPlayer.identifier, 'vehicle', plate, source)
     end
     if not allowed then
         return false, 'key_no_key', nil

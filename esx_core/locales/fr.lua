@@ -20,7 +20,18 @@ Locales['fr'] = {
     key_received = 'Tu as reçu une clé : %s',
     key_garage = 'Clés du véhicule %s récupérées.',
     key_purchase = 'Clés du véhicule %s obtenues.',
+    key_shop = 'Clé du véhicule %s ajoutée à ton inventaire.',
     key_removed = 'Clé retirée.',
+    key_wrong_vehicle = 'Cette clé est pour le véhicule %s.',
+
+    -- Serrurier
+    keyshop_title = 'Serrurier',
+    keyshop_help = '~INPUT_CONTEXT~ Acheter une clé de véhicule',
+    keyshop_no_vehicles = 'Tu ne possèdes aucun véhicule',
+    keyshop_option = 'Prix : %s$ — Clés en inventaire : %s/%s',
+    keyshop_bought = 'Clé %s achetée pour %s$.',
+    keyshop_max = 'Tu as déjà le maximum de clés (%s) pour ce véhicule.',
+    keyshop_inventory_full = 'Inventaire plein — impossible d\'ajouter la clé.',
     key_house_locked = 'Porte verrouillée.',
     key_house_unlocked = 'Porte déverrouillée.',
     key_house_no_key = 'Tu n\'as pas les clés de cette habitation.',

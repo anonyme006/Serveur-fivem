@@ -79,6 +79,11 @@ RegisterKeyMapping(
     Config.Keys.lockKey or 'U'
 )
 
+-- ESX usable item → verrouille le véhicule proche
+RegisterNetEvent('esx_core:keys:useItem', function()
+    toggleLock()
+end)
+
 --- Habitations : export pour scripts housing
 --- houseId + coords porte
 local houseDoors = {} -- id -> { coords, locked }

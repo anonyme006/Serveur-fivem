@@ -7,8 +7,16 @@ local function isExpired(row)
     return tostring(row.expires_at) < os.date('!%Y-%m-%d %H:%M:%S', os.time())
 end
 
-local function hasKey(identifier, keyType, keyRef)
+local function hasKey(identifier, keyType, keyRef, src)
     keyRef = keyType == 'vehicle' and Core.NormalizePlate(keyRef) or tostring(keyRef)
+
+    -- Item inventaire (prioritaire pour les véhicules)
+    if keyType == 'vehicle' and src and Core.Inventory and Core.Inventory.Enabled() then
+        if Core.Inventory.HasVehicleKey(src, keyRef) then
+            return true, { inventory = true }
+        end
+    end
+
     local rows = MySQL.query.await(
         'SELECT * FROM esx_core_keys WHERE holder = ? AND key_type = ? AND key_ref = ?',
         { identifier, keyType, keyRef }
@@ -20,11 +28,13 @@ local function hasKey(identifier, keyType, keyRef)
         end
     end
 
-    -- Propriétaire ESX du véhicule = clé implicite
-    if keyType == 'vehicle' then
+    -- Propriétaire ESX = clé implicite (désactivable si requireItemToLock)
+    local invCfg = Config.Keys.inventory or {}
+    local requireItem = invCfg.enabled ~= false and invCfg.requireItemToLock
+    if keyType == 'vehicle' and not requireItem then
         local cols = Config.Persistence.columns
         local owned = MySQL.single.await(
-            ('SELECT 1 FROM `%s` WHERE `%s` = ? AND REPLACE(`%s`, " ", "") = ? LIMIT 1'):format(
+            ('SELECT 1 FROM `%s` WHERE `%s` = ? AND REPLACE(UPPER(`%s`), " ", "") = ? LIMIT 1'):format(
                 cols.table, cols.owner, cols.plate
             ),
             { identifier, keyRef }
@@ -35,15 +45,15 @@ local function hasKey(identifier, keyType, keyRef)
     return false, nil
 end
 
-function Core.HasKey(identifier, keyType, keyRef)
-    local ok = hasKey(identifier, keyType, keyRef)
+function Core.HasKey(identifier, keyType, keyRef, src)
+    local ok = hasKey(identifier, keyType, keyRef, src)
     return ok
 end
 
 exports('HasKey', function(src, keyType, keyRef)
     local id = Core.GetIdentifier(src)
     if not id then return false end
-    return Core.HasKey(id, keyType, keyRef)
+    return Core.HasKey(id, keyType, keyRef, src)
 end)
 
 exports('GiveKey', function(holderIdentifier, keyType, keyRef, ownerIdentifier, label, temporary, minutes)
@@ -105,6 +115,31 @@ function Core.EnsureVehicleKey(src, plate, label, notifyKey)
         created = true
     end
 
+    -- Item inventaire
+    local invCfg = Config.Keys.inventory or {}
+    local gaveItem = false
+    if Core.Inventory and Core.Inventory.Enabled() then
+        if notifyKey == 'key_shop' then
+            -- Serrurier : toujours une nouvelle copie item
+            gaveItem = Core.Inventory.AddVehicleKey(src, plate, label or plate, 1)
+            if gaveItem then created = true end
+        else
+            local wantItem = false
+            if notifyKey == 'key_purchase' and invCfg.giveItemOnPurchase ~= false then
+                wantItem = true
+            elseif notifyKey == 'key_garage' and invCfg.giveMissingOnGarage then
+                wantItem = true
+            elseif not notifyKey and invCfg.giveItemOnPurchase ~= false then
+                wantItem = true
+            end
+
+            if wantItem and not Core.Inventory.HasVehicleKey(src, plate) then
+                gaveItem = Core.Inventory.AddVehicleKey(src, plate, label or plate, 1)
+                if gaveItem then created = true end
+            end
+        end
+    end
+
     if Config.Keys.notifyOnGive and notifyKey then
         TriggerClientEvent(
             'esx_core:notify',
@@ -116,7 +151,7 @@ function Core.EnsureVehicleKey(src, plate, label, notifyKey)
         TriggerClientEvent('esx_core:notify', src, Core.Locale('key_received', plate), 'success')
     end
 
-    return created
+    return created or gaveItem
 end
 
 --- Donner une clé véhicule au propriétaire (hook concessionnaire / exports)
@@ -132,16 +167,31 @@ exports('EnsureVehicleKey', function(src, plate, label, notifyKey)
     return Core.EnsureVehicleKey(src, plate, label, notifyKey)
 end)
 
+-- ESX usable item (serveur)
+CreateThread(function()
+    Wait(1000)
+    if not Config.Keys or not Config.Keys.enabled then return end
+    if not (Config.Keys.inventory and Config.Keys.inventory.enabled ~= false) then return end
+
+    local item = Config.Keys.inventory.item or 'vehicle_key'
+    local ESX = exports['es_extended']:getSharedObject()
+    if ESX and ESX.RegisterUsableItem then
+        ESX.RegisterUsableItem(item, function(playerId)
+            TriggerClientEvent('esx_core:keys:useItem', playerId)
+        end)
+    end
+end)
+
 lib.callback.register('esx_core:keys:canLock', function(source, plate)
     local id = Core.GetIdentifier(source)
     if not id then return false end
-    return hasKey(id, 'vehicle', plate)
+    return hasKey(id, 'vehicle', plate, source)
 end)
 
 lib.callback.register('esx_core:keys:canHouse', function(source, houseId)
     local id = Core.GetIdentifier(source)
     if not id then return false end
-    return hasKey(id, 'house', houseId)
+    return hasKey(id, 'house', houseId, source)
 end)
 
 lib.callback.register('esx_core:keys:list', function(source)
@@ -211,7 +261,7 @@ RegisterNetEvent('esx_core:keys:give', function(targetId, keyType, keyRef, tempo
     keyType = keyType == 'house' and 'house' or 'vehicle'
     keyRef = keyType == 'vehicle' and Core.NormalizePlate(keyRef) or tostring(keyRef)
 
-    local ok = hasKey(xPlayer.identifier, keyType, keyRef)
+    local ok = hasKey(xPlayer.identifier, keyType, keyRef, src)
     if not ok then
         TriggerClientEvent('esx_core:notify', src, Core.Locale('key_no_key'), 'error')
         return
@@ -222,7 +272,7 @@ RegisterNetEvent('esx_core:keys:give', function(targetId, keyType, keyRef, tempo
     local isOwner = false
     if keyType == 'vehicle' then
         local owned = MySQL.single.await(
-            ('SELECT 1 FROM `%s` WHERE `%s` = ? AND REPLACE(`%s`, " ", "") = ? LIMIT 1'):format(
+            ('SELECT 1 FROM `%s` WHERE `%s` = ? AND REPLACE(UPPER(`%s`), " ", "") = ? LIMIT 1'):format(
                 cols.table, cols.owner, cols.plate
             ),
             { xPlayer.identifier, keyRef }
@@ -260,6 +310,11 @@ RegisterNetEvent('esx_core:keys:give', function(targetId, keyType, keyRef, tempo
         }
     )
 
+    -- Donne aussi l'item inventaire au destinataire (véhicule)
+    if keyType == 'vehicle' and Core.Inventory and Core.Inventory.Enabled() then
+        Core.Inventory.AddVehicleKey(target.source, keyRef, keyRef, 1)
+    end
+
     TriggerClientEvent('esx_core:notify', src, Core.Locale('key_given', keyRef), 'success')
     TriggerClientEvent('esx_core:notify', target.source, Core.Locale('key_received', keyRef), 'inform')
 end)
@@ -289,7 +344,7 @@ RegisterNetEvent('esx_core:keys:setLock', function(netId, plate, locking)
     local id = Core.GetIdentifier(src)
     if not id then return end
     plate = Core.NormalizePlate(plate)
-    if not hasKey(id, 'vehicle', plate) then
+    if not hasKey(id, 'vehicle', plate, src) then
         TriggerClientEvent('esx_core:notify', src, Core.Locale('key_no_key'), 'error')
         return
     end
@@ -301,7 +356,7 @@ RegisterNetEvent('esx_core:keys:toggleHouse', function(houseId, locked)
     local id = Core.GetIdentifier(src)
     if not id then return end
     houseId = tostring(houseId or '')
-    if not hasKey(id, 'house', houseId) then
+    if not hasKey(id, 'house', houseId, src) then
         TriggerClientEvent('esx_core:notify', src, Core.Locale('key_house_no_key'), 'error')
         return
     end

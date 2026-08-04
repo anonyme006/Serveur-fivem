@@ -33,7 +33,7 @@ ensure esx_core
 | **Persistance** | Sauvegarde périodique moteur / carrosserie / essence / dégâts dans `owned_vehicles` |
 | **Fourrière reboot** | Tous les véhicules `stored = 0` → `impound_public` au démarrage |
 | **Accidents** | Dégâts renforcés + risque de calage + save immédiate |
-| **Clés** | Véhicules + habitations, permanentes / temporaires — touche **U** |
+| **Clés** | Item inventaire à l’achat + serrurier pour racheter |
 | **Portefeuille** | Espèces, banque, trousseau — touche **F4** (NUI) ou `/trousseau` |
 | **Bâche** | `/bache` — pose / retire une bâche, véhicule protégé du reboot fourrière |
 | **Occasions** | Parking Strawberry — **E** acheter, **G** mettre en vente |
@@ -70,7 +70,7 @@ Tous les joueurs partagent la même météo et la même heure (`Config.Weather` 
 
 | Commande | Description |
 |----------|-------------|
-| `/weather [TYPE]` | FORCE météo (CLEAR, RAIN, THUNDER…) |
+| `/weather [TYPE]` | Force la météo (CLEAR, RAIN, THUNDER…) |
 | `/time [h] [m]` | Force l’heure |
 | `/blackout [on/off]` | Coupe les lumières de la ville |
 | `/freezetime` | Gele / dégèle l’heure |
@@ -89,6 +89,39 @@ Sur sable, boue, herbe haute, gravier, neige… le véhicule perd de l’adhére
 - Les **4x4** (classe 9) sont moins pénalisés (`offroadClassMultiplier`)
 - Motos / bateaux / air = exemptés
 - Ajuste `Config.Offroad.surfaces` pour chaque type de sol
+
+## Clés inventaire + serrurier
+
+À l’**achat** d’un véhicule, une clé item (`vehicle_key`) est ajoutée à l’inventaire (ox_inventory / ESX).
+
+### Installation item
+
+**ox_inventory** — ajoute dans `ox_inventory/data/items.lua` le contenu de `install/ox_items.lua` :
+
+```lua
+['vehicle_key'] = {
+    label = 'Clé de véhicule',
+    weight = 20,
+    stack = false,
+    close = true,
+    description = 'Clé permettant de verrouiller / déverrouiller un véhicule',
+    client = {
+        export = 'esx_core.useVehicleKey',
+    },
+},
+```
+
+**ESX items** — exécute `install/esx_items.sql`.
+
+### Serrurier
+
+Point sur la carte pour **racheter / dupliquer** une clé (prix `Config.KeyShop.price`, max par plaque configurable). Commande `/serrurier`.
+
+| Option | Défaut | Effet |
+|--------|--------|--------|
+| `Keys.inventory.giveItemOnPurchase` | true | Item à l’achat |
+| `Keys.inventory.requireItemToLock` | true | Il faut la clé en inventaire pour verrouiller |
+| `Keys.inventory.giveMissingOnGarage` | false | Ne redonne pas gratuitement à la sortie garage |
 
 ## Clés automatiques (garage + achat)
 
