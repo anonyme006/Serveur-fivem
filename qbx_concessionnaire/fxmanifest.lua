@@ -2,13 +2,12 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'esx_concessionnaire'
+name 'qbx_concessionnaire'
 author 'VIBE'
-description 'Concessionnaire véhicules ESX — menus ox_lib'
-version '1.1.0'
+description 'Concessionnaire véhicules Qbox — menus ox_lib'
+version '1.2.0'
 
 shared_scripts {
-    '@es_extended/imports.lua',
     '@ox_lib/init.lua',
     'config.lua',
     'locales/fr.lua',
@@ -24,7 +23,7 @@ server_scripts {
 }
 
 dependencies {
-    'es_extended',
+    'qbx_core',
     'oxmysql',
     'ox_lib',
 }

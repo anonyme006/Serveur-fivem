@@ -1,7 +1,7 @@
 # Serveur-fivem
 
-Ressources FiveM pour serveur ESX.
+Ressources FiveM pour serveur Qbox / ESX.
 
 ## Ressources
 
-- [`esx_concessionnaire`](./esx_concessionnaire) — Concessionnaire véhicules (NUI Voiture / VIBE)
+- [`qbx_concessionnaire`](./qbx_concessionnaire) — Concessionnaire véhicules Qbox (menus ox_lib)

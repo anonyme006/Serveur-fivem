@@ -44,8 +44,15 @@ Config.PurchaseSpawn = {
     heading = 340.0,
 }
 
--- Paiement accepté : 'bank' | 'money' | 'both' (priorité cash puis banque)
+-- Paiement accepté : 'bank' | 'cash' | 'both' (priorité cash puis banque)
+-- Alias 'money' accepté (= cash)
 Config.PaymentAccount = 'both'
+
+-- Garage par défaut dans player_vehicles (si le véhicule est stocké)
+Config.DefaultGarage = 'pillboxgarage'
+
+-- État à l'achat : 0 = sorti, 1 = en garage
+Config.PurchaseState = 0
 
 -- Plaque générée (longueur max 8)
 Config.PlatePrefix = 'VIBE'

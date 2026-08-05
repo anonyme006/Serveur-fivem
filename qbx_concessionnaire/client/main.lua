@@ -6,25 +6,16 @@ local selectedCategory = nil
 local isClosing = false
 
 local function notify(msg, nType)
-    if lib and lib.notify then
-        lib.notify({
-            title = Translate('shop_title'),
-            description = msg,
-            type = nType or 'inform',
-        })
-        return
-    end
-    if ESX and ESX.ShowNotification then
-        ESX.ShowNotification(msg)
-    end
+    lib.notify({
+        title = Translate('shop_title'),
+        description = msg,
+        type = nType or 'inform',
+    })
 end
 
 local function formatMoney(amount)
-    local n = tonumber(amount) or 0
-    if ESX and ESX.Math and ESX.Math.GroupDigits then
-        return ESX.Math.GroupDigits(n)
-    end
-    local s = tostring(math.floor(n))
+    local n = math.floor(tonumber(amount) or 0)
+    local s = tostring(n)
     local left, num, right = string.match(s, '^([^%d]*%d)(%d*)(.-)$')
     return left .. (num:reverse():gsub('(%d%d%d)', '%1,'):reverse()) .. right
 end
@@ -187,7 +178,7 @@ local function buyVehicle(vehicle)
         return
     end
 
-    local result = lib.callback.await('esx_concessionnaire:buyVehicle', false, vehicle.model)
+    local result = lib.callback.await('qbx_concessionnaire:buyVehicle', false, vehicle.model)
     if result and result.ok then
         closeShop()
         notify(Translate('purchase_success', result.name, formatMoney(result.price)), 'success')
@@ -209,9 +200,9 @@ openVehicleActions = function(vehicle)
     spawnPreview(vehicle.model)
 
     lib.registerContext({
-        id = 'esx_concessionnaire_vehicle',
+        id = 'qbx_concessionnaire_vehicle',
         title = vehicle.name,
-        menu = 'esx_concessionnaire_list',
+        menu = 'qbx_concessionnaire_list',
         onExit = closeShop,
         options = {
             {
@@ -242,7 +233,7 @@ openVehicleActions = function(vehicle)
         },
     })
 
-    lib.showContext('esx_concessionnaire_vehicle')
+    lib.showContext('qbx_concessionnaire_vehicle')
 end
 
 openVehicleList = function(categoryId, search)
@@ -275,14 +266,14 @@ openVehicleList = function(categoryId, search)
     end
 
     lib.registerContext({
-        id = 'esx_concessionnaire_list',
+        id = 'qbx_concessionnaire_list',
         title = categoryId and getCategoryLabel(categoryId) or 'Résultats',
-        menu = 'esx_concessionnaire_main',
+        menu = 'qbx_concessionnaire_main',
         onExit = closeShop,
         options = options,
     })
 
-    lib.showContext('esx_concessionnaire_list')
+    lib.showContext('qbx_concessionnaire_list')
 
     if vehicles[1] then
         spawnPreview(vehicles[1].model)
@@ -339,13 +330,13 @@ openCategoriesMenu = function()
     }
 
     lib.registerContext({
-        id = 'esx_concessionnaire_main',
+        id = 'qbx_concessionnaire_main',
         title = Translate('shop_title'),
         options = options,
         onExit = closeShop,
     })
 
-    lib.showContext('esx_concessionnaire_main')
+    lib.showContext('qbx_concessionnaire_main')
 end
 
 local function openShop()
@@ -366,7 +357,6 @@ local function openShop()
     end
 end
 
--- Blips
 CreateThread(function()
     for i = 1, #Config.Zones do
         local zone = Config.Zones[i]
@@ -384,7 +374,6 @@ CreateThread(function()
     end
 end)
 
--- Markers / interaction
 CreateThread(function()
     local showingTextUI = false
 
@@ -422,7 +411,7 @@ CreateThread(function()
                             showingTextUI = true
                         end
 
-                        if IsControlJustReleased(0, 38) then -- E
+                        if IsControlJustReleased(0, 38) then
                             lib.hideTextUI()
                             showingTextUI = false
                             openShop()
@@ -443,7 +432,7 @@ CreateThread(function()
     end
 end)
 
-RegisterNetEvent('esx_concessionnaire:spawnPurchased', function(data)
+RegisterNetEvent('qbx_concessionnaire:client:spawnPurchased', function(data)
     if not data or not data.model then return end
 
     closeShop()
@@ -468,8 +457,20 @@ RegisterNetEvent('esx_concessionnaire:spawnPurchased', function(data)
     SetVehicleEngineOn(vehicle, false, true, false)
     SetModelAsNoLongerNeeded(hash)
 
-    -- Véhicule dehors uniquement — pas de warp joueur
-    TriggerEvent('esx_concessionnaire:vehiclePurchased', vehicle, data.plate, data.model)
+    local netId = NetworkGetNetworkIdFromEntity(vehicle)
+    TriggerEvent('qbx_concessionnaire:vehiclePurchased', vehicle, data.plate, data.model)
+    TriggerServerEvent('qbx_concessionnaire:server:vehicleSpawned', data.plate, netId)
+end)
+
+RegisterNetEvent('qbx_concessionnaire:client:giveKeys', function(netId, plate)
+    local vehicle = netId and NetworkGetEntityFromNetworkId(netId) or 0
+    if vehicle ~= 0 and DoesEntityExist(vehicle) then
+        pcall(function()
+            exports.qbx_vehiclekeys:GiveKeys(vehicle)
+        end)
+    end
+    TriggerEvent('qb-vehiclekeys:client:AddKeys', plate)
+    TriggerEvent('vehiclekeys:client:SetOwner', plate)
 end)
 
 RegisterCommand('concessionnaire', function()
