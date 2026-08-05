@@ -98,7 +98,7 @@ Config.Keys = {
 Config.KeyShop = {
     enabled = true,
     label = 'Serrurier',
-    price = 750,
+    price = 100,
     account = 'bank', -- 'bank' | 'money'
     -- Nombre max de clés item en inventaire par plaque
     maxKeysPerPlate = 3,
