@@ -58,7 +58,7 @@ lib.callback.register('esx_core:keyshop:buy', function(source, plate)
         end
     end
 
-    local price = tonumber(Config.KeyShop.price) or 750
+    local price = tonumber(Config.KeyShop.price) or 100
     local account = Config.KeyShop.account or 'bank'
     local bal = xPlayer.getAccount(account)
     if not bal or (bal.money or 0) < price then

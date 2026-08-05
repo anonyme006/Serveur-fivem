@@ -5,7 +5,7 @@ local blips = {}
 
 local function openShop()
     local vehicles = lib.callback.await('esx_core:keyshop:list', false) or {}
-    local price = tonumber(Config.KeyShop.price) or 750
+    local price = tonumber(Config.KeyShop.price) or 100
     local options = {}
 
     if #vehicles == 0 then
