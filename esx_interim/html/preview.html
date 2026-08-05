@@ -3,10 +3,186 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pôle Emploi - Preview</title>
-    <link rel="stylesheet" href="style.css" />
+    <title>Pôle Emploi — Jobs intérim (aperçu)</title>
+    <style>
+        :root {
+            --bg-panel: rgba(12, 14, 18, 0.92);
+            --bg-hover: rgba(255, 255, 255, 0.08);
+            --bg-selected: rgba(220, 220, 225, 0.88);
+            --text: #f2f2f2;
+            --text-muted: #b8b8bc;
+            --text-dark: #1a1a1e;
+            --logo-blue: #1a4d8f;
+            --border: rgba(255, 255, 255, 0.06);
+            --font-display: "Segoe Script", "Brush Script MT", "Apple Chancery", cursive;
+            --font-body: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: var(--font-body);
+            user-select: none;
+            background:
+                linear-gradient(180deg, rgba(8, 10, 14, 0.72), rgba(8, 10, 14, 0.88)),
+                url("https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=60") center / cover no-repeat;
+            color: var(--text);
+        }
+
+        #app {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .panel {
+            width: min(420px, 92vw);
+            padding: 28px 32px 24px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+            animation: panelIn 280ms ease-out;
+        }
+
+        @keyframes panelIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .header { text-align: center; margin-bottom: 28px; }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .logo-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--logo-blue);
+            color: #fff;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 22px;
+            font-weight: 700;
+            font-style: italic;
+            line-height: 1;
+        }
+
+        .logo-text {
+            color: #fff;
+            font-family: var(--font-display);
+            font-size: 28px;
+            letter-spacing: 0.5px;
+        }
+
+        .slogan {
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .job-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-bottom: 28px;
+        }
+
+        .job-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            transition: background 140ms ease, color 140ms ease;
+        }
+
+        .job-item:hover:not(.selected) { background: var(--bg-hover); }
+
+        .job-item.selected {
+            background: var(--bg-selected);
+            color: var(--text-dark);
+        }
+
+        .lock-spacer { width: 16px; flex-shrink: 0; }
+
+        .job-label { flex: 1; }
+
+        .job-sub {
+            font-size: 12px;
+            font-weight: 400;
+            opacity: 0.7;
+            margin-left: 6px;
+        }
+
+        .confirm {
+            display: block;
+            width: 100%;
+            padding: 14px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .confirm:hover { color: #fff; }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 28px;
+            transform: translateX(-50%);
+            background: rgba(20, 22, 28, 0.95);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff;
+            padding: 12px 18px;
+            font-size: 14px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 180ms ease;
+            z-index: 10;
+        }
+
+        .toast.show { opacity: 1; }
+
+        .hint {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: rgba(255,255,255,0.65);
+            letter-spacing: 0.3px;
+        }
+    </style>
 </head>
 <body>
+    <p class="hint">Aperçu HTML — menu Pôle Emploi (jobs intérim)</p>
+
     <div id="app">
         <div class="panel">
             <header class="header">
@@ -14,36 +190,71 @@
                     <span class="logo-mark" aria-hidden="true">e</span>
                     <span class="logo-text">Pôle emploi</span>
                 </div>
-                <p class="slogan" id="slogan">Changez votre avenir avec nous !</p>
+                <p class="slogan">Changez votre avenir avec nous !</p>
             </header>
 
-            <ul class="job-list" id="jobList" role="listbox" aria-label="Métiers intérim">
-                <li class="job-item" role="option">
-                    <div class="lock-spacer"></div>
-                    <span class="job-label">Electricien</span>
-                </li>
-                <li class="job-item" role="option">
-                    <div class="lock-spacer"></div>
-                    <span class="job-label">Éboueur</span>
-                </li>
-                <li class="job-item selected" role="option" aria-selected="true">
-                    <div class="lock-spacer"></div>
-                    <span class="job-label">Plombier</span>
-                </li>
-                <li class="job-item" role="option">
-                    <div class="lock-spacer"></div>
-                    <span class="job-label">Joaillier<span class="job-sub">(Mineur)</span></span>
-                </li>
-                <li class="job-item" role="option">
-                    <div class="lock-spacer"></div>
-                    <span class="job-label">Livreur de Journaux</span>
-                </li>
-            </ul>
+            <ul class="job-list" id="jobList" role="listbox" aria-label="Métiers intérim"></ul>
 
-            <button type="button" class="confirm" id="confirmBtn">
+            <button type="button" class="confirm" id="confirmBtn" disabled>
                 Choisir ce nouveau métier
             </button>
         </div>
     </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const jobs = [
+            { id: 'electricien', label: 'Electricien' },
+            { id: 'eboueur', label: 'Éboueur' },
+            { id: 'plombier', label: 'Plombier' },
+            { id: 'mineur', label: 'Joaillier', subtitle: 'Mineur' },
+            { id: 'livreur', label: 'Livreur de Journaux' },
+        ];
+
+        const list = document.getElementById('jobList');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const toast = document.getElementById('toast');
+        let selectedId = 'plombier';
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(showToast._t);
+            showToast._t = setTimeout(() => toast.classList.remove('show'), 2200);
+        }
+
+        function render() {
+            list.innerHTML = '';
+            jobs.forEach((job) => {
+                const li = document.createElement('li');
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'job-item' + (selectedId === job.id ? ' selected' : '');
+                btn.setAttribute('role', 'option');
+                const sub = job.subtitle
+                    ? `<span class="job-sub">(${job.subtitle})</span>`
+                    : '';
+                btn.innerHTML = `<span class="lock-spacer"></span><span class="job-label">${job.label}${sub}</span>`;
+                btn.addEventListener('click', () => {
+                    selectedId = job.id;
+                    confirmBtn.disabled = false;
+                    render();
+                });
+                li.appendChild(btn);
+                list.appendChild(li);
+            });
+            confirmBtn.disabled = !selectedId;
+        }
+
+        confirmBtn.addEventListener('click', () => {
+            const job = jobs.find((j) => j.id === selectedId);
+            if (!job) return;
+            const name = job.subtitle ? `${job.label} (${job.subtitle})` : job.label;
+            showToast('Métier choisi : ' + name);
+        });
+
+        render();
+    </script>
 </body>
 </html>
