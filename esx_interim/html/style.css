@@ -1,0 +1,201 @@
+:root {
+    --bg-panel: rgba(12, 14, 18, 0.92);
+    --bg-hover: rgba(255, 255, 255, 0.08);
+    --bg-selected: rgba(220, 220, 225, 0.88);
+    --text: #f2f2f2;
+    --text-muted: #b8b8bc;
+    --text-dark: #1a1a1e;
+    --accent: #e8e8ec;
+    --logo-blue: #1a4d8f;
+    --border: rgba(255, 255, 255, 0.06);
+    --font-display: "Segoe Script", "Brush Script MT", "Apple Chancery", cursive;
+    --font-body: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    font-family: var(--font-body);
+    user-select: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+.panel {
+    width: min(420px, 92vw);
+    padding: 28px 32px 24px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+    animation: panelIn 280ms ease-out;
+}
+
+@keyframes panelIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.logo-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--logo-blue);
+    color: #fff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 22px;
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1;
+}
+
+.logo-text {
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+.slogan {
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.job-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 28px;
+    max-height: 48vh;
+    overflow-y: auto;
+}
+
+.job-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 140ms ease, color 140ms ease;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+}
+
+.job-item:hover:not(.locked):not(.selected) {
+    background: var(--bg-hover);
+}
+
+.job-item.selected {
+    background: var(--bg-selected);
+    color: var(--text-dark);
+}
+
+.job-item.locked {
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.lock-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    opacity: 0.95;
+}
+
+.lock-spacer {
+    width: 16px;
+    flex-shrink: 0;
+}
+
+.job-label {
+    flex: 1;
+}
+
+.job-sub {
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.7;
+    margin-left: 6px;
+}
+
+.confirm {
+    display: block;
+    width: 100%;
+    padding: 14px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: color 140ms ease, opacity 140ms ease;
+}
+
+.confirm:hover:not(:disabled) {
+    color: #fff;
+}
+
+.confirm:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.job-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.job-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}

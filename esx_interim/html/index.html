@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pôle Emploi</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="app" class="hidden">
+        <div class="panel">
+            <header class="header">
+                <div class="logo">
+                    <span class="logo-mark" aria-hidden="true">e</span>
+                    <span class="logo-text">Pôle emploi</span>
+                </div>
+                <p class="slogan" id="slogan">Changez votre avenir avec nous !</p>
+            </header>
+
+            <ul class="job-list" id="jobList" role="listbox" aria-label="Métiers intérim"></ul>
+
+            <button type="button" class="confirm" id="confirmBtn" disabled>
+                Choisir ce nouveau métier
+            </button>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
