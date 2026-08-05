@@ -43,10 +43,24 @@ Fichier `config.lua` :
 
 ## Base de données
 
+Importe le SQL Qbox **une fois** :
+
+```bash
+mysql -u USER -p DATABASE < sql/qbox_vehicles.sql
+# ou
+mysql -u USER -p DATABASE < qbx_concessionnaire/sql/player_vehicles.sql
+```
+
 Insert dans `player_vehicles` :
 
 - `license`, `citizenid`, `vehicle`, `hash`, `mods`, `plate`
 - `garage`, `fuel`, `engine`, `body`, `state`
+
+| state | Signification |
+|------:|---------------|
+| 0 | Sorti (après achat) |
+| 1 | En garage |
+| 2 | Fourrière |
 
 ## Exports
 

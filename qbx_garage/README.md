@@ -21,6 +21,34 @@ ensure qbx_garage
 
 Compatible avec les véhicules achetés via `qbx_concessionnaire`.
 
+## SQL (obligatoire)
+
+Importe **une** de ces options sur ta base Qbox :
+
+```bash
+# recommandé (racine du repo)
+mysql -u USER -p DATABASE < sql/qbox_vehicles.sql
+
+# ou depuis la ressource garage
+mysql -u USER -p DATABASE < qbx_garage/sql/player_vehicles.sql
+```
+
+Fichiers :
+
+| Fichier | Usage |
+|---------|--------|
+| `sql/qbox_vehicles.sql` | Install complète |
+| `qbx_garage/sql/player_vehicles.sql` | Création table |
+| `qbx_garage/sql/migrations.sql` | Colonnes manquantes si table déjà existante |
+
+### États
+
+| state | Signification |
+|------:|---------------|
+| 0 | Sorti |
+| 1 | En garage |
+| 2 | Fourrière |
+
 ## Fonctions
 
 - Garages publics configurables
