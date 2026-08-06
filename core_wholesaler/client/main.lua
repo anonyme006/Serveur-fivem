@@ -10,6 +10,7 @@ Client = {
     zones = {},
     activeDelivery = nil,
     activeExport = nil,
+    npcMode = false, -- achat via PNJ hors service
 }
 
 --- Rafraîchit les droits d'accès
@@ -146,6 +147,14 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
 end)
 
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function()
+    Client.RefreshAccess()
+end)
+
+RegisterNetEvent('QBCore:Client:SetDuty', function()
+    Client.RefreshAccess()
+end)
+
+RegisterNetEvent('qbx_core:client:onJobUpdate', function()
     Client.RefreshAccess()
 end)
 

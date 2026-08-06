@@ -24,10 +24,21 @@ end
 ---@param method string
 ---@param fulfillment string 'pickup'|'delivery'
 ---@param deliveryCoords vector3|nil
+---@param opts { npc?: boolean }|nil
 ---@return integer|nil orderId, string|nil errKey
-function Orders.Create(source, cart, method, fulfillment, deliveryCoords)
+function Orders.Create(source, cart, method, fulfillment, deliveryCoords, opts)
+    opts = opts or {}
+    local npcSale = opts.npc == true
+
     local player = Payment.GetPlayer(source)
     if not player then return nil, 'error' end
+
+    -- Vente PNJ : uniquement si aucun employé en service
+    if npcSale then
+        if not Duty.CanNpcSell() then
+            return nil, 'npc_staff_on_duty'
+        end
+    end
 
     local job = player.PlayerData.job
     if not Config.AllowedCompanies[job.name] then
@@ -42,6 +53,11 @@ function Orders.Create(source, cart, method, fulfillment, deliveryCoords)
     end
     if #cart > Config.Orders.maxLines then
         return nil, 'max_lines'
+    end
+
+    local multiplier = 1.0
+    if npcSale and Config.NpcVendor and Config.NpcVendor.priceMultiplier then
+        multiplier = Config.NpcVendor.priceMultiplier
     end
 
     -- Validation lignes + calcul
@@ -71,7 +87,8 @@ function Orders.Create(source, cart, method, fulfillment, deliveryCoords)
             return nil, 'out_of_stock'
         end
 
-        local lineTotal = product.price * qty
+        local unitPrice = Wholesaler.Round(product.price * multiplier)
+        local lineTotal = unitPrice * qty
         subtotal = subtotal + lineTotal
         totalQty = totalQty + qty
 
@@ -79,7 +96,7 @@ function Orders.Create(source, cart, method, fulfillment, deliveryCoords)
             item = item,
             label = product.label,
             qty = qty,
-            price = product.price,
+            price = unitPrice,
             total = lineTotal,
             image = product.image,
         }
@@ -87,11 +104,22 @@ function Orders.Create(source, cart, method, fulfillment, deliveryCoords)
 
     local tax, vat, total = Wholesaler.CalcTaxes(subtotal)
 
+    local instant = npcSale and Config.NpcVendor and Config.NpcVendor.instantGive
+
+    -- Vérifier place inventaire AVANT de retirer stock / payer (vente instantanée)
+    if instant then
+        for _, line in ipairs(lines) do
+            local canCarry = exports.ox_inventory:CanCarryItem(source, line.item, line.qty)
+            if not canCarry then
+                return nil, 'pickup_inventory'
+            end
+        end
+    end
+
     -- Réservation stock
     local reserved = {}
     for _, line in ipairs(lines) do
         if not Stock.Remove(line.item, line.qty) then
-            -- rollback
             for _, r in ipairs(reserved) do
                 Stock.Add(r.item, r.qty)
             end
@@ -110,6 +138,11 @@ function Orders.Create(source, cart, method, fulfillment, deliveryCoords)
     end
 
     fulfillment = fulfillment == 'delivery' and 'delivery' or 'pickup'
+    -- PNJ : pas de livraison transporteur
+    if npcSale then
+        fulfillment = 'pickup'
+    end
+
     local reward = 0
     if fulfillment == 'delivery' and Config.Delivery.enabled then
         reward = Wholesaler.Round(Config.Delivery.rewardBase + total * Config.Delivery.rewardPercent)
@@ -118,10 +151,15 @@ function Orders.Create(source, cart, method, fulfillment, deliveryCoords)
     local citizenid = player.PlayerData.citizenid
     local companyLabel = job.label or job.name
 
+    local initialStatus = Config.Orders.statuses.pending
+    if instant then
+        initialStatus = Config.Orders.statuses.withdrawn
+    end
+
     local orderId = MySQL.insert.await([[
         INSERT INTO wholesaler_orders
-            (citizenid, company, items, subtotal, tax, vat, total, payment_method, fulfillment, status, delivery_reward, delivery_coords)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (citizenid, company, items, subtotal, tax, vat, total, payment_method, fulfillment, status, delivery_reward, delivery_coords, completed_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ]], {
         citizenid,
         job.name,
@@ -132,28 +170,42 @@ function Orders.Create(source, cart, method, fulfillment, deliveryCoords)
         total,
         method,
         fulfillment,
-        Config.Orders.statuses.pending,
+        initialStatus,
         reward,
         deliveryCoords and json.encode({
             x = deliveryCoords.x,
             y = deliveryCoords.y,
             z = deliveryCoords.z,
         }) or nil,
+        instant and os.date('%Y-%m-%d %H:%M:%S') or nil,
     })
 
     DB.LogHistory({
         orderId = orderId,
         citizenid = citizenid,
         company = job.name,
-        action = 'order_created',
-        details = { lines = lines, method = method, fulfillment = fulfillment },
+        action = npcSale and 'npc_sale' or 'order_created',
+        details = { lines = lines, method = method, fulfillment = fulfillment, npc = npcSale },
         amount = total,
     })
 
     DB.UpsertCompany(job.name, companyLabel, total)
 
-    -- Lancer la préparation asynchrone
-    Orders.SchedulePreparation(orderId, totalQty, citizenid)
+    if instant then
+        for _, line in ipairs(lines) do
+            exports.ox_inventory:AddItem(source, line.item, line.qty)
+        end
+        return orderId
+    end
+
+    if npcSale then
+        Orders.SchedulePreparation(orderId, totalQty, citizenid, {
+            prepareBase = Config.NpcVendor.prepareBase,
+            preparePerItem = Config.NpcVendor.preparePerItem,
+        })
+    else
+        Orders.SchedulePreparation(orderId, totalQty, citizenid)
+    end
 
     return orderId
 end
@@ -162,11 +214,14 @@ end
 ---@param orderId integer
 ---@param totalQty integer
 ---@param citizenid string
-function Orders.SchedulePreparation(orderId, totalQty, citizenid)
+---@param timing { prepareBase?: number, preparePerItem?: number }|nil
+function Orders.SchedulePreparation(orderId, totalQty, citizenid, timing)
     if preparing[orderId] then return end
     preparing[orderId] = true
 
-    local totalMs = (Config.Orders.prepareBase + totalQty * Config.Orders.preparePerItem) * 1000
+    local base = (timing and timing.prepareBase) or Config.Orders.prepareBase
+    local perItem = (timing and timing.preparePerItem) or Config.Orders.preparePerItem
+    local totalMs = (base + totalQty * perItem) * 1000
     local halfMs = math.floor(totalMs / 2)
 
     -- pending → prepared (mi-parcours)
@@ -315,7 +370,7 @@ function Orders.GetHistory(citizenid, limit)
     limit = limit or 30
     return MySQL.query.await([[
         SELECT * FROM wholesaler_history
-        WHERE citizenid = ? AND action IN ('order_created', 'order_withdrawn', 'order_delivered')
+        WHERE citizenid = ? AND action IN ('order_created', 'order_withdrawn', 'order_delivered', 'npc_sale')
         ORDER BY id DESC LIMIT ?
     ]], { citizenid, limit }) or {}
 end

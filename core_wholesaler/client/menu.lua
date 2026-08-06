@@ -12,6 +12,7 @@ end
 --- Menu principal
 ---@param focus string|nil 'main'|'buy'
 function OpenWholesalerMenu(focus)
+    Client.npcMode = false
     local access = ensureAccess()
     if not access or not access.ok then
         return Client.NotifyErr('error')
@@ -96,11 +97,61 @@ function OpenWholesalerMenu(focus)
     lib.showContext('wholesaler_main')
 end
 
+--- PNJ vendeur hors service
+function OpenNpcVendorMenu()
+    local status = lib.callback.await('core_wholesaler:canNpcSell', false)
+    if not status or not status.available then
+        return Client.Notify(_('npc_staff_on_duty'), 'inform')
+    end
+
+    local access = Client.RefreshAccess()
+    if not access or not access.isBuyer then
+        return Client.NotifyErr('not_authorized')
+    end
+
+    Client.npcMode = true
+    Client.ClearCart()
+
+    local mult = status.multiplier or 1.0
+    local desc = status.instant and _('npc_instant_hint') or _('npc_order_hint')
+    if mult > 1.0 then
+        desc = desc .. ' — ' .. _('npc_markup', math.floor((mult - 1) * 100 + 0.5))
+    end
+
+    lib.registerContext({
+        id = 'wholesaler_npc',
+        title = _('menu_npc_vendor'),
+        options = {
+            {
+                title = _('menu_buy'),
+                description = desc,
+                icon = 'store',
+                onSelect = OpenBuyMenu,
+            },
+            {
+                title = _('menu_stock'),
+                icon = 'boxes-stacked',
+                onSelect = OpenStockMenu,
+            },
+        },
+    })
+    lib.showContext('wholesaler_npc')
+end
+
 --- Achat — catégories
 function OpenBuyMenu()
     local categories = lib.callback.await('core_wholesaler:getCategories', false)
     if not categories or #categories == 0 then
         return Client.NotifyErr('not_authorized')
+    end
+
+    -- Si mode PNJ, revérifier qu'aucun employé n'est en service
+    if Client.npcMode then
+        local status = lib.callback.await('core_wholesaler:canNpcSell', false)
+        if not status or not status.available then
+            Client.npcMode = false
+            return Client.Notify(_('npc_staff_on_duty'), 'inform')
+        end
     end
 
     local options = {}
@@ -125,8 +176,8 @@ function OpenBuyMenu()
 
     lib.registerContext({
         id = 'wholesaler_buy',
-        title = _('menu_buy'),
-        menu = 'wholesaler_main',
+        title = Client.npcMode and _('menu_npc_vendor') or _('menu_buy'),
+        menu = Client.npcMode and 'wholesaler_npc' or 'wholesaler_main',
         options = options,
     })
     lib.showContext('wholesaler_buy')
@@ -136,7 +187,7 @@ end
 ---@param catId string
 ---@param catLabel string
 function OpenCategoryProducts(catId, catLabel)
-    local stock = lib.callback.await('core_wholesaler:getStock', false, { catId })
+    local stock = lib.callback.await('core_wholesaler:getStock', false, { catId }, Client.npcMode)
     if not stock or #stock == 0 then
         return Client.Notify(_('stock_empty'), 'inform')
     end
@@ -206,7 +257,7 @@ function OpenCartMenu()
         return Client.Notify(_('cart_empty'), 'inform')
     end
 
-    local totals = lib.callback.await('core_wholesaler:calcTotal', false, Client.cart)
+    local totals = lib.callback.await('core_wholesaler:calcTotal', false, Client.cart, Client.npcMode)
     local options = {}
 
     for i, line in ipairs(Client.cart) do
@@ -269,11 +320,12 @@ function OpenCheckout(totals)
     local fulfillOpts = {
         { value = 'pickup', label = _('mode_pickup') },
     }
-    if Config.Delivery.enabled then
+    -- Livraison uniquement hors mode PNJ
+    if Config.Delivery.enabled and not Client.npcMode then
         fulfillOpts[#fulfillOpts + 1] = { value = 'delivery', label = _('mode_delivery') }
     end
 
-    local input = lib.inputDialog(_('cart_checkout'), {
+    local fields = {
         {
             type = 'select',
             label = _('payment_method'),
@@ -281,30 +333,39 @@ function OpenCheckout(totals)
             required = true,
             default = methods[1] and methods[1].value,
         },
-        {
+    }
+
+    if not Client.npcMode then
+        fields[#fields + 1] = {
             type = 'select',
             label = _('delivery_mode'),
             options = fulfillOpts,
             required = true,
             default = 'pickup',
-        },
-        {
-            type = 'textarea',
-            label = _('vat_included', Wholesaler.FormatMoney(totals.vat)),
-            disabled = true,
-            default = ('HT: $%s | Taxe: $%s | TVA: $%s | TTC: $%s'):format(
-                Wholesaler.FormatMoney(totals.subtotal),
-                Wholesaler.FormatMoney(totals.tax),
-                Wholesaler.FormatMoney(totals.vat),
-                Wholesaler.FormatMoney(totals.total)
-            ),
-        },
-    })
+        }
+    end
+
+    fields[#fields + 1] = {
+        type = 'textarea',
+        label = _('vat_included', Wholesaler.FormatMoney(totals.vat)),
+        disabled = true,
+        default = ('HT: $%s | Taxe: $%s | TVA: $%s | TTC: $%s'):format(
+            Wholesaler.FormatMoney(totals.subtotal),
+            Wholesaler.FormatMoney(totals.tax),
+            Wholesaler.FormatMoney(totals.vat),
+            Wholesaler.FormatMoney(totals.total)
+        ),
+    }
+
+    local input = lib.inputDialog(
+        Client.npcMode and _('menu_npc_vendor') or _('cart_checkout'),
+        fields
+    )
 
     if not input then return end
 
     local method = input[1]
-    local fulfillment = input[2]
+    local fulfillment = Client.npcMode and 'pickup' or (input[2] or 'pickup')
     local deliveryCoords
 
     if fulfillment == 'delivery' then
@@ -318,6 +379,7 @@ function OpenCheckout(totals)
         method = method,
         fulfillment = fulfillment,
         deliveryCoords = deliveryCoords,
+        npc = Client.npcMode == true,
     })
 
     if not result or not result.ok then
@@ -325,11 +387,12 @@ function OpenCheckout(totals)
     end
 
     Client.ClearCart()
+    Client.npcMode = false
 end
 
 --- Stock disponible (lecture)
 function OpenStockMenu()
-    local stock = lib.callback.await('core_wholesaler:getStock', false)
+    local stock = lib.callback.await('core_wholesaler:getStock', false, nil, Client.npcMode)
     if not stock or #stock == 0 then
         return Client.Notify(_('stock_empty'), 'inform')
     end
@@ -352,7 +415,7 @@ function OpenStockMenu()
     lib.registerContext({
         id = 'wholesaler_stock',
         title = _('stock_title'),
-        menu = 'wholesaler_main',
+        menu = Client.npcMode and 'wholesaler_npc' or 'wholesaler_main',
         options = options,
     })
     lib.showContext('wholesaler_stock')

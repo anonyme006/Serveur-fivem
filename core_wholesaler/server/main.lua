@@ -42,6 +42,8 @@ lib.callback.register('core_wholesaler:getAccess', function(source)
     local isTransporter = Delivery.IsTransporter(player)
     local isAdmin = Admin.HasPermission(source, Config.Permissions.manageStock)
     local isBoss = Admin.CanBoss(source)
+    local staffOnDuty = Duty.HasStaffOnDuty()
+    local npcAvailable = Duty.CanNpcSell()
 
     local categories = Config.AllowedCompanies[job.name]
     if isWholesaler or isAdmin then
@@ -62,10 +64,14 @@ lib.callback.register('core_wholesaler:getAccess', function(source)
         paymentMethods = Config.Payment.methods,
         deliveryEnabled = Config.Delivery.enabled,
         exportEnabled = Config.Export.enabled,
+        staffOnDuty = staffOnDuty,
+        npcAvailable = npcAvailable,
+        npcMultiplier = (Config.NpcVendor and Config.NpcVendor.priceMultiplier) or 1.0,
+        npcInstant = Config.NpcVendor and Config.NpcVendor.instantGive == true,
     }
 end)
 
-lib.callback.register('core_wholesaler:getStock', function(source, categoryFilter)
+lib.callback.register('core_wholesaler:getStock', function(source, categoryFilter, npcSale)
     local job, player = getPlayerJob(source)
     if not player then return {} end
 
@@ -80,13 +86,20 @@ lib.callback.register('core_wholesaler:getStock', function(source, categoryFilte
         end
     end
 
+    local multiplier = 1.0
+    if npcSale and Config.NpcVendor and Config.NpcVendor.priceMultiplier then
+        multiplier = Config.NpcVendor.priceMultiplier
+    end
+
     local stock = Stock.GetAll(cats)
-    -- Enrichir avec images
     for i = 1, #stock do
+        stock[i].basePrice = stock[i].price
+        stock[i].price = Wholesaler.Round(stock[i].price * multiplier)
         stock[i].imageUrl = Wholesaler.ItemImage(stock[i].image, stock[i].item)
         stock[i].categoryLabel = Config.Categories[stock[i].category]
             and Config.Categories[stock[i].category].label
             or stock[i].category
+        stock[i].npcSale = npcSale == true
     end
     return stock
 end)
@@ -121,20 +134,39 @@ end)
 lib.callback.register('core_wholesaler:createOrder', function(source, data)
     if type(data) ~= 'table' then return { ok = false, err = 'error' } end
 
+    local npcSale = data.npc == true
+    if npcSale and not Duty.CanNpcSell() then
+        return { ok = false, err = 'npc_staff_on_duty' }
+    end
+
     local orderId, err = Orders.Create(
         source,
         data.cart,
         data.method or 'society',
         data.fulfillment or 'pickup',
-        data.deliveryCoords
+        data.deliveryCoords,
+        { npc = npcSale }
     )
 
     if not orderId then
         return { ok = false, err = err or 'error' }
     end
 
-    notify(source, _('order_created', orderId), 'success')
-    return { ok = true, orderId = orderId }
+    if npcSale and Config.NpcVendor and Config.NpcVendor.instantGive then
+        notify(source, _('npc_sale_success', orderId), 'success')
+    else
+        notify(source, _('order_created', orderId), 'success')
+    end
+    return { ok = true, orderId = orderId, instant = npcSale and Config.NpcVendor.instantGive }
+end)
+
+lib.callback.register('core_wholesaler:canNpcSell', function()
+    return {
+        available = Duty.CanNpcSell(),
+        staffOnDuty = Duty.HasStaffOnDuty(),
+        multiplier = (Config.NpcVendor and Config.NpcVendor.priceMultiplier) or 1.0,
+        instant = Config.NpcVendor and Config.NpcVendor.instantGive == true,
+    }
 end)
 
 lib.callback.register('core_wholesaler:getMyOrders', function(source)
@@ -408,17 +440,22 @@ lib.callback.register('core_wholesaler:prepareOrder', function(source, orderId)
     return { ok = true }
 end)
 
-lib.callback.register('core_wholesaler:calcTotal', function(_, cart)
+lib.callback.register('core_wholesaler:calcTotal', function(_, cart, npcSale)
     if type(cart) ~= 'table' then return { subtotal = 0, tax = 0, vat = 0, total = 0 } end
+    local multiplier = 1.0
+    if npcSale and Config.NpcVendor and Config.NpcVendor.priceMultiplier then
+        multiplier = Config.NpcVendor.priceMultiplier
+    end
     local subtotal = 0
     for _, line in ipairs(cart) do
         local product = Stock.Get(line.item)
         if product then
-            subtotal = subtotal + product.price * (math.floor(tonumber(line.qty) or 0))
+            local unit = Wholesaler.Round(product.price * multiplier)
+            subtotal = subtotal + unit * (math.floor(tonumber(line.qty) or 0))
         end
     end
     local tax, vat, total = Wholesaler.CalcTaxes(subtotal)
-    return { subtotal = subtotal, tax = tax, vat = vat, total = total }
+    return { subtotal = subtotal, tax = tax, vat = vat, total = total, multiplier = multiplier }
 end)
 
 --- Joueurs proches (recrutement)

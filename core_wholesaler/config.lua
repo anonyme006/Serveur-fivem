@@ -36,6 +36,30 @@ Config.Permissions = {
 }
 
 --------------------------------------------------------------------------------
+-- PNJ vendeur (hors service)
+-- Actif uniquement quand aucun employé grossiste n'est en service (onduty).
+--------------------------------------------------------------------------------
+Config.NpcVendor = {
+    enabled = true,
+    -- Majoration de prix hors service (1.0 = prix normal)
+    priceMultiplier = 1.15,
+    -- true = paie et reçoit les items immédiatement (boutique PNJ)
+    -- false = crée une commande avec préparation accélérée
+    instantGive = true,
+    -- Temps de préparation si instantGive = false (secondes)
+    prepareBase = 15,
+    preparePerItem = 1,
+    -- Position du PNJ vendeur
+    coords = vec4(1006.50, -3102.0, -39.0, 180.0),
+    ped = {
+        model = 's_m_m_linecook',
+        scenario = 'WORLD_HUMAN_CLIPBOARD',
+    },
+    targetLabel = 'Acheter (hors service)',
+    targetIcon = 'fas fa-store',
+}
+
+--------------------------------------------------------------------------------
 -- Paiement
 --------------------------------------------------------------------------------
 Config.Payment = {

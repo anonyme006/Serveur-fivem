@@ -27,6 +27,14 @@ Locales['en'] = {
     ['menu_admin']           = 'Administration',
     ['menu_boss']            = 'Boss menu',
     ['menu_export']          = 'Cargo export',
+    ['menu_npc_vendor']      = 'Automatic vendor',
+
+    ['target_npc_vendor']    = 'Buy (off duty)',
+    ['npc_staff_on_duty']    = 'An employee is on duty. Please go to reception.',
+    ['npc_sale_success']     = 'Purchase #%s completed. Items added to inventory.',
+    ['npc_instant_hint']     = 'Items handed over immediately',
+    ['npc_order_hint']       = 'Order prepared quickly',
+    ['npc_markup']           = 'Surcharge +%s%%',
 
     ['select_category']      = 'Select a category',
     ['product_stock']        = 'Stock: %s',

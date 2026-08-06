@@ -83,6 +83,12 @@ Créer aussi le compte société `wholesaler` dans votre banking (`Config.Paymen
 ### Catégories (configurables)
 Alimentation · Restaurant · Mécano · EMS · Police · Station-service · Chantier
 
+### PNJ hors service
+Quand **aucun employé** du job `wholesaler` n’est en service (`onduty`), un PNJ vendeur permet aux entreprises d’acheter directement (remise immédiate des items, majoration configurable).  
+Dès qu’un employé prend son service, le PNJ refuse la vente et renvoie vers l’accueil.
+
+Configurable via `Config.NpcVendor` (position, modèle, majoration, `instantGive`).
+
 ### Cycle des commandes
 `En attente` → `Préparée` → `Disponible` → `Retirée` / `Livrée`
 

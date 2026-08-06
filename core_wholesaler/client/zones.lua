@@ -29,10 +29,36 @@ local function setupWarehouse()
             label = _('target_reception'),
             distance = 2.5,
             onSelect = function()
+                Client.npcMode = false
                 OpenWholesalerMenu('main')
             end,
         },
     })
+
+    -- PNJ vendeur hors service (entreprises)
+    local npcCfg = Config.NpcVendor
+    if npcCfg and npcCfg.enabled then
+        local vendorPed = Client.SpawnPed(
+            npcCfg.ped.model,
+            npcCfg.coords,
+            npcCfg.ped.scenario
+        )
+        exports.ox_target:addLocalEntity(vendorPed, {
+            {
+                name = 'wholesaler_npc_vendor',
+                icon = npcCfg.targetIcon or 'fas fa-store',
+                label = _('target_npc_vendor'),
+                distance = 2.5,
+                canInteract = function()
+                    local access = Client.access or Client.RefreshAccess()
+                    return access and access.isBuyer == true
+                end,
+                onSelect = function()
+                    OpenNpcVendorMenu()
+                end,
+            },
+        })
+    end
 
     -- Zone commande
     exports.ox_target:addBoxZone({
@@ -48,6 +74,7 @@ local function setupWarehouse()
                 label = _('target_order'),
                 distance = 2.0,
                 onSelect = function()
+                    Client.npcMode = false
                     OpenWholesalerMenu('buy')
                 end,
             },

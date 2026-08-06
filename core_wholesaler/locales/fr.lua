@@ -29,6 +29,15 @@ Locales['fr'] = {
     ['menu_admin']           = 'Administration',
     ['menu_boss']            = 'Menu patron',
     ['menu_export']          = 'Export de cargaison',
+    ['menu_npc_vendor']      = 'Vendeur automatique',
+
+    -- PNJ hors service
+    ['target_npc_vendor']    = 'Acheter (hors service)',
+    ['npc_staff_on_duty']    = 'Un employé est en service. Adressez-vous à l\'accueil.',
+    ['npc_sale_success']     = 'Achat #%s effectué. Articles ajoutés à l\'inventaire.',
+    ['npc_instant_hint']     = 'Remise immédiate des articles',
+    ['npc_order_hint']       = 'Commande préparée rapidement',
+    ['npc_markup']           = 'Majoration +%s%%',
 
     -- Achat
     ['select_category']      = 'Choisir une catégorie',
