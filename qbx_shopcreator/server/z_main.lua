@@ -72,7 +72,12 @@ function ShopCreator.ListShopsAdmin(source)
     return { ok = true, data = summaries }
 end
 
+local bootstrapped = false
+
 local function bootstrap()
+    if bootstrapped then return end
+    bootstrapped = true
+
     if ServerConfig.AutoMigrate then
         local ok, err = pcall(Repo.RunMigration)
         if not ok then
