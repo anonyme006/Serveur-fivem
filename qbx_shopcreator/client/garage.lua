@@ -26,16 +26,20 @@ end
 
 ---@param shopId number
 ---@param model? string
-local function spawnBusinessVehicle(shopId, model)
+---@param coords? table
+local function spawnBusinessVehicle(shopId, model, coords)
     local shop = Client.GetShop(shopId)
-    if not shop then
+    if not shop and not coords then
         Client.Notify(L('invalid_data'), 'error')
         return
     end
 
-    local spawnLoc = Client.GetShopLocation(shop, ShopCreator.LocationTypes.vehicle_spawn)
-    if not spawnLoc then
-        spawnLoc = Client.GetShopLocation(shop, ShopCreator.LocationTypes.garage)
+    local spawnLoc = coords
+    if not spawnLoc and shop then
+        spawnLoc = Client.GetShopLocation(shop, ShopCreator.LocationTypes.vehicle_spawn)
+        if not spawnLoc then
+            spawnLoc = Client.GetShopLocation(shop, ShopCreator.LocationTypes.garage)
+        end
     end
 
     if not spawnLoc then
@@ -44,7 +48,7 @@ local function spawnBusinessVehicle(shopId, model)
     end
 
     model = model or Config.Delivery.vehicleModel or 'boxville2'
-    if shop.vehicles and shop.vehicles[1] and shop.vehicles[1].enabled then
+    if not coords and shop and shop.vehicles and shop.vehicles[1] and shop.vehicles[1].enabled then
         model = shop.vehicles[1].model or model
     end
 
@@ -101,7 +105,11 @@ local function takeOutVehicle(shopId, model)
     if not shopId then return end
 
     local ok, result = pcall(function()
-        return lib.callback.await('qbx_shopcreator:spawnBusinessVehicle', false, shopId, model)
+        return lib.callback.await('qbx_shopcreator:takeVehicle', false, {
+            shopId = shopId,
+            model = model,
+            vehicleId = tonumber(model) -- ignored unless numeric id passed as model
+        })
     end)
 
     if not ok or result == false or (type(result) == 'table' and result.ok == false) then
@@ -110,12 +118,11 @@ local function takeOutVehicle(shopId, model)
         return
     end
 
-    local spawnModel = model
-    if type(result) == 'table' then
-        spawnModel = result.model or spawnModel
-    end
+    local payload = type(result) == 'table' and (result.data or result) or {}
+    local spawnModel = payload.model or model
+    local coords = payload.coords
 
-    spawnBusinessVehicle(shopId, spawnModel)
+    spawnBusinessVehicle(shopId, spawnModel, coords)
     Client.Notify(L('vehicle_spawned'), 'success')
 end
 
@@ -155,7 +162,10 @@ local function storeVehicle(shopId)
     end
 
     local ok, result = pcall(function()
-        return lib.callback.await('qbx_shopcreator:storeBusinessVehicle', false, shopId, VehToNet(vehicle))
+        return lib.callback.await('qbx_shopcreator:storeVehicle', false, {
+            shopId = shopId,
+            netId = VehToNet(vehicle),
+        })
     end)
 
     if not ok or result == false or (type(result) == 'table' and result.ok == false) then

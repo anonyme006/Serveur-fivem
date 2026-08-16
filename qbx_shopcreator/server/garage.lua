@@ -34,13 +34,14 @@ end
 
 ---@param source number
 ---@param shopId number
----@param vehicleId number
+---@param vehicleId number|nil
+---@param modelHint string|nil
 ---@return table
-function ShopCreator.TakeVehicle(source, shopId, vehicleId)
+function ShopCreator.TakeVehicle(source, shopId, vehicleId, modelHint)
     shopId = tonumber(shopId)
     vehicleId = tonumber(vehicleId)
 
-    if not shopId or not vehicleId then
+    if not shopId then
         return { ok = false, error = ShopCreator.L('invalid_data') }
     end
 
@@ -60,9 +61,23 @@ function ShopCreator.TakeVehicle(source, shopId, vehicleId)
     local vehicleDef
     for i = 1, #(shop.vehicles or {}) do
         local veh = shop.vehicles[i]
-        if veh.id == vehicleId and veh.enabled then
-            vehicleDef = veh
-            break
+        if veh.enabled then
+            if vehicleId and veh.id == vehicleId then
+                vehicleDef = veh
+                break
+            elseif type(modelHint) == 'string' and veh.model == modelHint then
+                vehicleDef = veh
+                break
+            end
+        end
+    end
+
+    if not vehicleDef then
+        for i = 1, #(shop.vehicles or {}) do
+            if shop.vehicles[i].enabled then
+                vehicleDef = shop.vehicles[i]
+                break
+            end
         end
     end
 
@@ -79,7 +94,7 @@ function ShopCreator.TakeVehicle(source, shopId, vehicleId)
 
     ShopCreator.Garage.active[source] = {
         shopId = shopId,
-        vehicleId = vehicleId,
+        vehicleId = vehicleDef.id,
         model = vehicleDef.model,
         label = vehicleDef.label,
         spawnedAt = os.time(),
@@ -87,7 +102,7 @@ function ShopCreator.TakeVehicle(source, shopId, vehicleId)
 
     ShopCreator.Log('vehicle_taken', {
         shopId = shopId,
-        vehicleId = vehicleId,
+        vehicleId = vehicleDef.id,
         model = vehicleDef.model,
         citizenid = ShopCreator.GetCitizenId(source),
     })

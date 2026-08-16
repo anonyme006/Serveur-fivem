@@ -66,7 +66,7 @@ function ShopCreator.Purchase(source, shopId, cart, paymentMethod)
         end
 
         local itemName = ShopCreator.SanitizeItemName(product.item_name)
-        if not itemName then
+        if not itemName or not ShopCreator.ItemExists(itemName) then
             return { ok = false, error = ShopCreator.L('invalid_data') }
         end
 

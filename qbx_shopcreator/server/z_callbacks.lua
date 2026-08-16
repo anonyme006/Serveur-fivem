@@ -201,7 +201,7 @@ end)
 
 lib.callback.register('qbx_shopcreator:deliveries:completeDelivery', function(source, data)
     data = data or {}
-    return ShopCreator.CompleteDelivery(source, data.jobId or data.id)
+    return ShopCreator.CompleteDelivery(source, data.jobId or data.id, data.phase)
 end)
 
 lib.callback.register('qbx_shopcreator:deliveries:cancelSelfDelivery', function(source, data)
@@ -212,7 +212,7 @@ end)
 --- Garage
 lib.callback.register('qbx_shopcreator:garage:takeVehicle', function(source, data)
     data = data or {}
-    return ShopCreator.TakeVehicle(source, data.shopId, data.vehicleId or data.id)
+    return ShopCreator.TakeVehicle(source, data.shopId, data.vehicleId or data.id, data.model)
 end)
 
 lib.callback.register('qbx_shopcreator:garage:storeVehicle', function(source, data)
@@ -402,7 +402,7 @@ end)
 
 lib.callback.register('qbx_shopcreator:completeDelivery', function(source, data)
     data = data or {}
-    return ShopCreator.CompleteDelivery(source, data.jobId or data.id)
+    return ShopCreator.CompleteDelivery(source, data.jobId or data.id, data.phase)
 end)
 
 lib.callback.register('qbx_shopcreator:cancelSelfDelivery', function(source, data)
@@ -412,12 +412,43 @@ end)
 
 lib.callback.register('qbx_shopcreator:takeVehicle', function(source, data)
     data = data or {}
-    return ShopCreator.TakeVehicle(source, data.shopId, data.vehicleId or data.id)
+    return ShopCreator.TakeVehicle(source, data.shopId, data.vehicleId or data.id, data.model)
 end)
 
 lib.callback.register('qbx_shopcreator:storeVehicle', function(source, data)
     data = data or {}
     return ShopCreator.StoreVehicle(source, data.shopId, data.netId)
+end)
+
+lib.callback.register('qbx_shopcreator:spawnBusinessVehicle', function(source, data)
+    data = data or {}
+    return ShopCreator.TakeVehicle(source, data.shopId, data.vehicleId or data.id, data.model)
+end)
+
+lib.callback.register('qbx_shopcreator:storeBusinessVehicle', function(source, data)
+    data = data or {}
+    return ShopCreator.StoreVehicle(source, data.shopId, data.netId)
+end)
+
+lib.callback.register('qbx_shopcreator:listDeliveryJobs', function(source)
+    return ShopCreator.ListDeliveryJobs(source)
+end)
+
+lib.callback.register('qbx_shopcreator:syncShops', function(source)
+    if not ShopCreator.Cache.ready then
+        return { ok = false, error = ShopCreator.L('invalid_data') }
+    end
+    local list = {}
+    for _, shop in pairs(ShopCreator.Cache.shops) do
+        if shop.enabled then
+            list[#list + 1] = ShopCreator.BuildPublicPayload(shop)
+        end
+    end
+    return { ok = true, data = list }
+end)
+
+lib.callback.register('qbx_shopcreator:isAdmin', function(source)
+    return { ok = true, data = ShopCreator.IsAdmin(source) }
 end)
 
 lib.callback.register('qbx_shopcreator:useCurrentPosition', function(source)

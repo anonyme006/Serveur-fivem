@@ -578,6 +578,15 @@ function Repo.AcceptDeliveryJob(jobId, citizenid, playerName)
     )
 end
 
+function Repo.MarkDeliveryInTransit(jobId, citizenid)
+    return MySQL.update.await(
+        [[UPDATE shopcreator_delivery_jobs
+          SET status = 'accepted', updated_at = CURRENT_TIMESTAMP
+          WHERE id = ? AND status = 'accepted' AND accepted_by = ?]],
+        { jobId, citizenid }
+    )
+end
+
 function Repo.CompleteDeliveryJob(jobId, citizenid)
     return MySQL.update.await(
         [[UPDATE shopcreator_delivery_jobs

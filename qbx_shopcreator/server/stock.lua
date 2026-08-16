@@ -180,13 +180,23 @@ function ShopCreator.CreateStockOrder(source, shopId, method, items)
         { orderId = orderId, method = method }
     )
 
+    local mission = nil
+
     if method == 'instant' then
         ShopCreator.ApplyStockFromOrder(shopId, orderId)
     elseif method == 'self' or method == 'public' then
         local origin, dest = ShopCreator.ResolveDeliveryPoints(shopId, nil)
         local reward = method == 'public' and ShopCreator.CalculatePublicReward(totalCost) or 0
-        Repo.InsertDeliveryJob(orderId, shopId, reward, origin, dest)
+        local jobId = Repo.InsertDeliveryJob(orderId, shopId, reward, origin, dest)
         Repo.UpdateStockOrderStatus(orderId, ShopCreator.OrderStatus.pending)
+
+        if method == 'self' and jobId then
+            local accept = ShopCreator.AcceptDelivery(source, jobId)
+            if accept.ok then
+                mission = accept.data
+                TriggerClientEvent('qbx_shopcreator:client:startDelivery', source, mission)
+            end
+        end
     end
 
     ShopCreator.ReloadShop(shopId)
@@ -199,7 +209,7 @@ function ShopCreator.CreateStockOrder(source, shopId, method, items)
     })
 
     ShopCreator.Notify(source, ShopCreator.L('order_created'), 'success')
-    return { ok = true, data = { id = orderId, total_cost = totalCost } }
+    return { ok = true, data = { id = orderId, total_cost = totalCost, mission = mission } }
 end
 
 ---@param shopId number

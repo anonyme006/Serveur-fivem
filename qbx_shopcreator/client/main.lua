@@ -110,12 +110,17 @@ function Client.OpenStorefront(shopId, mode)
         return
     end
 
-    local ok, shop = pcall(function()
-        return lib.callback.await('qbx_shopcreator:getShop', false, shopId)
+    local ok, result = pcall(function()
+        return lib.callback.await('qbx_shopcreator:getShop', false, { shopId = shopId, id = shopId })
     end)
 
-    if not ok or not shop then
-        shop = cached
+    local shop = cached
+    if ok and type(result) == 'table' then
+        if result.ok and result.data then
+            shop = result.data
+        elseif result.id then
+            shop = result
+        end
     end
 
     if not shop then
@@ -138,11 +143,20 @@ function Client.OpenManagement(shopId)
     shopId = tonumber(shopId)
     if not shopId then return end
 
-    local ok, management = pcall(function()
-        return lib.callback.await('qbx_shopcreator:getManagementData', false, shopId)
+    local ok, result = pcall(function()
+        return lib.callback.await('qbx_shopcreator:getManagementData', false, { shopId = shopId })
     end)
 
-    if not ok or not management or not management.shop then
+    local management = nil
+    if ok and type(result) == 'table' then
+        if result.ok and result.data then
+            management = result.data
+        elseif result.shop then
+            management = result
+        end
+    end
+
+    if not management or not management.shop then
         Client.Notify(L('no_permission'), 'error')
         return
     end
@@ -159,20 +173,35 @@ end
 function Client.OpenDeliveries(jobs)
     if not jobs then
         local ok, result = pcall(function()
-            return lib.callback.await('qbx_shopcreator:listDeliveryJobs', false)
+            return lib.callback.await('qbx_shopcreator:getDeliveryJobs', false)
         end)
-        jobs = ok and result or {}
+        if ok and type(result) == 'table' then
+            if result.ok and result.data then
+                jobs = result.data
+            elseif result[1] or next(result) == nil then
+                jobs = result
+            end
+        end
     end
 
     Client.OpenNui('deliveries', { jobs = jobs or {} })
 end
 
 RegisterCommand(Config.AdminCommand, function()
-    local ok, isAdmin = pcall(function()
+    local ok, result = pcall(function()
         return lib.callback.await('qbx_shopcreator:isAdmin', false)
     end)
 
-    if not ok or not isAdmin then
+    local allowed = false
+    if ok then
+        if type(result) == 'table' then
+            allowed = result.ok == true and (result.data == true or result.isAdmin == true)
+        else
+            allowed = result == true
+        end
+    end
+
+    if not allowed then
         Client.Notify(L('no_permission'), 'error')
         return
     end
@@ -185,9 +214,13 @@ RegisterNUICallback('close', function(_, cb)
     cb(nuiOk())
 end)
 
-lib.callback.register('qbx_shopcreator:getCurrentPosition', function()
-    return Client.GetPlayerVec4()
-end)
+local function positionPayload()
+    local coords = Client.GetPlayerVec4()
+    return { x = coords.x, y = coords.y, z = coords.z, w = coords.w }
+end
+
+lib.callback.register('qbx_shopcreator:getCurrentPosition', positionPayload)
+lib.callback.register('qbx_shopcreator:client:getPlayerPosition', positionPayload)
 
 RegisterNetEvent('qbx_shopcreator:client:openStorefront', function(shopId)
     Client.OpenStorefront(shopId, 'storefront')

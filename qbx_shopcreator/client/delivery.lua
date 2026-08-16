@@ -178,7 +178,11 @@ local function beginDropoffPhase(mission)
         nearby = function()
             if IsControlJustReleased(0, 38) then
                 local ok, result = pcall(function()
-                    return lib.callback.await('qbx_shopcreator:completeDelivery', false, mission.job_id or mission.id, 'dropoff')
+                    return lib.callback.await('qbx_shopcreator:completeDelivery', false, {
+                        jobId = mission.job_id or mission.id,
+                        id = mission.job_id or mission.id,
+                        phase = 'dropoff',
+                    })
                 end)
 
                 if ok and result and (result.ok == true or result == true) then
@@ -238,7 +242,11 @@ local function beginPickupPhase(mission)
         nearby = function()
             if IsControlJustReleased(0, 38) then
                 local ok, result = pcall(function()
-                    return lib.callback.await('qbx_shopcreator:completeDelivery', false, mission.job_id or mission.id, 'pickup')
+                    return lib.callback.await('qbx_shopcreator:completeDelivery', false, {
+                        jobId = mission.job_id or mission.id,
+                        id = mission.job_id or mission.id,
+                        phase = 'pickup',
+                    })
                 end)
 
                 if not ok or not result or result == false or (type(result) == 'table' and result.ok == false) then

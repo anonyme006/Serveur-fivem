@@ -147,22 +147,31 @@ function Client.StashId(shopId)
     return ('shopcreator_%s'):format(tonumber(shopId) or 0)
 end
 
+local function unwrapList(result)
+    if type(result) ~= 'table' then return nil end
+    if result.ok and type(result.data) == 'table' then return result.data end
+    if result[1] ~= nil or next(result) == nil then return result end
+    return nil
+end
+
 local function requestInitialShops()
     local ok, result = pcall(function()
-        return lib.callback.await('qbx_shopcreator:syncShops', false)
+        return lib.callback.await('qbx_shopcreator:requestShops', false)
     end)
 
-    if ok and result then
-        Client.SyncShops(result)
+    local list = ok and unwrapList(result) or nil
+    if list then
+        Client.SyncShops(list)
         return
     end
 
     ok, result = pcall(function()
-        return lib.callback.await('qbx_shopcreator:getShops', false)
+        return lib.callback.await('qbx_shopcreator:syncShops', false)
     end)
 
-    if ok and result then
-        Client.SyncShops(result)
+    list = ok and unwrapList(result) or nil
+    if list then
+        Client.SyncShops(list)
     end
 end
 
