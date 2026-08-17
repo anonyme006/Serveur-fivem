@@ -1,0 +1,10 @@
+{
+  "laboratory": "Laboratory",
+  "enter": "Enter Laboratory",
+  "exit": "Exit Laboratory",
+  "locked": "Laboratory is locked",
+  "sealed": "Laboratory is sealed",
+  "no_permission": "You do not have permission",
+  "purchased": "Laboratory purchased",
+  "insufficient_funds": "Insufficient funds"
+}
