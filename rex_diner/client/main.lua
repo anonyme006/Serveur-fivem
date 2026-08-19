@@ -1,85 +1,58 @@
-RexDiner = RexDiner or {}
-RexDiner.IsTabletOpen = false
-RexDiner.OnDuty = false
-RexDiner.RestaurantKey = nil
-RexDiner.Blips = {}
+Rex = Rex or {}
+Rex.IsTabletOpen = false
+Rex.OnDuty = false
+Rex.CurrentDelivery = nil
+Rex.Blips = {}
 
----@return string|nil
----@return table|nil
----@return number
----@return boolean
-function RexDiner.GetLocalJob()
-    local player = exports.qbx_core:GetPlayerData()
-    if not player or not player.job then
-        return nil, nil, 0, false
-    end
-    local key, restaurant = GetRestaurantByJob(player.job.name)
-    local grade = player.job.grade and player.job.grade.level or 0
-    local onDuty = player.job.onduty == true
-    return key, restaurant, grade, onDuty
+function Rex.GetLocalJob()
+    local data = exports.qbx_core:GetPlayerData()
+    if not data or not data.job then return nil, nil, 0, false end
+    local key, restaurant = Rex.GetRestaurantByJob(data.job.name)
+    local grade = data.job.grade and data.job.grade.level or 0
+    return key, restaurant, grade, data.job.onduty == true
 end
 
----@param permission string
----@return boolean
-function RexDiner.HasLocalPermission(permission)
-    local _, _, grade = RexDiner.GetLocalJob()
-    return HasPermission(grade, permission)
+function Rex.Can(permission)
+    local _, _, grade = Rex.GetLocalJob()
+    return Rex.HasPermission(grade, permission)
 end
 
-function RexDiner.Notify(title, description, nType)
-    lib.notify({
-        title = title,
-        description = description,
-        type = nType or 'inform',
-        duration = 5000,
-    })
-end
-
-local function createBlips()
-    for _, blip in pairs(RexDiner.Blips) do
-        if DoesBlipExist(blip) then RemoveBlip(blip) end
-    end
-    RexDiner.Blips = {}
-
-    for key, restaurant in pairs(Config.Restaurants) do
-        local blipCfg = restaurant.blip
-        if blipCfg and blipCfg.enabled and blipCfg.coords then
-            local blip = AddBlipForCoord(blipCfg.coords.x, blipCfg.coords.y, blipCfg.coords.z)
-            SetBlipSprite(blip, blipCfg.sprite or 106)
-            SetBlipDisplay(blip, 4)
-            SetBlipScale(blip, blipCfg.scale or 0.75)
-            SetBlipColour(blip, blipCfg.color or 1)
-            SetBlipAsShortRange(blip, true)
-            BeginTextCommandSetBlipName('STRING')
-            AddTextComponentSubstringPlayerName(blipCfg.label or restaurant.label)
-            EndTextCommandSetBlipName(blip)
-            RexDiner.Blips[key] = blip
-        end
-    end
+function Rex.Notify(title, description, nType)
+    lib.notify({ title = title, description = description, type = nType or 'inform', duration = 5000 })
 end
 
 CreateThread(function()
-    createBlips()
+    for key, restaurant in pairs(Config.Restaurants) do
+        local cfg = restaurant.blip
+        if cfg and cfg.enabled and cfg.coords then
+            local blip = AddBlipForCoord(cfg.coords.x, cfg.coords.y, cfg.coords.z)
+            SetBlipSprite(blip, cfg.sprite or 106)
+            SetBlipDisplay(blip, 4)
+            SetBlipScale(blip, cfg.scale or 0.75)
+            SetBlipColour(blip, cfg.color or 1)
+            SetBlipAsShortRange(blip, true)
+            BeginTextCommandSetBlipName('STRING')
+            AddTextComponentSubstringPlayerName(cfg.label or restaurant.label)
+            EndTextCommandSetBlipName(blip)
+            Rex.Blips[key] = blip
+        end
+    end
 end)
 
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function()
-    local key, _, _, onDuty = RexDiner.GetLocalJob()
-    RexDiner.RestaurantKey = key
-    RexDiner.OnDuty = onDuty
+    local _, _, _, onDuty = Rex.GetLocalJob()
+    Rex.OnDuty = onDuty
 end)
 
 RegisterNetEvent('qbx_core:client:onJobUpdate', function()
-    local key, _, _, onDuty = RexDiner.GetLocalJob()
-    RexDiner.RestaurantKey = key
-    RexDiner.OnDuty = onDuty
+    local _, _, _, onDuty = Rex.GetLocalJob()
+    Rex.OnDuty = onDuty
 end)
 
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() then return end
-    if RexDiner.IsTabletOpen then
-        SetNuiFocus(false, false)
-    end
-    for _, blip in pairs(RexDiner.Blips) do
+    if Rex.IsTabletOpen then SetNuiFocus(false, false) end
+    for _, blip in pairs(Rex.Blips) do
         if DoesBlipExist(blip) then RemoveBlip(blip) end
     end
 end)

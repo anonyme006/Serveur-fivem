@@ -1,16 +1,14 @@
 Config = {}
 
----@type string Default restaurant key when none is resolved from job
+Config.Debug = false
+Config.Locale = 'fr'
+Config.Currency = '$'
 Config.DefaultRestaurant = 'rex_diner'
-
----@type string Alias kept for backwards compatibility
-Config.Job = 'rex_diner'
+Config.Job = 'rex_diner' -- alias / compat
 
 Config.TabletCommand = 'diner'
 Config.TabletKey = 'F6'
 Config.PaymentDistance = 5.0
-Config.Currency = '$'
-Config.Locale = 'fr'
 
 Config.EnableBilling = true
 Config.EnableDeliveries = true
@@ -18,8 +16,11 @@ Config.EnableCrafting = true
 Config.EnableEmployeeManagement = true
 Config.EnableStock = true
 Config.EnableSocietyAccount = true
+Config.SocietyAccountPrefix = 'society_'
 
---- Commission rate by job grade (0.25 = 25%)
+--- Max discount % employees with grade >= 3 can apply
+Config.MaxDiscount = 50
+
 Config.Commission = {
     [0] = 0.10,
     [1] = 0.15,
@@ -37,51 +38,16 @@ Config.GradeLabels = {
 }
 
 Config.Permissions = {
-    [0] = {
-        tablet = true,
-        sales = true,
-        service = true,
-    },
-    [1] = {
-        tablet = true,
-        sales = true,
-        recipes = true,
-        service = true,
-        billing = true,
-    },
-    [2] = {
-        tablet = true,
-        sales = true,
-        recipes = true,
-        kitchen = true,
-        service = true,
-        billing = true,
-    },
+    [0] = { tablet = true, sales = true, service = true },
+    [1] = { tablet = true, sales = true, service = true, recipes = true, billing = true },
+    [2] = { tablet = true, sales = true, service = true, recipes = true, billing = true, kitchen = true },
     [3] = {
-        tablet = true,
-        sales = true,
-        recipes = true,
-        kitchen = true,
-        employees = true,
-        stock = true,
-        orders = true,
-        deliveries = true,
-        service = true,
-        billing = true,
+        tablet = true, sales = true, service = true, recipes = true, billing = true, kitchen = true,
+        employees = true, stock = true, orders = true, deliveries = true,
     },
     [4] = {
-        tablet = true,
-        sales = true,
-        recipes = true,
-        kitchen = true,
-        employees = true,
-        stock = true,
-        orders = true,
-        deliveries = true,
-        finances = true,
-        settings = true,
-        service = true,
-        billing = true,
+        tablet = true, sales = true, service = true, recipes = true, billing = true, kitchen = true,
+        employees = true, stock = true, orders = true, deliveries = true, finances = true, settings = true,
     },
 }
 
@@ -92,11 +58,9 @@ Config.Cooldowns = {
     order = 5,
     hire = 3,
     grade = 2,
-    stock = 1,
 }
 
 Config.Craft = {
-    progressLabel = 'Préparation en cours...',
     animDict = 'amb@prop_human_bbq@male@base',
     animClip = 'base',
     cancelable = true,
@@ -105,17 +69,25 @@ Config.Craft = {
 Config.Delivery = {
     pickup = vector4(1208.45, -3115.12, 5.54, 90.0),
     vehicle = 'mule',
-    blip = {
-        sprite = 478,
-        color = 2,
-        scale = 0.85,
-        label = 'Livraison restaurant',
+    blip = { sprite = 478, color = 2, scale = 0.85, label = 'Livraison restaurant' },
+}
+
+Config.PatchNotes = {
+    {
+        version = '2.0.0',
+        date = '19/08/2026',
+        notes = {
+            'Refonte complète du resource rex_diner',
+            'Tablette NUI premium multi-pages',
+            'Ventes, factures, craft, stock et livraisons',
+            'Architecture multi-restaurants',
+        },
     },
 }
 
-Config.SocietyAccountPrefix = 'society_'
-
----@type table<string, RestaurantConfig>
+--[[
+    Ajoutez d'autres restaurants ici (job + locations + stash).
+]]
 Config.Restaurants = {
     rex_diner = {
         job = 'rex_diner',
@@ -127,6 +99,12 @@ Config.Restaurants = {
             color = 1,
             scale = 0.75,
             label = 'Rex Diner',
+        },
+        stash = {
+            id = 'rex_diner_storage',
+            label = 'Stock Rex Diner',
+            slots = 80,
+            weight = 200000,
         },
         locations = {
             Boss = {
@@ -172,33 +150,5 @@ Config.Restaurants = {
                 icon = 'fas fa-truck',
             },
         },
-        stash = {
-            id = 'rex_diner_storage',
-            label = 'Stock Rex Diner',
-            slots = 80,
-            weight = 200000,
-        },
     },
 }
-
---- Optional second restaurant template (disabled by default — set job + coords to enable)
--- Config.Restaurants.burger_shot = {
---     job = 'burgershot',
---     label = 'Burger Shot',
---     locations = { ... },
--- }
-
-Config.PatchNotes = {
-    {
-        version = '1.0.0',
-        date = '19/08/2026',
-        notes = {
-            'Lancement de la tablette Rex Diner',
-            'Système de ventes, factures et commissions',
-            'Cuisine, stock et livraisons',
-            'Gestion multi-restaurants',
-        },
-    },
-}
-
-Config.Debug = false

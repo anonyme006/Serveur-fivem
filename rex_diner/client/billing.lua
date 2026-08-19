@@ -1,7 +1,7 @@
 RegisterNetEvent('rex_diner:client:invoicePrompt', function(invoice)
     if not invoice or not invoice.id then return end
 
-    local alert = lib.alertDialog({
+    local choice = lib.alertDialog({
         header = ('Facture — %s'):format(invoice.restaurant or 'Restaurant'),
         content = ('**%s** vous facture **%s%s**\n\n%s'):format(
             invoice.issuer or 'Employé',
@@ -11,22 +11,19 @@ RegisterNetEvent('rex_diner:client:invoicePrompt', function(invoice)
         ),
         centered = true,
         cancel = true,
-        labels = {
-            confirm = 'Payer',
-            cancel = 'Refuser',
-        },
+        labels = { confirm = 'Payer', cancel = 'Refuser' },
     })
 
-    if alert ~= 'confirm' then
+    if choice ~= 'confirm' then
         lib.callback.await('rex_diner:cancelInvoice', false, invoice.id)
-        RexDiner.Notify('Factures', 'Facture refusée.', 'inform')
+        Rex.Notify('Factures', 'Facture refusée.', 'inform')
         return
     end
 
     local method = lib.inputDialog('Paiement facture', {
         {
             type = 'select',
-            label = 'Méthode de paiement',
+            label = 'Méthode',
             options = {
                 { value = 'bank', label = 'Banque / Carte' },
                 { value = 'cash', label = 'Espèces' },
@@ -35,7 +32,6 @@ RegisterNetEvent('rex_diner:client:invoicePrompt', function(invoice)
             default = 'bank',
         },
     })
-
     if not method then
         lib.callback.await('rex_diner:cancelInvoice', false, invoice.id)
         return
@@ -45,48 +41,32 @@ RegisterNetEvent('rex_diner:client:invoicePrompt', function(invoice)
         invoiceId = invoice.id,
         paymentMethod = method[1],
     })
-
     if not result or not result.ok then
-        RexDiner.Notify('Factures', result and result.message or 'Paiement impossible.', 'error')
-        return
+        Rex.Notify('Factures', result and result.message or 'Échec.', 'error')
     end
 end)
 
-function RexDiner.OpenBillingDialog()
-    if not Config.EnableBilling then
-        RexDiner.Notify('Factures', 'Facturation désactivée.', 'error')
-        return
-    end
-
+function Rex.OpenBillingDialog()
+    if not Config.EnableBilling then return end
     local players = lib.callback.await('rex_diner:getNearbyPlayers', false) or {}
     if #players == 0 then
-        RexDiner.Notify('Factures', 'Aucun joueur proche.', 'error')
+        Rex.Notify('Factures', 'Aucun joueur proche.', 'error')
         return
     end
-
-    local playerOptions = {}
+    local opts = {}
     for i = 1, #players do
-        playerOptions[#playerOptions + 1] = {
-            value = players[i].id,
-            label = ('ID %s — %s'):format(players[i].id, players[i].name),
-        }
+        opts[#opts + 1] = { value = players[i].id, label = ('ID %s — %s'):format(players[i].id, players[i].name) }
     end
-
     local input = lib.inputDialog('Créer une facture', {
-        { type = 'select', label = 'Client', options = playerOptions, required = true },
+        { type = 'select', label = 'Client', options = opts, required = true },
         { type = 'number', label = 'Montant', required = true, min = 1 },
         { type = 'input', label = 'Raison', required = true },
     })
-
     if not input then return end
-
     local result = lib.callback.await('rex_diner:createInvoice', false, {
-        targetId = input[1],
-        amount = input[2],
-        reason = input[3],
+        targetId = input[1], amount = input[2], reason = input[3],
     })
-
     if not result or not result.ok then
-        RexDiner.Notify('Factures', result and result.error or 'Échec.', 'error')
+        Rex.Notify('Factures', result and result.error or 'Échec.', 'error')
     end
 end

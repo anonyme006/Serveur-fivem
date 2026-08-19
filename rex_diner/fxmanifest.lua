@@ -4,13 +4,16 @@ lua54 'yes'
 
 name 'rex_diner'
 author 'Rex Diner'
-description 'Système complet de restaurant multi-établissements pour Qbox'
-version '1.0.0'
+description 'Système de restaurant multi-établissements pour Qbox'
+version '2.0.0'
 
 shared_scripts {
     '@ox_lib/init.lua',
     'config.lua',
-    'shared/*.lua',
+    'shared/utils.lua',
+    'shared/products.lua',
+    'shared/recipes.lua',
+    'shared/locations.lua',
 }
 
 client_scripts {

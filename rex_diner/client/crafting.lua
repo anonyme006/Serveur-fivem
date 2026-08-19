@@ -1,75 +1,55 @@
-RexDiner.CurrentDelivery = nil
-local deliveryBlip = nil
-local deliveryVehicle = nil
+local deliveryBlip, deliveryVehicle
 
-function RexDiner.OpenCraftMenu()
-    if not RexDiner.HasLocalPermission('kitchen') then
-        RexDiner.Notify('Cuisine', 'Permission refusée.', 'error')
+function Rex.OpenCraftMenu()
+    if not Rex.Can('kitchen') then
+        Rex.Notify('Cuisine', 'Permission refusée.', 'error')
         return
     end
 
-    local recipes = GetRecipeList()
     local options = {}
-
-    for i = 1, #recipes do
-        local recipe = recipes[i]
-        local ingredientText = {}
-        for j = 1, #recipe.ingredients do
-            local ing = recipe.ingredients[j]
-            ingredientText[#ingredientText + 1] = ('%sx %s'):format(ing.amount, ing.label)
+    for _, recipe in ipairs(Rex.GetRecipeList()) do
+        local parts = {}
+        for _, ing in ipairs(recipe.ingredients) do
+            parts[#parts + 1] = ('%sx %s'):format(ing.amount, ing.label)
         end
-
         options[#options + 1] = {
             title = recipe.label,
-            description = table.concat(ingredientText, ' · ') .. ('\n⏱ %ss'):format(math.floor((recipe.time or 0) / 1000)),
+            description = table.concat(parts, ' · ') .. ('\n⏱ %ss'):format(math.floor((recipe.time or 0) / 1000)),
             icon = 'utensils',
             onSelect = function()
                 local result = lib.callback.await('rex_diner:startCraft', false, recipe.id)
                 if not result or not result.ok then
-                    RexDiner.Notify('Cuisine', result and result.error or 'Impossible de préparer.', 'error')
+                    Rex.Notify('Cuisine', result and result.error or 'Impossible.', 'error')
                     return
                 end
-                RexDiner.RunCraft(result.craft)
+                Rex.RunCraft(result.craft)
             end,
         }
     end
 
-    lib.registerContext({
-        id = 'rex_diner_craft',
-        title = '🍳 Cuisine — Préparer une recette',
-        options = options,
-    })
+    lib.registerContext({ id = 'rex_diner_craft', title = '🍳 Cuisine', options = options })
     lib.showContext('rex_diner_craft')
 end
 
----@param craft table
-function RexDiner.RunCraft(craft)
+function Rex.RunCraft(craft)
     if not craft or not craft.recipeId then return end
-
-    if RexDiner.IsTabletOpen then
-        RexDiner.CloseTablet()
+    if Rex.IsTabletOpen then
+        Rex.CloseTablet()
         Wait(200)
     end
 
-    local success = lib.progressBar({
+    local ok = lib.progressBar({
         duration = craft.time or 8000,
         label = ('Préparation du %s...'):format(craft.label or 'plat'),
         useWhileDead = false,
         canCancel = Config.Craft.cancelable ~= false,
-        disable = {
-            move = true,
-            car = true,
-            combat = true,
-        },
-        anim = {
-            dict = Config.Craft.animDict,
-            clip = Config.Craft.animClip,
-        },
+        disable = { move = true, car = true, combat = true },
+        anim = { dict = Config.Craft.animDict, clip = Config.Craft.animClip },
     })
 
-    if not success then
+    if not ok then
         TriggerServerEvent('rex_diner:server:cancelCraft')
-        RexDiner.Notify('Cuisine', 'Préparation annulée.', 'error')
+        Rex.Notify('Cuisine', 'Préparation annulée.', 'error')
         return
     end
 
@@ -77,18 +57,14 @@ function RexDiner.RunCraft(craft)
         recipeId = craft.recipeId,
         useStock = craft.useStock == true,
     })
-
     if not result or not result.ok then
-        RexDiner.Notify('Cuisine', result and result.message or 'Échec de la préparation.', 'error')
-        return
+        Rex.Notify('Cuisine', result and result.message or 'Échec.', 'error')
     end
 end
 
-function RexDiner.StartDelivery(data)
-    RexDiner.CurrentDelivery = data
-    if deliveryBlip and DoesBlipExist(deliveryBlip) then
-        RemoveBlip(deliveryBlip)
-    end
+function Rex.StartDelivery(data)
+    Rex.CurrentDelivery = data
+    if deliveryBlip and DoesBlipExist(deliveryBlip) then RemoveBlip(deliveryBlip) end
 
     local pickup = data.pickup
     if pickup then
@@ -100,7 +76,6 @@ function RexDiner.StartDelivery(data)
         BeginTextCommandSetBlipName('STRING')
         AddTextComponentSubstringPlayerName(Config.Delivery.blip.label or 'Livraison')
         EndTextCommandSetBlipName(deliveryBlip)
-
         SetNewWaypoint(pickup.x, pickup.y)
     end
 
@@ -113,20 +88,16 @@ function RexDiner.StartDelivery(data)
         SetModelAsNoLongerNeeded(model)
     end
 
-    RexDiner.Notify('Livraisons', 'Récupérez la commande puis déposez-la au restaurant.', 'inform')
+    Rex.Notify('Livraisons', 'Récupérez la commande puis déposez au restaurant.', 'inform')
 
-    -- After pickup proximity, switch waypoint to dropoff
     CreateThread(function()
         local switched = false
-        while RexDiner.CurrentDelivery and RexDiner.CurrentDelivery.deliveryId == data.deliveryId do
+        while Rex.CurrentDelivery and Rex.CurrentDelivery.deliveryId == data.deliveryId do
             Wait(1000)
-            if not switched and pickup then
-                local coords = GetEntityCoords(cache.ped)
-                if #(coords - vec3(pickup.x, pickup.y, pickup.z)) < 20.0 and data.dropoff then
+            if not switched and pickup and data.dropoff then
+                if #(GetEntityCoords(cache.ped) - vec3(pickup.x, pickup.y, pickup.z)) < 20.0 then
                     SetNewWaypoint(data.dropoff.x, data.dropoff.y)
-                    if deliveryBlip and DoesBlipExist(deliveryBlip) then
-                        RemoveBlip(deliveryBlip)
-                    end
+                    if deliveryBlip and DoesBlipExist(deliveryBlip) then RemoveBlip(deliveryBlip) end
                     deliveryBlip = AddBlipForCoord(data.dropoff.x, data.dropoff.y, data.dropoff.z)
                     SetBlipSprite(deliveryBlip, 478)
                     SetBlipColour(deliveryBlip, 2)
@@ -134,7 +105,7 @@ function RexDiner.StartDelivery(data)
                     BeginTextCommandSetBlipName('STRING')
                     AddTextComponentSubstringPlayerName('Dépôt restaurant')
                     EndTextCommandSetBlipName(deliveryBlip)
-                    RexDiner.Notify('Livraisons', 'Retournez au restaurant pour déposer.', 'success')
+                    Rex.Notify('Livraisons', 'Retournez au restaurant.', 'success')
                     switched = true
                 end
             end
@@ -142,26 +113,17 @@ function RexDiner.StartDelivery(data)
     end)
 end
 
-function RexDiner.CompleteDelivery()
-    if not RexDiner.CurrentDelivery then
-        RexDiner.Notify('Livraisons', 'Aucune livraison en cours.', 'error')
+function Rex.CompleteDelivery()
+    if not Rex.CurrentDelivery then
+        Rex.Notify('Livraisons', 'Aucune livraison.', 'error')
         return
     end
-
-    local deliveryId = RexDiner.CurrentDelivery.deliveryId
-    local result = lib.callback.await('rex_diner:completeDelivery', false, deliveryId)
+    local result = lib.callback.await('rex_diner:completeDelivery', false, Rex.CurrentDelivery.deliveryId)
     if not result or not result.ok then
-        RexDiner.Notify('Livraisons', result and result.message or 'Échec dépôt.', 'error')
+        Rex.Notify('Livraisons', result and result.message or 'Échec.', 'error')
         return
     end
-
-    if deliveryBlip and DoesBlipExist(deliveryBlip) then
-        RemoveBlip(deliveryBlip)
-        deliveryBlip = nil
-    end
-    if deliveryVehicle and DoesEntityExist(deliveryVehicle) then
-        DeleteEntity(deliveryVehicle)
-        deliveryVehicle = nil
-    end
-    RexDiner.CurrentDelivery = nil
+    if deliveryBlip and DoesBlipExist(deliveryBlip) then RemoveBlip(deliveryBlip) deliveryBlip = nil end
+    if deliveryVehicle and DoesEntityExist(deliveryVehicle) then DeleteEntity(deliveryVehicle) deliveryVehicle = nil end
+    Rex.CurrentDelivery = nil
 end

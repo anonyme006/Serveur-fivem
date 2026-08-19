@@ -2,4 +2,4 @@
 
 ## Resources
 
-- [`rex_diner`](./rex_diner) — Script restaurant Qbox (tablette NUI, craft, ventes, factures, stock, livraisons)
+- [`rex_diner`](./rex_diner) — Restaurant Qbox v2 (tablette NUI, craft, ventes, stock, livraisons)

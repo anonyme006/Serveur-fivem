@@ -28,9 +28,7 @@ CREATE TABLE IF NOT EXISTS `rex_diner_sale_items` (
     PRIMARY KEY (`id`),
     KEY `idx_sale` (`sale_id`),
     KEY `idx_product` (`product_id`),
-    CONSTRAINT `fk_sale_items_sale`
-        FOREIGN KEY (`sale_id`) REFERENCES `rex_diner_sales` (`id`)
-        ON DELETE CASCADE
+    CONSTRAINT `fk_rex_sale_items` FOREIGN KEY (`sale_id`) REFERENCES `rex_diner_sales` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `rex_diner_employees` (
@@ -57,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `rex_diner_invoices` (
     `target_name` VARCHAR(128) NOT NULL DEFAULT '',
     `amount` INT UNSIGNED NOT NULL DEFAULT 0,
     `reason` VARCHAR(255) NOT NULL DEFAULT '',
-    `status` ENUM('pending', 'paid', 'cancelled') NOT NULL DEFAULT 'pending',
+    `status` ENUM('pending','paid','cancelled') NOT NULL DEFAULT 'pending',
     `sale_id` INT UNSIGNED DEFAULT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `paid_at` TIMESTAMP NULL DEFAULT NULL,
@@ -85,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `rex_diner_orders` (
     `ordered_by` VARCHAR(64) NOT NULL,
     `ordered_by_name` VARCHAR(128) NOT NULL DEFAULT '',
     `total_cost` INT UNSIGNED NOT NULL DEFAULT 0,
-    `status` ENUM('pending', 'assigned', 'in_transit', 'delivered', 'cancelled') NOT NULL DEFAULT 'pending',
+    `status` ENUM('pending','assigned','in_transit','delivered','cancelled') NOT NULL DEFAULT 'pending',
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `delivered_at` TIMESTAMP NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
@@ -101,9 +99,7 @@ CREATE TABLE IF NOT EXISTS `rex_diner_order_items` (
     `unit_price` INT UNSIGNED NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     KEY `idx_order` (`order_id`),
-    CONSTRAINT `fk_order_items_order`
-        FOREIGN KEY (`order_id`) REFERENCES `rex_diner_orders` (`id`)
-        ON DELETE CASCADE
+    CONSTRAINT `fk_rex_order_items` FOREIGN KEY (`order_id`) REFERENCES `rex_diner_orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `rex_diner_deliveries` (
@@ -112,16 +108,14 @@ CREATE TABLE IF NOT EXISTS `rex_diner_deliveries` (
     `restaurant` VARCHAR(64) NOT NULL,
     `driver_identifier` VARCHAR(64) DEFAULT NULL,
     `driver_name` VARCHAR(128) DEFAULT NULL,
-    `status` ENUM('waiting', 'in_progress', 'completed', 'cancelled') NOT NULL DEFAULT 'waiting',
+    `status` ENUM('waiting','in_progress','completed','cancelled') NOT NULL DEFAULT 'waiting',
     `started_at` TIMESTAMP NULL DEFAULT NULL,
     `completed_at` TIMESTAMP NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `idx_order` (`order_id`),
     KEY `idx_driver` (`driver_identifier`),
     KEY `idx_restaurant_status` (`restaurant`, `status`),
-    CONSTRAINT `fk_deliveries_order`
-        FOREIGN KEY (`order_id`) REFERENCES `rex_diner_orders` (`id`)
-        ON DELETE CASCADE
+    CONSTRAINT `fk_rex_deliveries` FOREIGN KEY (`order_id`) REFERENCES `rex_diner_orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `rex_diner_service` (

@@ -1,6 +1,5 @@
 --[[
-    Job Qbox / qbx_core
-    Ajoutez ce job dans votre configuration jobs (ex: qbx_core/shared/jobs.lua)
+    À ajouter dans qbx_core/shared/jobs.lua
 ]]
 
 return {
