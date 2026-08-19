@@ -544,4 +544,147 @@
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && S.open) nui('close');
   });
+
+  // Preview navigateur (hors FiveM) — ?preview=1 ou ouverture hors resource FiveM
+  const isPreview = typeof GetParentResourceName !== 'function'
+    || new URLSearchParams(location.search).has('preview');
+  if (isPreview) {
+    const mock = {
+      ok: true,
+      player: {
+        firstname: 'Paquito', lastname: 'Morales', name: 'Paquito Morales',
+        grade: 1, gradeLabel: 'Employé', onDuty: true,
+        commissionRate: 0.25, commissionPercent: 25, avatar: 'P',
+      },
+      restaurant: { key: 'rex_diner', label: 'Rex Diner', job: 'rex_diner' },
+      permissions: {
+        tablet: true, sales: true, service: true, recipes: true, billing: true,
+        kitchen: true, employees: true, stock: true, orders: true, deliveries: true,
+        finances: true, settings: true,
+      },
+      stats: {
+        salesTotal: 68500, salesCount: 17, salesToday: 24000, salesWeek: 51200, salesMonth: 68500,
+        deliveryCount: 1, deliveryEarnings: 1350, commission: 17463, mySales: 24000,
+        topProducts: [
+          { product_label: 'Formule Mini Dino', qty: 15, revenue: 12000 },
+          { product_label: 'Plat', qty: 10, revenue: 5000 },
+          { product_label: 'Burger', qty: 5, revenue: 3000 },
+        ],
+        chartWeek: [
+          { day: '2026-08-13', total: 4200 }, { day: '2026-08-14', total: 8100 },
+          { day: '2026-08-15', total: 6500 }, { day: '2026-08-16', total: 9200 },
+          { day: '2026-08-17', total: 7800 }, { day: '2026-08-18', total: 8700 },
+          { day: '2026-08-19', total: 24000 },
+        ],
+      },
+      service: { today: 16320, week: 78420, onDuty: true },
+      products: [
+        { id: 'formula_jurassic_royal', label: 'Formule Jurassic Royal', price: 1400, category: 'Menus', color: '#C0392B' },
+        { id: 'formula_mini_dino', label: 'Formule Mini Dino', price: 800, category: 'Menus', color: '#E74C3C' },
+        { id: 'plat', label: 'Plat', price: 500, category: 'Petite Faim', color: '#E67E22' },
+        { id: 'burger', label: 'Burger', price: 600, category: 'Petite Faim', color: '#D35400' },
+        { id: 'dessert', label: 'Dessert', price: 600, category: 'Desserts', color: '#8E44AD' },
+        { id: 'boisson', label: 'Boisson', price: 400, category: 'Boissons', color: '#5D6D7E' },
+      ],
+      recipes: [
+        { id: 'burger_classic', label: 'Burger Classic', time: 10000, grade: 2, ingredients: [
+          { label: 'Pain', amount: 1 }, { label: 'Viande', amount: 1 }, { label: 'Fromage', amount: 1 },
+        ]},
+        { id: 'fries', label: 'Frites', time: 7000, grade: 1, ingredients: [
+          { label: 'Pomme de terre', amount: 2 }, { label: 'Huile', amount: 1 },
+        ]},
+      ],
+      patchNotes: ConfigPatchNotes(),
+      currency: '$', maxDiscount: 50,
+      features: { billing: true, deliveries: true, crafting: true, employees: true, stock: true },
+    };
+
+    // Mock NUI callbacks for preview navigation
+    const originalNui = nui;
+    window.__previewStock = [
+      { item: 'meat', label: 'Viande', icon: '🥩', quantity: 42, max: 200, min: 20, status: 'ok', orderPrice: 25 },
+      { item: 'bread', label: 'Pain', icon: '🍞', quantity: 86, max: 200, min: 30, status: 'ok', orderPrice: 8 },
+      { item: 'cheese', label: 'Fromage', icon: '🧀', quantity: 31, max: 150, min: 20, status: 'ok', orderPrice: 12 },
+      { item: 'lettuce', label: 'Salade', icon: '🥬', quantity: 8, max: 150, min: 20, status: 'low', orderPrice: 6 },
+      { item: 'potato', label: 'Pommes de terre', icon: '🥔', quantity: 120, max: 250, min: 40, status: 'ok', orderPrice: 4 },
+      { item: 'oil', label: 'Huile', icon: '🫒', quantity: 0, max: 100, min: 15, status: 'out', orderPrice: 10 },
+    ];
+    // redefine nui via closure replacement for preview-only events
+    async function previewNui(event, data = {}) {
+      if (event === 'close') return { ok: true };
+      if (event === 'refresh') return mock;
+      if (event === 'getStats') return mock.stats;
+      if (event === 'getStock') return { ok: true, stock: window.__previewStock };
+      if (event === 'getOrders') return { ok: true, orders: [
+        { id: 1048, total_cost: 1850, status: 'pending', delivery_id: 12, delivery_status: 'waiting',
+          items: [{ quantity: 50, label: 'Viande' }, { quantity: 100, label: 'Pain' }, { quantity: 50, label: 'Fromage' }] },
+      ]};
+      if (event === 'getSales') return { ok: true, sales: [
+        { id: 1045, created_at: '14/08/2026 20:18', customer_name: 'Aaron Banning', employee_name: 'Paquito Morales', amount: 24000, items_summary: 'Formule Mini Dino x15, Plat x10, Burger x5' },
+        { id: 1044, created_at: '14/08/2026 19:02', customer_name: 'Michael Smith', employee_name: 'James Peterson', amount: 12000, items_summary: 'Formule Jurassic Royal x5' },
+      ]};
+      if (event === 'getEmployees') return { ok: true, employees: [
+        { identifier: 'a', name: 'James Peterson', grade: 4, gradeLabel: 'Patron', commission: 30, online: true, onDuty: true, totalSales: 40000, totalCommission: 12000, serviceSeconds: 90000 },
+        { identifier: 'b', name: 'Paquito Morales', grade: 1, gradeLabel: 'Employé', commission: 25, online: true, onDuty: true, totalSales: 24000, totalCommission: 17463, serviceSeconds: 78420 },
+        { identifier: 'c', name: 'Jay Horton', grade: 1, gradeLabel: 'Employé', commission: 25, online: false, onDuty: false, totalSales: 8000, totalCommission: 2000, serviceSeconds: 36000 },
+      ]};
+      if (event === 'getInvoices') return { ok: true, invoices: [
+        { id: 88, amount: 24000, reason: 'Formule Mini Dino x15 Plat x10 Burger x5', target_name: 'Aaron Banning', status: 'paid' },
+        { id: 87, amount: 20000, reason: 'Formule Mini Dino x15', target_name: 'Aaron Banning', status: 'pending' },
+      ]};
+      if (event === 'getNearbyPlayers') return [
+        { id: 106, name: 'Aaron Banning', distance: 1.4 },
+        { id: 112, name: 'Michael Smith', distance: 3.2 },
+      ];
+      if (event === 'notify' || event === 'toggleService' || event === 'processSale' || event === 'createInvoice'
+        || event === 'createOrder' || event === 'takeDelivery' || event === 'hireEmployee'
+        || event === 'fireEmployee' || event === 'setEmployeeGrade' || event === 'startCraft') {
+        console.log('[preview]', event, data);
+        return { ok: true, data: 1, message: 'OK (preview)', invoiceId: 99, sale: {} };
+      }
+      return originalNui(event, data);
+    }
+    // Monkey-patch by reassigning calls — replace nui usage through window hook
+    const nuiRef = { fn: previewNui };
+    // Override fetch-based nui: wrap existing function name in closure by replacing event handlers after open
+    // Simplest: assign to outer nui via eval-style — redefine by posting open then patching
+    Object.defineProperty(window, '__rexNui', { get: () => nuiRef.fn });
+
+    // Patch: replace nui calls by swapping the const binding isn't possible; instead intercept fetch
+    const realFetch = window.fetch.bind(window);
+    window.fetch = async (url, opts) => {
+      if (typeof url === 'string' && url.includes('https://rex_diner/')) {
+        const event = url.split('/').pop();
+        const body = opts && opts.body ? JSON.parse(opts.body) : {};
+        const result = await previewNui(event, body);
+        return {
+          ok: true,
+          json: async () => result,
+        };
+      }
+      return realFetch(url, opts);
+    };
+
+    const page = new URLSearchParams(location.search).get('page') || 'dashboard';
+    window.postMessage({ action: 'open', page, data: mock }, '*');
+
+    // Seed cart on sales preview
+    if (page === 'sales') {
+      setTimeout(() => {
+        S.cart = [
+          { id: 'formula_mini_dino', label: 'Formule Mini Dino', price: 800, quantity: 15 },
+          { id: 'burger', label: 'Burger', price: 600, quantity: 2 },
+        ];
+        render();
+      }, 100);
+    }
+  }
+
+  function ConfigPatchNotes() {
+    return [{ version: '2.0.0', date: '19/08/2026', notes: [
+      'Refonte complète du resource rex_diner',
+      'Tablette NUI premium multi-pages',
+      'Ventes, factures, craft, stock et livraisons',
+    ]}];
+  }
 })();
