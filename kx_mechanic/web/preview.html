@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KX Mechanic — Preview</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        html, body {
+            background: #1a1f2e !important;
+        }
+        #app { display: grid !important; }
+        .preview-banner {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: rgba(62, 207, 178, 0.95);
+            color: #041018;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-size: 13px;
+            letter-spacing: 0.04em;
+        }
+        .preview-tabs {
+            position: fixed;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 8px;
+        }
+        .preview-tabs button {
+            border: 0;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #172231;
+            color: #e8eef6;
+            border: 1px solid rgba(140, 170, 200, 0.2);
+        }
+        .preview-tabs button.active {
+            background: linear-gradient(135deg, #3ecfb2, #2ea8ff);
+            color: #041018;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-banner">PREVIEW NUI — kx_mechanic</div>
+    <div class="preview-tabs">
+        <button class="active" data-view="menu">Menu atelier</button>
+        <button data-view="diagnostic">Diagnostic</button>
+        <button data-view="dashboard">Dashboard</button>
+    </div>
+
+    <div id="app">
+        <div class="shell">
+            <aside class="sidebar">
+                <div class="brand">
+                    <div class="brand-mark">KX</div>
+                    <div>
+                        <div class="brand-title" id="shopName">Los Santos Customs</div>
+                        <div class="brand-sub">Workshop OS</div>
+                    </div>
+                </div>
+                <nav id="navCategories" class="nav"></nav>
+                <div class="sidebar-footer">
+                    <div id="playerMeta" class="meta"></div>
+                    <button id="btnClose" class="btn ghost"><i class="fa-solid fa-xmark"></i> Fermer</button>
+                </div>
+            </aside>
+
+            <main class="content">
+                <header class="topbar">
+                    <div>
+                        <h1 id="viewTitle">Atelier</h1>
+                        <p id="viewSubtitle">Sélectionnez une intervention</p>
+                    </div>
+                    <div id="vehicleBadge" class="vehicle-badge hidden">
+                        <i class="fa-solid fa-car-side"></i>
+                        <div>
+                            <strong id="vehPlate">----</strong>
+                            <span id="vehModel">Véhicule</span>
+                        </div>
+                    </div>
+                </header>
+
+                <section id="panelServices" class="panel"></section>
+                <section id="panelDiagnostic" class="panel hidden"></section>
+                <section id="panelBilling" class="panel hidden"></section>
+                <section id="panelOrders" class="panel hidden"></section>
+                <section id="panelEmployees" class="panel hidden"></section>
+                <section id="panelDashboard" class="panel hidden"></section>
+                <section id="panelStock" class="panel hidden"></section>
+                <section id="panelManagement" class="panel hidden"></section>
+            </main>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+    <script src="app.js"></script>
+    <script src="preview-boot.js"></script>
+</body>
+</html>
