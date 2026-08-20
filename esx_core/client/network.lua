@@ -228,17 +228,20 @@ CreateThread(function()
         if hasSignal ~= (not phoneBlocked) then
             phoneBlocked = not hasSignal
             setPhoneNetwork(hasSignal)
-            if not hasSignal then
-                Core.Notify(Core.Locale('network_lost'), 'error')
-            elseif signalStrength >= 50 then
-                Core.Notify(Core.Locale('network_ok'), 'success')
-            else
-                Core.Notify(Core.Locale('network_weak'), 'warning')
+            if signalReady then
+                if not hasSignal then
+                    Core.Notify(Core.Locale('network_lost'), 'error')
+                elseif signalStrength >= 50 then
+                    Core.Notify(Core.Locale('network_ok'), 'success')
+                else
+                    Core.Notify(Core.Locale('network_weak'), 'warning')
+                end
             end
         else
             setPhoneNetwork(hasSignal)
         end
 
+        signalReady = true
         Wait(cfg.checkInterval or 1000)
     end
 end)

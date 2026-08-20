@@ -66,6 +66,25 @@ exports.esx_core:RegisterHouseDoor(houseId, coords, locked)
 exports.esx_core:ToggleVehicleLock()
 ```
 
+## Réseau téléphone (antennes)
+
+Sans antenne à portée : **pas d’appels, SMS, ni réseaux sociaux**.
+
+1. Ajoute l’item `phone_antenna` (`install/ox_items_antenna.lua` ou `install/esx_items.sql`)
+2. Utilise l’item / `/antenne` pour déployer
+3. `/retirerantenne` ou **E** près de l’antenne pour récupérer l’item
+
+Portée : `Config.Network.range` (180 m). Antennes fixes optionnelles dans `staticAntennas`.
+
+```lua
+-- Dans ton script téléphone
+if not exports.esx_core:CanUsePhoneFeature('call') then return end
+-- ou serveur :
+if not exports.esx_core:HasNetworkSignal(source) then return end
+```
+
+Compat auto : npwd, lb-phone, gksphone, qs-smartphone (désactive le téléphone hors réseau).
+
 ## Logs Discord
 
 Dans `config.lua` → `Config.Discord.defaultWebhook` (URL webhook Discord).
