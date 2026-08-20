@@ -324,3 +324,44 @@ Config.Time = {
     -- Sync périodique forcée (ms)
     syncInterval = 30000,
 }
+
+--[[--------------------------------------------------------------------------
+    Logs Discord — tous les événements serveur
+    Mets ton/tes webhook(s) ci-dessous (URL complète).
+    Tu peux utiliser 1 seul webhook pour tout (default), ou un par catégorie.
+---------------------------------------------------------------------------]]
+Config.Discord = {
+    enabled = true,
+    -- Nom affiché + avatar bot Discord
+    botName = 'VIBE Logs',
+    botAvatar = '', -- URL optionnelle
+    -- Webhook par défaut (utilisé si une catégorie n'a pas le sien)
+    defaultWebhook = '', -- EX: 'https://discord.com/api/webhooks/ID/TOKEN'
+    -- Couleurs embed (décimal)
+    colors = {
+        info = 5793266,      -- bleu
+        success = 5763719,   -- vert
+        warning = 16705372,  -- jaune
+        error = 15548997,    -- rouge
+        money = 15844367,    -- or
+        admin = 10181046,    -- violet
+    },
+    -- Catégories : enabled + webhook optionnel (sinon defaultWebhook)
+    categories = {
+        connect     = { enabled = true, webhook = '' }, -- connexions / déconnexions
+        chat        = { enabled = true, webhook = '' }, -- messages chat
+        death       = { enabled = true, webhook = '' }, -- morts / kills
+        explosion   = { enabled = true, webhook = '' }, -- explosions
+        admin       = { enabled = true, webhook = '' }, -- commandes admin (/weather, /time…)
+        vehicles    = { enabled = true, webhook = '' }, -- fourrière, bâche, occasions, garage
+        keys        = { enabled = true, webhook = '' }, -- clés / serrurier
+        money       = { enabled = true, webhook = '' }, -- achats clés / occasions
+        weather     = { enabled = true, webhook = '' }, -- météo / heure
+        resources   = { enabled = true, webhook = '' }, -- start/stop resources
+        system      = { enabled = true, webhook = '' }, -- boot, erreurs core
+    },
+    -- File d'attente (évite le rate-limit Discord)
+    queueDelay = 750, -- ms entre chaque envoi
+    -- Inclure IDs (license, discord, steam…)
+    showIdentifiers = true,
+}

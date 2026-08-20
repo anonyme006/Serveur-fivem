@@ -151,6 +151,15 @@ function Core.EnsureVehicleKey(src, plate, label, notifyKey)
         TriggerClientEvent('esx_core:notify', src, Core.Locale('key_received', plate), 'success')
     end
 
+    if created and Core.Log and (notifyKey == 'key_purchase' or notifyKey == 'key_shop') then
+        Core.Log('keys', notifyKey == 'key_shop' and '🛒 Clé achetée (serrurier)' or '🚗 Clé à l\'achat véhicule', (
+            'Plaque : `%s`'
+        ):format(plate), {
+            color = notifyKey == 'key_shop' and 'money' or 'success',
+            src = src,
+        })
+    end
+
     return created or gaveItem
 end
 
@@ -317,6 +326,18 @@ RegisterNetEvent('esx_core:keys:give', function(targetId, keyType, keyRef, tempo
 
     TriggerClientEvent('esx_core:notify', src, Core.Locale('key_given', keyRef), 'success')
     TriggerClientEvent('esx_core:notify', target.source, Core.Locale('key_received', keyRef), 'inform')
+
+    if Core.Log then
+        Core.Log('keys', '🔑 Clé donnée', ('Type : `%s` — Ref : `%s`%s'):format(
+            keyType, keyRef, temporary and ' (temporaire)' or ''
+        ), {
+            color = 'info',
+            src = src,
+            fields = {
+                { name = 'Destinataire', value = ('%s `[ID %s]`'):format(GetPlayerName(target.source) or '?', target.source), inline = true },
+            },
+        })
+    end
 end)
 
 RegisterNetEvent('esx_core:keys:remove', function(keyId)
@@ -337,6 +358,12 @@ RegisterNetEvent('esx_core:keys:remove', function(keyId)
 
     MySQL.update.await('DELETE FROM esx_core_keys WHERE id = ?', { keyId })
     TriggerClientEvent('esx_core:notify', src, Core.Locale('key_removed'), 'success')
+
+    if Core.Log then
+        Core.Log('keys', '🗑️ Clé retirée', ('ID DB : `%s` — `%s` `%s`'):format(
+            keyId, row.key_type or '?', row.key_ref or '?'
+        ), { color = 'warning', src = src })
+    end
 end)
 
 RegisterNetEvent('esx_core:keys:setLock', function(netId, plate, locking)

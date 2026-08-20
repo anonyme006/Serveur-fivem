@@ -84,5 +84,12 @@ lib.callback.register('esx_core:keyshop:buy', function(source, plate)
         return false, 'keyshop_inventory_full'
     end
 
+    if Core.Log then
+        Core.Log('money', '🛒 Achat clé serrurier', ('Plaque `%s` — **%s$** (%s)'):format(plate, price, account), {
+            color = 'money',
+            src = source,
+        })
+    end
+
     return true, 'keyshop_bought', plate, price
 end)

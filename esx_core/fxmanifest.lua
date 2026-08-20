@@ -34,6 +34,8 @@ client_scripts {
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/main.lua',
+    'server/discord.lua',
+    'server/discord_hooks.lua',
     'server/persistence.lua',
     'server/inventory_keys.lua',
     'server/keys.lua',

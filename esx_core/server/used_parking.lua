@@ -89,6 +89,12 @@ lib.callback.register('esx_core:used:list', function(source, plate, price, props
     slotTaken[slot] = insertId
 
     TriggerClientEvent('esx_core:used:sync', -1, listings)
+    if Core.Log then
+        Core.Log('vehicles', '🅿️ Mise en vente (occasions)', ('Plaque `%s` — **%s$** — slot %s'):format(plate, price, slot), {
+            color = 'money',
+            src = source,
+        })
+    end
     return true, 'used_listed', price
 end)
 
@@ -109,6 +115,12 @@ lib.callback.register('esx_core:used:remove', function(source, listingId)
     Core.SetVehicleStored(entry.plate, true, 'legion') -- retour garage public par défaut
 
     TriggerClientEvent('esx_core:used:sync', -1, listings)
+    if Core.Log then
+        Core.Log('vehicles', '🅿️ Annonce retirée', ('Plaque `%s`'):format(entry.plate), {
+            color = 'warning',
+            src = source,
+        })
+    end
     return true, 'used_removed'
 end)
 
@@ -174,5 +186,14 @@ lib.callback.register('esx_core:used:buy', function(source, listingId)
     listings[listingId] = nil
 
     TriggerClientEvent('esx_core:used:sync', -1, listings)
+    if Core.Log then
+        Core.Log('money', '💵 Vente occasion', ('Plaque `%s` — **%s$** (commission vendeur nette appliquée)'):format(entry.plate, price), {
+            color = 'money',
+            src = source,
+            fields = {
+                { name = 'Vendeur', value = ('`%s`'):format(entry.seller), inline = true },
+            },
+        })
+    end
     return true, 'used_bought', entry.plate, price
 end)

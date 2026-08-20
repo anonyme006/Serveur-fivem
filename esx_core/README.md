@@ -41,6 +41,7 @@ ensure esx_core
 | **Alertes** | Essence basse, faim / soif (seuils dans `config.lua`) |
 | **Offroad** | Sable / boue / herbe / gravier → couple et vitesse réduits |
 | **Météo sync** | Même météo & heure pour tous + rotation dynamique |
+| **Logs Discord** | Connexions, chat, morts, véhicules, clés, admin… |
 
 ## Raccourcis
 
@@ -62,6 +63,17 @@ exports.esx_core:RegisterHouseDoor(houseId, coords, locked)
 
 -- Client
 exports.esx_core:ToggleVehicleLock()
+```
+
+## Logs Discord
+
+Dans `config.lua` → `Config.Discord.defaultWebhook` (URL webhook Discord).
+
+Catégories : `connect`, `chat`, `death`, `explosion`, `admin`, `vehicles`, `keys`, `money`, `weather`, `resources`, `system`.
+
+```lua
+-- Depuis un autre script
+exports.esx_core:DiscordLog('admin', 'Titre', 'Description', { color = 'warning', src = source })
 ```
 
 ## Météo synchronisée

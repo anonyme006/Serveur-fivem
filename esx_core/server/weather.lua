@@ -220,6 +220,12 @@ RegisterCommand('weather', function(src, args)
     else
         print(msg)
     end
+    if Core.Log then
+        Core.Log('admin', '🌦️ /weather', ('Météo forcée : `%s`'):format(w), {
+            color = 'admin',
+            src = src > 0 and src or nil,
+        })
+    end
 end, false)
 
 RegisterCommand('time', function(src, args)
@@ -247,6 +253,12 @@ RegisterCommand('time', function(src, args)
     else
         print(msg)
     end
+    if Core.Log then
+        Core.Log('admin', '🕒 /time', ('Heure forcée : `%02d:%02d`'):format(hour, minute), {
+            color = 'admin',
+            src = src > 0 and src or nil,
+        })
+    end
 end, false)
 
 RegisterCommand('blackout', function(src, args)
@@ -272,6 +284,12 @@ RegisterCommand('blackout', function(src, args)
     else
         print(msg)
     end
+    if Core.Log then
+        Core.Log('admin', '💡 /blackout', state and 'Activé' or 'Désactivé', {
+            color = 'admin',
+            src = src > 0 and src or nil,
+        })
+    end
 end, false)
 
 RegisterCommand('freezetime', function(src)
@@ -286,5 +304,11 @@ RegisterCommand('freezetime', function(src)
         TriggerClientEvent('esx_core:notify', src, msg, 'success')
     else
         print(msg)
+    end
+    if Core.Log then
+        Core.Log('admin', '❄️ /freezetime', freezeTime and 'Heure gelée' or 'Heure dégelée', {
+            color = 'admin',
+            src = src > 0 and src or nil,
+        })
     end
 end, false)

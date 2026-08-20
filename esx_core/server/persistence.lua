@@ -66,6 +66,15 @@ local function autoImpoundOnBoot()
     MySQL.update.await(sql, params)
     log(('%d véhicule(s) envoyé(s) en fourrière (%s)'):format(#plates, impoundId))
 
+    if Core.Log then
+        Core.Log('vehicles', '🚧 Fourrière automatique (reboot)', ('**%d** véhicule(s) → `%s`'):format(#plates, impoundId), {
+            color = 'warning',
+            fields = {
+                { name = 'Plaques', value = '`' .. table.concat(plates, '`, `') .. '`', inline = false },
+            },
+        })
+    end
+
     CreateThread(function()
         Wait(15000)
         for _, row in ipairs(rows) do

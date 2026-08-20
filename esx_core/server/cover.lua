@@ -67,6 +67,15 @@ lib.callback.register('esx_core:cover:put', function(source, plate, coords, prop
     Core.SetVehicleStored(plate, true, 'cover')
 
     TriggerClientEvent('esx_core:cover:sync', -1, covers)
+    if Core.Log then
+        Core.Log('vehicles', '🧥 Bâche posée', ('Plaque `%s`'):format(plate), {
+            color = 'info',
+            src = source,
+            fields = {
+                { name = 'Coords', value = ('`%.1f, %.1f, %.1f`'):format(coords.x or 0, coords.y or 0, coords.z or 0), inline = false },
+            },
+        })
+    end
     return true, 'cover_on'
 end)
 
@@ -92,6 +101,12 @@ lib.callback.register('esx_core:cover:remove', function(source, plate)
     Core.SetVehicleStored(plate, false, nil)
 
     TriggerClientEvent('esx_core:cover:sync', -1, covers)
+    if Core.Log then
+        Core.Log('vehicles', '🧥 Bâche retirée', ('Plaque `%s`'):format(plate), {
+            color = 'info',
+            src = source,
+        })
+    end
     return true, 'cover_off', entry
 end)
 

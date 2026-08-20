@@ -10,6 +10,12 @@ local function giveFromGarage(src, plate)
     if not Config.Keys.giveOnGarageTakeOut then return end
     if type(plate) ~= 'string' or plate == '' then return end
     Core.EnsureVehicleKey(src, plate, plate, 'key_garage')
+    if Core.Log then
+        Core.Log('vehicles', '🚪 Sortie garage', ('Plaque `%s`'):format(Core.NormalizePlate(plate)), {
+            color = 'info',
+            src = src,
+        })
+    end
 end
 
 local function giveFromPurchase(src, plate, label)
