@@ -1,0 +1,96 @@
+-- Items à ajouter dans ox_inventory/data/items.lua
+-- Copiez ce contenu dans votre fichier items.lua (ou fusionnez les entrées).
+
+return {
+    ['engine_part'] = {
+        label = 'Pièce moteur',
+        weight = 1500,
+        stack = true,
+        close = true,
+        description = 'Composant moteur pour réparations et upgrades.',
+    },
+    ['brake_part'] = {
+        label = 'Pièce freins',
+        weight = 800,
+        stack = true,
+        close = true,
+        description = 'Plaquettes et disques de frein.',
+    },
+    ['transmission_part'] = {
+        label = 'Pièce transmission',
+        weight = 1200,
+        stack = true,
+        close = true,
+        description = 'Éléments de boîte de vitesses.',
+    },
+    ['suspension_part'] = {
+        label = 'Pièce suspension',
+        weight = 1000,
+        stack = true,
+        close = true,
+        description = 'Amortisseurs et ressorts.',
+    },
+    ['clutch_part'] = {
+        label = 'Pièce embrayage',
+        weight = 900,
+        stack = true,
+        close = true,
+        description = 'Kit embrayage.',
+    },
+    ['repair_kit'] = {
+        label = 'Kit de réparation',
+        weight = 500,
+        stack = true,
+        close = true,
+        description = 'Outils et consommables de réparation.',
+    },
+    ['tire'] = {
+        label = 'Pneu',
+        weight = 2000,
+        stack = true,
+        close = true,
+        description = 'Pneu de rechange.',
+    },
+    ['oil'] = {
+        label = 'Huile moteur',
+        weight = 400,
+        stack = true,
+        close = true,
+        description = 'Huile pour vidange.',
+    },
+    ['battery'] = {
+        label = 'Batterie',
+        weight = 1800,
+        stack = true,
+        close = true,
+        description = 'Batterie automobile 12V.',
+    },
+    ['radiator'] = {
+        label = 'Radiateur',
+        weight = 1600,
+        stack = true,
+        close = true,
+        description = 'Radiateur de refroidissement.',
+    },
+    ['spark_plug'] = {
+        label = 'Bougie',
+        weight = 50,
+        stack = true,
+        close = true,
+        description = 'Bougie d\'allumage.',
+    },
+    ['cleaning_kit'] = {
+        label = 'Kit nettoyage',
+        weight = 300,
+        stack = true,
+        close = true,
+        description = 'Produits pour nettoyer un véhicule.',
+    },
+    ['body_kit'] = {
+        label = 'Kit carrosserie',
+        weight = 1100,
+        stack = true,
+        close = true,
+        description = 'Pièces de carrosserie et mastic.',
+    },
+}

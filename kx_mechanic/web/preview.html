@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KX Mechanic — Preview Tablette</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        html, body { background: #151b24 !important; }
+        #app { display: grid !important; }
+        .preview-banner {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: rgba(62, 207, 178, 0.95);
+            color: #041018;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-banner">PREVIEW — 3 menus dans la tablette</div>
+
+    <div id="app">
+        <div class="shell tablet">
+            <div class="tablet-bezel">
+                <div class="tablet-camera"></div>
+                <div class="tablet-screen">
+                    <header class="tablet-header">
+                        <div class="brand compact">
+                            <div class="brand-mark">KX</div>
+                            <div>
+                                <div class="brand-title" id="shopName">Los Santos Customs</div>
+                                <div class="brand-sub">Workshop OS</div>
+                            </div>
+                        </div>
+
+                        <nav class="tablet-tabs" id="mainTabs" aria-label="Menus principaux">
+                            <button class="tablet-tab active" data-tab="atelier" type="button">
+                                <i class="fa-solid fa-wrench"></i>
+                                <span>Menu atelier</span>
+                            </button>
+                            <button class="tablet-tab" data-tab="diagnostic" type="button">
+                                <i class="fa-solid fa-stethoscope"></i>
+                                <span>Diagnostic</span>
+                            </button>
+                            <button class="tablet-tab" data-tab="dashboard" type="button">
+                                <i class="fa-solid fa-chart-line"></i>
+                                <span>Dashboard</span>
+                            </button>
+                        </nav>
+
+                        <div class="tablet-header-right">
+                            <div id="vehicleBadge" class="vehicle-badge hidden">
+                                <i class="fa-solid fa-car-side"></i>
+                                <div>
+                                    <strong id="vehPlate">----</strong>
+                                    <span id="vehModel">Véhicule</span>
+                                </div>
+                            </div>
+                            <button id="btnClose" class="btn ghost icon-only" type="button" title="Fermer">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </header>
+
+                    <div class="tablet-body">
+                        <aside class="sidebar" id="atelierSidebar">
+                            <nav id="navCategories" class="nav"></nav>
+                            <div class="sidebar-footer">
+                                <div id="playerMeta" class="meta"></div>
+                            </div>
+                        </aside>
+
+                        <main class="content">
+                            <header class="topbar">
+                                <div>
+                                    <h1 id="viewTitle">Atelier</h1>
+                                    <p id="viewSubtitle">Sélectionnez une intervention</p>
+                                </div>
+                            </header>
+
+                            <section id="panelServices" class="panel"></section>
+                            <section id="panelDiagnostic" class="panel hidden"></section>
+                            <section id="panelBilling" class="panel hidden"></section>
+                            <section id="panelOrders" class="panel hidden"></section>
+                            <section id="panelEmployees" class="panel hidden"></section>
+                            <section id="panelDashboard" class="panel hidden"></section>
+                            <section id="panelStock" class="panel hidden"></section>
+                            <section id="panelManagement" class="panel hidden"></section>
+                        </main>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+    <script src="app.js"></script>
+    <script src="preview-boot.js"></script>
+</body>
+</html>
