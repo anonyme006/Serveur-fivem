@@ -460,16 +460,11 @@ AddEventHandler('onResourceStop', function(res)
 end)
 
 --- Commande admin
-lib.addCommand('sleepingbodies', {
-    help = 'Menu admin — corps endormis',
-    restricted = false,
-}, function(source)
+local function openAdminMenu(source)
     if source == 0 then
-        print(('[SleepingBodies] %d bodies in memory'):format((function()
-            local n = 0
-            for _ in pairs(Bodies) do n = n + 1 end
-            return n
-        end)()))
+        local n = 0
+        for _ in pairs(Bodies) do n = n + 1 end
+        print(('[SleepingBodies] %d bodies in memory'):format(n))
         return
     end
     if not isAdmin(source) then
@@ -481,4 +476,16 @@ lib.addCommand('sleepingbodies', {
         return
     end
     TriggerClientEvent('qbx_sleeping_bodies:client:adminMenu', source)
-end)
+end
+
+if lib and lib.addCommand then
+    lib.addCommand('sleepingbodies', {
+        help = 'Menu admin — corps endormis',
+    }, function(source)
+        openAdminMenu(source)
+    end)
+else
+    RegisterCommand('sleepingbodies', function(source)
+        openAdminMenu(source)
+    end, false)
+end
