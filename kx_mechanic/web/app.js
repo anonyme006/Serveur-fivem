@@ -1,5 +1,6 @@
 const app = document.getElementById('app');
 const nav = document.getElementById('navCategories');
+const tabletBody = document.querySelector('.tablet-body');
 const panels = {
     services: document.getElementById('panelServices'),
     diagnostic: document.getElementById('panelDiagnostic'),
@@ -15,7 +16,9 @@ let state = {
     menu: null,
     vehicle: null,
     category: 'repair',
+    mainTab: 'atelier',
     permissions: {},
+    lastReport: null,
 };
 
 const ICON_MAP = {
@@ -31,6 +34,11 @@ const ICON_MAP = {
     users: 'fa-users',
     building: 'fa-building',
 };
+
+const ATELIER_CATEGORIES = new Set([
+    'repair', 'performance', 'body', 'tires', 'maintenance',
+    'stock', 'billing', 'orders', 'employees', 'management',
+]);
 
 function post(name, data = {}) {
     return fetch(`https://kx_mechanic/${name}`, {
@@ -95,11 +103,23 @@ function canSeeCategory(id) {
     return !!state.permissions[perm];
 }
 
+function setMainTabActive(tab) {
+    document.querySelectorAll('.tablet-tab').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
+}
+
+function setSidebarVisible(visible) {
+    if (!tabletBody) return;
+    tabletBody.classList.toggle('no-sidebar', !visible);
+}
+
 function renderNav() {
     nav.innerHTML = '';
-    if (!state.menu) return;
+    if (!state.menu || state.mainTab !== 'atelier') return;
 
     state.menu.categories.forEach((cat) => {
+        if (!ATELIER_CATEGORIES.has(cat.id)) return;
         if (!canSeeCategory(cat.id)) return;
         if (cat.id === 'performance' && state.menu.config && !state.menu.config.enablePerformance) return;
         if (cat.id === 'maintenance' && state.menu.config && !state.menu.config.enableMaintenance) return;
@@ -112,14 +132,6 @@ function renderNav() {
         btn.addEventListener('click', () => selectCategory(cat.id));
         nav.appendChild(btn);
     });
-
-    if (state.permissions.dashboard && state.menu.config?.enableDashboard) {
-        const dash = document.createElement('button');
-        dash.className = `nav-btn${state.category === 'dashboard' ? ' active' : ''}`;
-        dash.innerHTML = `<i class="fa-solid fa-chart-line"></i><span>Tableau de bord</span>`;
-        dash.addEventListener('click', () => selectCategory('dashboard'));
-        nav.appendChild(dash);
-    }
 }
 
 function renderServices(categoryId) {
@@ -134,25 +146,6 @@ function renderServices(categoryId) {
     setTitle(category.label, 'Interventions disponibles');
     const grid = document.createElement('div');
     grid.className = 'grid';
-
-    if (categoryId === 'diagnostic') {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <h3>Diagnostic complet</h3>
-            <p>Analyse moteur, transmission, freins, suspension, pneus, fluides et température.</p>
-            <div class="card-meta">
-                <span class="pill accent">${money(50)}</span>
-                <span class="pill">5 s</span>
-            </div>
-            <button class="btn" id="runDiagnose"><i class="fa-solid fa-stethoscope"></i> Lancer le diagnostic</button>
-        `;
-        grid.appendChild(card);
-        panels.services.innerHTML = '';
-        panels.services.appendChild(grid);
-        document.getElementById('runDiagnose').addEventListener('click', () => post('diagnose'));
-        return;
-    }
 
     (category.services || []).forEach((service, index) => {
         const card = document.createElement('div');
@@ -186,7 +179,45 @@ function renderServices(categoryId) {
     });
 }
 
-function renderDiagnostic(report) {
+function renderDiagnosticHome() {
+    hideAllPanels();
+    panels.diagnostic.classList.remove('hidden');
+    setTitle('Diagnostic', 'Analyse complète du véhicule');
+
+    if (state.lastReport) {
+        renderDiagnostic(state.lastReport, false);
+        return;
+    }
+
+    panels.diagnostic.innerHTML = `
+        <div class="grid">
+            <div class="card">
+                <h3>Diagnostic véhicule</h3>
+                <p>Analyse moteur, transmission, freins, suspension, pneus, fluides et température.</p>
+                <div class="card-meta">
+                    <span class="pill accent">${money(50)}</span>
+                    <span class="pill">5 s</span>
+                </div>
+                <button class="btn" id="runDiagnose"><i class="fa-solid fa-stethoscope"></i> Lancer le diagnostic</button>
+            </div>
+            <div class="card">
+                <h3>Rapport</h3>
+                <p>Aucun diagnostic récent. Lancez une analyse pour afficher le rapport dans la tablette.</p>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('runDiagnose')?.addEventListener('click', () => post('diagnose'));
+}
+
+function renderDiagnostic(report, switchTab = true) {
+    state.lastReport = report;
+    if (switchTab) {
+        state.mainTab = 'diagnostic';
+        setMainTabActive('diagnostic');
+        setSidebarVisible(false);
+    }
+
     hideAllPanels();
     panels.diagnostic.classList.remove('hidden');
     setTitle('Rapport de diagnostic', report.plate ? `Plaque ${report.plate}` : 'Analyse terminée');
@@ -215,18 +246,18 @@ function renderDiagnostic(report) {
                 <span class="pill">Pneus : ${report.tire_type || 'stock'}</span>
                 <span class="pill">Dernier entretien : ${report.last_service || 'N/A'}</span>
             </div>
+            <div class="btn-row" style="margin-top:12px">
+                <button class="btn" id="runDiagnoseAgain"><i class="fa-solid fa-rotate"></i> Relancer</button>
+                <button class="btn secondary" id="backAtelier">Menu atelier</button>
+            </div>
         </div>
         <div class="diag-grid">${comps}</div>
         <h2 style="margin:18px 0 10px;font-size:18px">Pneus</h2>
         <div class="diag-grid">${tires}</div>
-        <div class="btn-row" style="margin-top:16px">
-            <button class="btn secondary" id="backMenu">Retour menu</button>
-        </div>
     `;
 
-    document.getElementById('backMenu')?.addEventListener('click', () => {
-        selectCategory(state.category || 'repair');
-    });
+    document.getElementById('runDiagnoseAgain')?.addEventListener('click', () => post('diagnose'));
+    document.getElementById('backAtelier')?.addEventListener('click', () => selectMainTab('atelier'));
 }
 
 async function renderBilling() {
@@ -397,7 +428,7 @@ async function renderEmployees() {
 async function renderDashboard() {
     hideAllPanels();
     panels.dashboard.classList.remove('hidden');
-    setTitle('Tableau de bord', 'Performance de l\'atelier');
+    setTitle('Dashboard', 'Performance de l\'atelier');
 
     const result = await post('getDashboard');
     if (!result.ok) {
@@ -507,7 +538,7 @@ function renderManagement() {
     panels.management.innerHTML = `
         <div class="grid">
             <div class="card">
-                <h3>Tableau de bord</h3>
+                <h3>Dashboard</h3>
                 <p>Consultez le CA, les réparations et le stock faible.</p>
                 <button class="btn" id="goDash">Ouvrir</button>
             </div>
@@ -529,23 +560,71 @@ function renderManagement() {
         </div>
     `;
 
-    document.getElementById('goDash')?.addEventListener('click', () => selectCategory('dashboard'));
+    document.getElementById('goDash')?.addEventListener('click', () => selectMainTab('dashboard'));
     document.getElementById('goEmp')?.addEventListener('click', () => selectCategory('employees'));
     document.getElementById('goOrd')?.addEventListener('click', () => selectCategory('orders'));
     document.getElementById('goStock')?.addEventListener('click', () => selectCategory('stock'));
 }
 
 function selectCategory(id) {
+    state.mainTab = 'atelier';
     state.category = id;
+    setMainTabActive('atelier');
+    setSidebarVisible(true);
     renderNav();
 
     if (id === 'billing') return renderBilling();
     if (id === 'orders') return renderOrders();
     if (id === 'employees') return renderEmployees();
-    if (id === 'dashboard') return renderDashboard();
     if (id === 'stock') return renderStock();
     if (id === 'management') return renderManagement();
     return renderServices(id);
+}
+
+function selectMainTab(tab) {
+    state.mainTab = tab;
+    setMainTabActive(tab);
+
+    if (tab === 'atelier') {
+        setSidebarVisible(true);
+        const fallback = ATELIER_CATEGORIES.has(state.category) ? state.category : 'repair';
+        selectCategory(fallback);
+        return;
+    }
+
+    if (tab === 'diagnostic') {
+        setSidebarVisible(false);
+        renderNav();
+        if (!state.permissions.diagnose && state.permissions.diagnose !== undefined) {
+            panels.diagnostic.innerHTML = '<div class="card"><p>Permission insuffisante.</p></div>';
+            hideAllPanels();
+            panels.diagnostic.classList.remove('hidden');
+            setTitle('Diagnostic', 'Accès restreint');
+            return;
+        }
+        renderDiagnosticHome();
+        return;
+    }
+
+    if (tab === 'dashboard') {
+        setSidebarVisible(false);
+        renderNav();
+        if (state.menu?.config && !state.menu.config.enableDashboard) {
+            hideAllPanels();
+            panels.dashboard.classList.remove('hidden');
+            panels.dashboard.innerHTML = '<div class="card"><p>Dashboard désactivé.</p></div>';
+            setTitle('Dashboard', 'Indisponible');
+            return;
+        }
+        if (state.permissions.dashboard === false) {
+            hideAllPanels();
+            panels.dashboard.classList.remove('hidden');
+            panels.dashboard.innerHTML = '<div class="card"><p>Permission insuffisante.</p></div>';
+            setTitle('Dashboard', 'Accès restreint');
+            return;
+        }
+        renderDashboard();
+    }
 }
 
 function openUI(payload) {
@@ -565,12 +644,21 @@ function openUI(payload) {
     updateVehicleBadge();
 
     if (payload.view === 'diagnostic' && payload.report) {
-        renderDiagnostic(payload.report);
+        renderDiagnostic(payload.report, true);
         return;
     }
 
-    renderNav();
-    selectCategory(state.category);
+    if (payload.defaultCategory === 'dashboard' || payload.view === 'dashboard') {
+        selectMainTab('dashboard');
+        return;
+    }
+
+    if (payload.defaultCategory === 'diagnostic' || payload.view === 'diagnostic') {
+        selectMainTab('diagnostic');
+        return;
+    }
+
+    selectMainTab('atelier');
 }
 
 function closeUI() {
@@ -579,6 +667,12 @@ function closeUI() {
 }
 
 document.getElementById('btnClose').addEventListener('click', closeUI);
+
+document.getElementById('mainTabs')?.addEventListener('click', (event) => {
+    const btn = event.target.closest('.tablet-tab');
+    if (!btn) return;
+    selectMainTab(btn.dataset.tab);
+});
 
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !app.classList.contains('hidden')) {

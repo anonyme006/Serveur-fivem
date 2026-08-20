@@ -28,9 +28,6 @@
                 ],
             },
             {
-                id: 'diagnostic', label: 'Diagnostic', icon: 'stethoscope', services: [],
-            },
-            {
                 id: 'performance', label: 'Performance', icon: 'gauge-high',
                 services: [
                     { id: 'engine_3', label: 'Moteur niveau 3', description: 'Amélioration moteur niveau 3.', price: 7000, duration: 30000, materials: [{ count: 4, label: 'Pièce moteur' }] },
@@ -107,7 +104,16 @@
                 return Response.json({ ok: true });
             }
             if (name === 'diagnose') {
-                window.postMessage({ action: 'open', data: { view: 'diagnostic', report: mockReport, menu: mockMenu, shopName: 'Los Santos Customs', vehicle: { plate: 'KX 4821', model: 'SULTAN' } } }, '*');
+                window.postMessage({
+                    action: 'open',
+                    data: {
+                        view: 'diagnostic',
+                        report: mockReport,
+                        menu: mockMenu,
+                        shopName: 'Los Santos Customs',
+                        vehicle: { plate: 'KX 4821', model: 'SULTAN RS' },
+                    },
+                }, '*');
                 return Response.json({ ok: true });
             }
             if (name === 'getNearbyPlayers') {
@@ -204,57 +210,36 @@
         return originalFetch(url, options);
     };
 
-    function openMenu() {
-        window.postMessage({
-            action: 'open',
-            data: {
-                view: 'menu',
-                menu: mockMenu,
-                defaultCategory: 'repair',
-                shopName: 'Los Santos Customs',
-                vehicle: { plate: 'KX 4821', model: 'SULTAN RS' },
-            },
-        }, '*');
-    }
-
-    function openDiagnostic() {
-        window.postMessage({
-            action: 'open',
-            data: {
-                view: 'diagnostic',
-                report: mockReport,
-                menu: mockMenu,
-                shopName: 'Los Santos Customs',
-                vehicle: { plate: 'KX 4821', model: 'SULTAN RS' },
-            },
-        }, '*');
-    }
-
-    function openDashboard() {
-        window.postMessage({
-            action: 'open',
-            data: {
-                view: 'menu',
-                menu: mockMenu,
-                defaultCategory: 'dashboard',
-                shopName: 'Los Santos Customs',
-                vehicle: { plate: 'KX 4821', model: 'SULTAN RS' },
-            },
-        }, '*');
-    }
-
-    document.querySelectorAll('.preview-tabs button').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.preview-tabs button').forEach((b) => b.classList.remove('active'));
-            btn.classList.add('active');
-            const view = btn.dataset.view;
-            if (view === 'menu') openMenu();
-            if (view === 'diagnostic') openDiagnostic();
-            if (view === 'dashboard') openDashboard();
-        });
+    // Auto-show mock report when opening Diagnostic tab in preview
+    document.addEventListener('click', (e) => {
+        const tab = e.target.closest('.tablet-tab[data-tab="diagnostic"]');
+        if (!tab) return;
+        setTimeout(() => {
+            window.postMessage({
+                action: 'open',
+                data: {
+                    view: 'diagnostic',
+                    report: mockReport,
+                    menu: mockMenu,
+                    shopName: 'Los Santos Customs',
+                    vehicle: { plate: 'KX 4821', model: 'SULTAN RS' },
+                },
+            }, '*');
+        }, 40);
     });
 
     window.addEventListener('load', () => {
-        setTimeout(openMenu, 150);
+        setTimeout(() => {
+            window.postMessage({
+                action: 'open',
+                data: {
+                    view: 'menu',
+                    menu: mockMenu,
+                    defaultCategory: 'repair',
+                    shopName: 'Los Santos Customs',
+                    vehicle: { plate: 'KX 4821', model: 'SULTAN RS' },
+                },
+            }, '*');
+        }, 120);
     });
 })();
