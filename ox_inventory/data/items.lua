@@ -2,7 +2,9 @@ return {
 	['testburger'] = {
 		label = 'Test Burger',
 		weight = 220,
-		degrade = 60,
+		degrade = 120, -- minutes avant péremption
+		decay = true,  -- disparaît une fois périmé
+		description = 'Périssable — se conserve environ 2 heures',
 		client = {
 			image = 'burger_chicken.png',
 			status = { hunger = 200000 },
@@ -71,6 +73,9 @@ return {
 	['burger'] = {
 		label = 'Burger',
 		weight = 220,
+		degrade = 180,
+		decay = true,
+		description = 'Périssable — se conserve environ 3 heures',
 		client = {
 			status = { hunger = 200000 },
 			anim = 'eating',
@@ -83,6 +88,9 @@ return {
 	['sprunk'] = {
 		label = 'Sprunk',
 		weight = 350,
+		degrade = 360,
+		decay = true,
+		description = 'Périssable — se conserve environ 6 heures',
 		client = {
 			status = { thirst = 200000 },
 			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
@@ -165,6 +173,9 @@ return {
 	['mustard'] = {
 		label = 'Mustard',
 		weight = 500,
+		degrade = 480,
+		decay = true,
+		description = 'Périssable — se conserve environ 8 heures',
 		client = {
 			status = { hunger = 25000, thirst = 25000 },
 			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
@@ -177,6 +188,9 @@ return {
 	['water'] = {
 		label = 'Water',
 		weight = 500,
+		degrade = 720,
+		decay = true,
+		description = 'Périssable — se conserve environ 12 heures',
 		client = {
 			status = { thirst = 200000 },
 			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
@@ -228,6 +242,9 @@ return {
 		weight = 1,
 		stack = true,
 		close = true,
+		degrade = 120,
+		decay = true,
+		description = "Périssable — se conserve environ 2 heures",
 	},
 
 	["blowpipe"] = {
@@ -242,6 +259,16 @@ return {
 		weight = 1,
 		stack = true,
 		close = true,
+		degrade = 480,
+		decay = true,
+		description = "Périssable — se conserve environ 8 heures",
+		client = {
+			status = { hunger = 150000 },
+			anim = 'eating',
+			prop = 'burger',
+			usetime = 2500,
+			notification = 'Tu manges du pain'
+		},
 	},
 
 	["cannabis"] = {
@@ -312,6 +339,9 @@ return {
 		weight = 1,
 		stack = true,
 		close = true,
+		degrade = 90,
+		decay = true,
+		description = "Périssable — se conserve environ 1 h 30",
 	},
 
 	["fixkit"] = {
@@ -368,6 +398,16 @@ return {
 		weight = 1,
 		stack = true,
 		close = true,
+		degrade = 240,
+		decay = true,
+		description = "Périssable — se conserve environ 4 heures",
+		client = {
+			status = { hunger = 180000 },
+			anim = 'eating',
+			prop = 'burger',
+			usetime = 2500,
+			notification = 'Tu manges du poulet'
+		},
 	},
 
 	["packaged_plank"] = {
@@ -396,6 +436,9 @@ return {
 		weight = 1,
 		stack = true,
 		close = true,
+		degrade = 90,
+		decay = true,
+		description = "Périssable — se conserve environ 1 h 30",
 	},
 
 	["stone"] = {
@@ -452,6 +495,16 @@ return {
       weight = 200,
       stack = true,
       close = true,
+      degrade = 720,
+      decay = true,
+      description = 'Périssable — se conserve environ 12 heures',
+      client = {
+        status = { thirst = 200000 },
+        anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
+        prop = { model = `prop_ld_flow_bottle`, pos = vec3(0.03, 0.03, 0.02), rot = vec3(0.0, 0.0, -1.5) },
+        usetime = 2500,
+        notification = 'Tu bois de l\'eau'
+      },
     },
 
      ['bread'] = {
@@ -459,6 +512,16 @@ return {
       weight = 150,
       stack = true,
       close = true,
+      degrade = 480,
+      decay = true,
+      description = 'Périssable — se conserve environ 8 heures',
+      client = {
+        status = { hunger = 150000 },
+        anim = 'eating',
+        prop = 'burger',
+        usetime = 2500,
+        notification = 'Tu manges du pain'
+      },
     },
 
      ['carte_chance'] = {
