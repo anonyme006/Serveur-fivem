@@ -26,4 +26,10 @@ Locales['en'] = {
     ['error_generic'] = 'Something went wrong.',
     ['cooldown'] = 'Please wait.',
     ['permission_denied'] = 'Permission denied.',
+    ['duty_on'] = 'You are now on duty.',
+    ['duty_off'] = 'You are now off duty.',
+    ['waypoint_set'] = 'GPS set to company.',
+    ['company_balance'] = 'Company balance',
+    ['take_duty'] = 'Go on duty',
+    ['leave_duty'] = 'Go off duty',
 }

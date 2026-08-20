@@ -5,14 +5,15 @@ Stack : `qbx_core` · `ox_lib` · `ox_inventory` · `oxmysql` · `pma-voice` · 
 
 > Ce projet n’est **pas** une copie de LB Phone ni d’un autre téléphone commercial. Interface, code et assets sont originaux.
 
-## État actuel (v0.1 — fondation)
+## État actuel (v0.2 — Services)
 
 | Module | Statut |
 |--------|--------|
 | Architecture / config / SQL | OK |
 | Open/close + lock/home + drag | OK |
-| Services (liste + détail + hooks serveur) | Fondation |
-| Contacts / Messages / Appels | API serveur + stubs NUI |
+| **Services** : liste GPS/appel/message, chat, actions | OK |
+| Gestion patron (solde, employés, statut) + duty | OK |
+| Contacts / Messages perso / Appels | API serveur + stubs NUI |
 | Banque / Garage / Market / GPS | Prochaines étapes |
 
 ## Installation rapide

@@ -32,6 +32,7 @@ server_scripts {
     'server/messages.lua',
     'server/calls.lua',
     'server/companies.lua',
+    'server/company_messages.lua',
     'server/services.lua',
 }
 

@@ -26,4 +26,10 @@ Locales['es'] = {
     ['error_generic'] = 'Ha ocurrido un error.',
     ['cooldown'] = 'Espere un momento.',
     ['permission_denied'] = 'Permiso denegado.',
+    ['duty_on'] = 'Has entrado de servicio.',
+    ['duty_off'] = 'Has salido de servicio.',
+    ['waypoint_set'] = 'GPS fijado a la empresa.',
+    ['company_balance'] = 'Saldo de empresa',
+    ['take_duty'] = 'Entrar de servicio',
+    ['leave_duty'] = 'Salir de servicio',
 }

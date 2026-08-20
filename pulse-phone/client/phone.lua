@@ -39,21 +39,6 @@ RegisterNUICallback('phone:closeApp', function(_, cb)
     cb({ ok = true })
 end)
 
-RegisterNUICallback('services:getCompanies', function(_, cb)
-    local list = lib.callback.await('pulse-phone:server:getCompanies', false) or {}
-    cb(list)
-end)
-
-RegisterNUICallback('services:createRequest', function(data, cb)
-    local result = lib.callback.await('pulse-phone:server:createServiceRequest', false, data)
-    cb(result or { ok = false })
-end)
-
-RegisterNUICallback('services:acceptRequest', function(data, cb)
-    local result = lib.callback.await('pulse-phone:server:acceptServiceRequest', false, data and data.id)
-    cb(result or { ok = false })
-end)
-
 --- Met à jour status bar (heure gérée côté NUI; batterie/signal poussés ponctuellement)
 function Pulse.Phone.PushStatus(partial)
     if not Pulse.Client.IsOpen() then return end

@@ -90,9 +90,13 @@ CREATE TABLE IF NOT EXISTS `phone_companies` (
     `job` VARCHAR(50) NOT NULL,
     `category` VARCHAR(40) NOT NULL DEFAULT 'service',
     `description` VARCHAR(255) DEFAULT NULL,
+    `location` VARCHAR(120) DEFAULT NULL,
     `number` VARCHAR(20) NOT NULL,
     `logo` VARCHAR(255) DEFAULT NULL,
+    `icon` VARCHAR(16) DEFAULT NULL,
+    `icon_color` VARCHAR(16) DEFAULT NULL,
     `status` ENUM('open','busy','closed') NOT NULL DEFAULT 'closed',
+    `balance` INT NOT NULL DEFAULT 0,
     `auto_status` TINYINT(1) NOT NULL DEFAULT 1,
     `pos_x` FLOAT DEFAULT NULL,
     `pos_y` FLOAT DEFAULT NULL,
@@ -117,6 +121,22 @@ CREATE TABLE IF NOT EXISTS `phone_company_employees` (
     UNIQUE KEY `uq_company_employee` (`company_id`, `citizenid`),
     KEY `idx_employee_citizen` (`citizenid`),
     KEY `idx_employee_duty` (`company_id`, `on_duty`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `phone_company_messages` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `company_id` VARCHAR(50) NOT NULL,
+    `citizenid` VARCHAR(50) NOT NULL,
+    `sender_type` ENUM('player','company') NOT NULL,
+    `sender_name` VARCHAR(80) NOT NULL,
+    `sender_number` VARCHAR(20) DEFAULT NULL,
+    `body` TEXT NOT NULL,
+    `is_read` TINYINT(1) NOT NULL DEFAULT 0,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_cmsg_company_citizen` (`company_id`, `citizenid`, `id`),
+    KEY `idx_cmsg_company_unread` (`company_id`, `is_read`),
+    KEY `idx_cmsg_citizen` (`citizenid`, `created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `phone_service_requests` (

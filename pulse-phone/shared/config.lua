@@ -103,7 +103,12 @@ Config.Companies = {
         category = 'public',
         description = 'Forces de l\'ordre et urgences.',
         number = '911',
+        location = 'Mission Row',
+        icon = 'POL',
+        iconColor = '#1D4ED8',
+        canCall = true,
         blip = { sprite = 60, color = 29 },
+        coords = { x = 428.2, y = -981.0, z = 30.7 },
         autoStatus = true,
     },
     ambulance = {
@@ -115,7 +120,12 @@ Config.Companies = {
         category = 'public',
         description = 'Services médicaux d\'urgence.',
         number = '912',
+        location = 'Pillbox Hill',
+        icon = 'EMS',
+        iconColor = '#DC2626',
+        canCall = true,
         blip = { sprite = 61, color = 1 },
+        coords = { x = 298.6, y = -584.5, z = 43.3 },
         autoStatus = true,
     },
     mechanic = {
@@ -127,7 +137,12 @@ Config.Companies = {
         category = 'service',
         description = 'Réparation et dépannage véhicules.',
         number = '5551001',
+        location = 'La Mesa',
+        icon = 'MEC',
+        iconColor = '#EA580C',
+        canCall = true,
         blip = { sprite = 446, color = 5 },
+        coords = { x = 732.0, y = -1088.7, z = 22.2 },
         autoStatus = true,
     },
     taxi = {
@@ -139,7 +154,12 @@ Config.Companies = {
         category = 'service',
         description = 'Transport de personnes.',
         number = '5551002',
+        location = 'Downtown',
+        icon = 'TAX',
+        iconColor = '#CA8A04',
+        canCall = true,
         blip = { sprite = 198, color = 5 },
+        coords = { x = 895.3, y = -179.3, z = 74.7 },
         autoStatus = true,
     },
     burgershot = {
@@ -151,7 +171,12 @@ Config.Companies = {
         category = 'food',
         description = 'Fast-food emblématique de Los Santos.',
         number = '5552001',
+        location = 'Vespucci',
+        icon = 'BS',
+        iconColor = '#BE123C',
+        canCall = false,
         blip = { sprite = 106, color = 1 },
+        coords = { x = -1193.0, y = -892.0, z = 14.0 },
         autoStatus = true,
     },
 }
@@ -164,10 +189,18 @@ Config.CompanyStatus = {
 
 -- Statut auto selon employés on duty
 Config.CompanyAutoStatus = {
-    closedBelow = 1, -- < 1 employé => fermé
-    busyAt = 1,      -- 1 employé => occupé
-    openAt = 2,      -- >= 2 => ouvert
+    closedBelow = 1,
+    busyAt = 1,
+    openAt = 2,
 }
+
+-- Solde société : renewed | qb-management | qbx_management | phone_db
+Config.CompanyBanking = {
+    provider = 'auto', -- auto tente les exports connus puis phone_db
+}
+
+Config.Cooldowns.sendCompanyMessage = 800
+Config.Cooldowns.toggleDuty = 1500
 
 -- Banque
 Config.Bank = {

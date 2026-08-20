@@ -26,4 +26,10 @@ Locales['fr'] = {
     ['error_generic'] = 'Une erreur est survenue.',
     ['cooldown'] = 'Veuillez patienter.',
     ['permission_denied'] = 'Permission refusée.',
+    ['duty_on'] = 'Vous avez pris votre service.',
+    ['duty_off'] = 'Vous avez terminé votre service.',
+    ['waypoint_set'] = 'GPS défini vers l\'entreprise.',
+    ['company_balance'] = 'Solde entreprise',
+    ['take_duty'] = 'Prendre son service',
+    ['leave_duty'] = 'Quitter le service',
 }

@@ -22,6 +22,17 @@ const TITLES: Record<AppId, string> = {
 };
 
 export function AppHost({ app, onBack }: AppHostProps): ReactNode {
+  if (app === 'services') {
+    return (
+      <div className="app-frame app-frame--services">
+        <button type="button" className="svc-close-app" onClick={onBack} aria-label="Fermer">
+          ‹ Accueil
+        </button>
+        <ServicesApp />
+      </div>
+    );
+  }
+
   return (
     <div className="app-frame">
       <div className="app-header">
@@ -31,13 +42,9 @@ export function AppHost({ app, onBack }: AppHostProps): ReactNode {
         <h2>{TITLES[app]}</h2>
       </div>
       <div className="app-body">
-        {app === 'services' ? (
-          <ServicesApp />
-        ) : (
-          <p className="placeholder">
-            Module <strong>{TITLES[app]}</strong> — fondation prête. L’UI complète arrive à l’étape suivante.
-          </p>
-        )}
+        <p className="placeholder">
+          Module <strong>{TITLES[app]}</strong> — fondation prête. L’UI complète arrive à l’étape suivante.
+        </p>
       </div>
     </div>
   );
