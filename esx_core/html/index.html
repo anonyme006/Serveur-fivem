@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Portefeuille</title>
+</head>
+<body>
+  <div id="app" class="hidden">
+    <div class="wallet">
+      <header>
+        <div>
+          <p class="eyebrow">Trousseau</p>
+          <h1 id="title">Portefeuille</h1>
+        </div>
+        <button id="closeBtn" type="button" aria-label="Fermer">✕</button>
+      </header>
+      <p id="playerName" class="name"></p>
+
+      <section class="accounts" id="accounts"></section>
+
+      <section class="keys">
+        <div class="keys-head">
+          <h2 id="keysTitle">Trousseau de clés</h2>
+        </div>
+        <div id="keysList" class="keys-list"></div>
+      </section>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
