@@ -29,6 +29,7 @@ client_scripts {
     'client/used_parking.lua',
     'client/offroad.lua',
     'client/weather.lua',
+    'client/network.lua',
 }
 
 server_scripts {
@@ -45,6 +46,7 @@ server_scripts {
     'server/cover.lua',
     'server/used_parking.lua',
     'server/weather.lua',
+    'server/network.lua',
 }
 
 ui_page 'html/index.html'

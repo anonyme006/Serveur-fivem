@@ -365,3 +365,48 @@ Config.Discord = {
     -- Inclure IDs (license, discord, steam…)
     showIdentifiers = true,
 }
+
+--[[--------------------------------------------------------------------------
+    Réseau téléphone — antennes à déployer
+    Sans couverture : pas d'appels, SMS, ni réseaux sociaux.
+---------------------------------------------------------------------------]]
+Config.Network = {
+    enabled = true,
+    -- Item pour déployer une antenne
+    antennaItem = 'phone_antenna',
+    -- Prop antenne
+    prop = 'prop_mast_01',
+    fallbackProp = 'prop_telegraph_01a',
+    -- Portée (mètres) et niveaux de signal
+    range = 180.0,          -- distance max pour un signal faible
+    goodRange = 90.0,       -- signal fort
+    -- Durée pose / retrait (ms)
+    deployProgress = 8000,
+    removeProgress = 6000,
+    -- Seul le poseur (ou job) peut retirer
+    removeJobs = { ['police'] = 0, ['mechanic'] = 0 }, -- grades min ; proprio toujours OK
+    -- Max antennes par joueur (0 = illimité)
+    maxPerPlayer = 3,
+    -- Afficher barre de signal (HUD simple)
+    showSignalHud = true,
+    -- Intervalle check client (ms)
+    checkInterval = 1000,
+    -- Blips antennes (pour tous / seulement si signal)
+    blip = { enabled = true, sprite = 459, color = 3, scale = 0.65, shortRange = true },
+    -- Antennes fixes permanentes (ville) — laisse {} pour forcer le déploiement joueur
+    staticAntennas = {
+        -- Exemples (décommente pour couverture de base) :
+        -- { coords = vec3(215.0, -810.0, 30.7), range = 220.0, label = 'Antenne Legion' },
+        -- { coords = vec3(-265.0, -963.0, 31.2), range = 220.0, label = 'Antenne Mairie' },
+        -- { coords = vec3(1850.0, 3683.0, 34.2), range = 250.0, label = 'Antenne Sandy' },
+        -- { coords = vec3(-448.0, 6010.0, 31.7), range = 250.0, label = 'Antenne Paleto' },
+    },
+    -- Ponts téléphone (désactive appels/SMS/social sans signal)
+    phones = {
+        npwd = true,           -- exports.npwd:setPhoneDisabled
+        lbphone = true,        -- lb-phone
+        gksphone = true,
+        qsmartphone = true,    -- qs-smartphone / qs-smartphone-pro
+        notifyOnBlock = true,  -- notif si tentative sans réseau
+    },
+}

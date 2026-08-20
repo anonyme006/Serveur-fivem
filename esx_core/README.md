@@ -42,6 +42,7 @@ ensure esx_core
 | **Offroad** | Sable / boue / herbe / gravier → couple et vitesse réduits |
 | **Météo sync** | Même météo & heure pour tous + rotation dynamique |
 | **Logs Discord** | Connexions, chat, morts, véhicules, clés, admin… |
+| **Réseau téléphone** | Antennes à déployer — sans signal : pas d’appels / SMS / social |
 
 ## Raccourcis
 

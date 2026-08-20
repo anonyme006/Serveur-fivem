@@ -41,3 +41,15 @@ CREATE TABLE IF NOT EXISTS `esx_core_used_parking` (
   UNIQUE KEY `slot` (`slot`),
   KEY `seller` (`seller`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `esx_core_antennas` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `owner` VARCHAR(60) NOT NULL,
+  `label` VARCHAR(80) DEFAULT NULL,
+  `coords` LONGTEXT NOT NULL,
+  `heading` FLOAT NOT NULL DEFAULT 0,
+  `range_m` FLOAT NOT NULL DEFAULT 180,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `owner` (`owner`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
