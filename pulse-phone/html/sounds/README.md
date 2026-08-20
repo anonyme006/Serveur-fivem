@@ -1,0 +1,2 @@
+-- Placeholder: replace with real OGG files in production.
+-- Config.Sounds paths point to html/sounds/*.ogg after copy from web/public/sounds
