@@ -11,8 +11,6 @@
       --desk: #12141a;
       --desk-2: #1c2030;
       --accent: #5b8cff;
-      --phone: #0a0a0c;
-      --bezel: #2a2a32;
     }
 
     * { box-sizing: border-box; }
@@ -34,9 +32,7 @@
       padding: 2.5rem clamp(1.25rem, 4vw, 3.5rem);
     }
 
-    .copy {
-      max-width: 28rem;
-    }
+    .copy { max-width: 28rem; }
 
     .eyebrow {
       display: inline-block;
@@ -57,10 +53,7 @@
       letter-spacing: -0.02em;
     }
 
-    h1 em {
-      font-style: italic;
-      color: #a8c0ff;
-    }
+    h1 em { font-style: italic; color: #a8c0ff; }
 
     p {
       margin: 0 0 1.25rem;
@@ -73,7 +66,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.45rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
 
     .chip {
@@ -84,6 +77,29 @@
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.08);
       color: #c5ccd9;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .tabs button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      color: #c5ccd9;
+    }
+
+    .tabs button.active {
+      background: var(--accent);
+      color: #fff;
     }
 
     .hint {
@@ -97,6 +113,23 @@
       background: rgba(255,255,255,0.06);
       padding: 0.1rem 0.35rem;
       border-radius: 0.3rem;
+    }
+
+    .phone-wrap { position: relative; }
+
+    .theme-toggle {
+      position: absolute;
+      top: -2.4rem;
+      right: 0;
+      border: 0;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.4rem 0.75rem;
+      border-radius: 999px;
+      cursor: pointer;
     }
 
     .phone-shell {
@@ -132,7 +165,6 @@
       border-radius: 2.05rem;
       overflow: hidden;
       background: #000;
-      position: relative;
     }
 
     .screen iframe {
@@ -143,21 +175,6 @@
       background: #000;
     }
 
-    .theme-toggle {
-      position: absolute;
-      top: -2.4rem;
-      right: 0;
-      border: 0;
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-      font: inherit;
-      font-size: 0.8rem;
-      font-weight: 700;
-      padding: 0.4rem 0.75rem;
-      border-radius: 999px;
-      cursor: pointer;
-    }
-
     @media (max-width: 860px) {
       body {
         grid-template-columns: 1fr;
@@ -165,7 +182,7 @@
         text-align: center;
       }
       .copy { max-width: 36rem; }
-      .chips { justify-content: center; }
+      .chips, .tabs { justify-content: center; }
       .theme-toggle { position: static; margin-bottom: 0.75rem; }
     }
   </style>
@@ -175,25 +192,30 @@
     <span class="eyebrow">SD-Phone · Preview</span>
     <h1>Annonces <em>Entreprise</em></h1>
     <p>
-      Interface mobile intégrée à SD-Phone : liste, recherche, détail, création
-      et permissions ESX. Données de démo en mode navigateur.
+      Formulaire avec aperçu live et bouton <strong>Valider l’annonce</strong>
+      (publication + notification ox_lib).
     </p>
+    <div class="tabs" id="tabs">
+      <button type="button" data-view="list">Liste</button>
+      <button type="button" data-view="form" class="active">Valider</button>
+      <button type="button" data-view="detail">Détail</button>
+    </div>
     <div class="chips">
-      <span class="chip">ESX Legacy</span>
-      <span class="chip">oxmysql</span>
-      <span class="chip">sd-phone addCustomApp</span>
-      <span class="chip">NUI moderne</span>
+      <span class="chip">Valider → publish</span>
+      <span class="chip">ox_lib notify</span>
+      <span class="chip">Aperçu live</span>
     </div>
     <p class="hint">
-      Ouvre aussi <code>web/index.html</code> seul. En jeu, le body reste masqué
-      jusqu’à l’injection SD-Phone (<code>componentsLoaded</code>).
+      Fichier : <code>preview/index.html</code> · NUI : <code>web/index.html?view=form&amp;demo=1</code>
     </p>
   </section>
 
-  <div class="phone-shell">
+  <div class="phone-wrap">
     <button class="theme-toggle" id="themeBtn" type="button">Thème clair</button>
-    <div class="screen">
-      <iframe id="appFrame" src="../web/index.html" title="Annonces app"></iframe>
+    <div class="phone-shell">
+      <div class="screen">
+        <iframe id="appFrame" src="../web/index.html?view=form&demo=1" title="Annonces app"></iframe>
+      </div>
     </div>
   </div>
 
@@ -202,8 +224,13 @@
       var frame = document.getElementById("appFrame");
       var btn = document.getElementById("themeBtn");
       var dark = true;
+      var views = {
+        list: "../web/index.html",
+        form: "../web/index.html?view=form&demo=1",
+        detail: "../web/index.html?view=detail"
+      };
 
-      function apply() {
+      function applyTheme() {
         try {
           var doc = frame.contentDocument || frame.contentWindow.document;
           if (!doc || !doc.body) return;
@@ -213,12 +240,21 @@
       }
 
       frame.addEventListener("load", function () {
-        setTimeout(apply, 80);
+        setTimeout(applyTheme, 120);
       });
 
       btn.addEventListener("click", function () {
         dark = !dark;
-        apply();
+        applyTheme();
+      });
+
+      document.getElementById("tabs").addEventListener("click", function (e) {
+        var t = e.target.closest("button[data-view]");
+        if (!t) return;
+        document.querySelectorAll("#tabs button").forEach(function (b) {
+          b.classList.toggle("active", b === t);
+        });
+        frame.src = views[t.getAttribute("data-view")];
       });
     })();
   </script>

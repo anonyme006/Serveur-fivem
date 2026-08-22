@@ -475,7 +475,7 @@
     }
 
     state.formDirty = false;
-    toast(asStatus === "published" ? "Annonce publiée" : "Annonce enregistrée");
+    toast(asStatus === "published" ? "Annonce validée" : "Annonce enregistrée");
     await loadList();
     if (res.announcement) {
       goDetail(res.announcement);
@@ -508,7 +508,7 @@
       toast(errMsg(res && res.error));
       return;
     }
-    toast("Annonce publiée");
+    toast("Annonce validée");
     if (res.announcement) state.current = res.announcement;
     await loadList();
     render();
@@ -654,7 +654,7 @@
       "</span></div></div>" +
       '<div class="btn-row">' +
       (canPublish && a.status !== "published"
-        ? '<button class="btn primary" id="btn-publish">Publier</button>'
+        ? '<button class="btn primary" id="btn-publish">Valider</button>'
         : "") +
       (canPublish && a.status !== "archived"
         ? '<button class="btn warn" id="btn-archive">Archiver</button>'
@@ -699,6 +699,41 @@
       .join("");
   }
 
+  function renderFormPreview(f) {
+    var title = (f.title && f.title.trim()) || "Titre de l’annonce";
+    var content =
+      (f.content && f.content.trim()) || "Le contenu apparaîtra ici…";
+    var author =
+      (state.bootstrap && state.bootstrap.playerName) || "Vous";
+    return (
+      '<div class="preview-block">' +
+      '<div class="preview-label">Aperçu</div>' +
+      '<article class="ann-card priority-' +
+      esc(f.priority || "normal") +
+      ' preview-card">' +
+      '<div class="card-top">' +
+      '<h3 class="card-title">' +
+      esc(iconOf(f.type) + " " + title) +
+      "</h3>" +
+      '<div class="badges">' +
+      '<span class="badge priority-' +
+      esc(f.priority || "normal") +
+      '">' +
+      esc(labelOf("priority", f.priority || "normal")) +
+      "</span>" +
+      '<span class="badge status-published">Validée</span>' +
+      "</div></div>" +
+      '<p class="card-excerpt">' +
+      esc(content) +
+      "</p>" +
+      '<div class="card-meta"><span>' +
+      esc(author) +
+      " · aperçu</span><span>" +
+      esc(labelOf("type", f.type || "information")) +
+      "</span></div></article></div>"
+    );
+  }
+
   function renderForm() {
     var f = state.form || emptyForm();
     var isEdit = state.formMode === "edit";
@@ -732,11 +767,14 @@
       '<select id="f-status">' +
       optionList("statuses", f.status) +
       "</select></div>" +
+      '<div id="form-preview">' +
+      renderFormPreview(f) +
+      "</div>" +
       '<div class="form-actions">' +
       '<button class="btn" id="btn-cancel">Annuler</button>' +
-      '<button class="btn primary" id="btn-save">Enregistrer</button>' +
+      '<button class="btn" id="btn-save">Enregistrer</button>' +
       (canPublish
-        ? '<button class="btn primary span-2" id="btn-publish-form">Publier</button>'
+        ? '<button class="btn primary span-2" id="btn-validate">Valider l’annonce</button>'
         : "") +
       "</div></div></div>"
     );
@@ -790,6 +828,14 @@
 
   function markDirty() {
     state.formDirty = true;
+    syncFormFromDom();
+    refreshFormPreview();
+  }
+
+  function refreshFormPreview() {
+    var box = el("form-preview");
+    if (!box || !state.form) return;
+    box.innerHTML = renderFormPreview(state.form);
   }
 
   function bindEvents() {
@@ -808,7 +854,7 @@
       });
     }
 
-    document.querySelectorAll(".ann-card").forEach(function (card) {
+    document.querySelectorAll(".ann-card:not(.preview-card)").forEach(function (card) {
       card.addEventListener("click", function () {
         var id = Number(card.getAttribute("data-id"));
         var found = state.announcements.find(function (a) {
@@ -858,13 +904,14 @@
         syncFormFromDom();
         var status = state.form.status || "draft";
         if (status === "published" && !perms().publish) status = "draft";
-        saveForm(status);
+        if (status === "published") status = "draft";
+        saveForm("draft");
       });
     }
 
-    var pubForm = el("btn-publish-form");
-    if (pubForm) {
-      pubForm.addEventListener("click", function () {
+    var validateBtn = el("btn-validate");
+    if (validateBtn) {
+      validateBtn.addEventListener("click", function () {
         syncFormFromDom();
         saveForm("published");
       });
@@ -919,7 +966,26 @@
     booted = true;
     initSettings();
     initPush();
-    loadBootstrap();
+    loadBootstrap().then(function () {
+      if (!isDev() || !state.bootstrap || !state.bootstrap.ok) return;
+      var hash = (window.location.hash || "").replace(/^#/, "");
+      var params = new URLSearchParams(window.location.search || "");
+      var view = hash || params.get("view");
+      if (view === "form" || view === "create") {
+        goCreate();
+        if (params.get("demo") === "1" || hash.indexOf("demo") !== -1) {
+          state.form.title = "Briefing soirée";
+          state.form.content =
+            "Point opérationnel à 20h au QG. Présence requise pour l’équipe de nuit.";
+          state.form.type = "meeting";
+          state.form.priority = "urgent";
+          state.formDirty = false;
+          render();
+        }
+      } else if (view === "detail") {
+        if (state.announcements[0]) goDetail(state.announcements[0]);
+      }
+    });
   }
 
   if (isDev()) {

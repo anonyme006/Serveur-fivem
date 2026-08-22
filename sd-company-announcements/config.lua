@@ -48,7 +48,7 @@ Config.Notifications = {
     --- Textes ox_lib (auteur)
     Messages = {
         saved     = 'Annonce enregistrée.',
-        published = 'Annonce publiée.',
+        published = 'Annonce validée.',
         archived  = 'Annonce archivée.',
         deleted   = 'Annonce supprimée.',
         error     = 'Action impossible.',
