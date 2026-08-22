@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Preview — Annonces Entreprise (SD-Phone)</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&family=Instrument+Serif:ital@0;1&display=swap");
+
+    :root {
+      --desk: #12141a;
+      --desk-2: #1c2030;
+      --accent: #5b8cff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "DM Sans", system-ui, sans-serif;
+      color: #e8eaf0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(91, 140, 255, 0.22), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 90% 80%, rgba(255, 90, 90, 0.12), transparent 50%),
+        linear-gradient(160deg, var(--desk), var(--desk-2));
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) auto;
+      gap: 2.5rem;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem clamp(1.25rem, 4vw, 3.5rem);
+    }
+
+    .copy { max-width: 28rem; }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: clamp(2.4rem, 4vw, 3.4rem);
+      font-weight: 400;
+      line-height: 1.05;
+      margin: 0 0 0.85rem;
+      letter-spacing: -0.02em;
+    }
+
+    h1 em { font-style: italic; color: #a8c0ff; }
+
+    p {
+      margin: 0 0 1.25rem;
+      color: #9aa3b5;
+      line-height: 1.55;
+      font-size: 1.02rem;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .chip {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #c5ccd9;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .tabs button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      color: #c5ccd9;
+    }
+
+    .tabs button.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .hint {
+      font-size: 0.85rem;
+      color: #7d8699;
+    }
+
+    .hint code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.8rem;
+      background: rgba(255,255,255,0.06);
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.3rem;
+    }
+
+    .phone-wrap { position: relative; }
+
+    .theme-toggle {
+      position: absolute;
+      top: -2.4rem;
+      right: 0;
+      border: 0;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.4rem 0.75rem;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .phone-shell {
+      position: relative;
+      width: min(390px, 92vw);
+      height: min(780px, 88vh);
+      background: linear-gradient(160deg, #3a3a44, #16161c 40%, #0c0c10);
+      border-radius: 2.6rem;
+      padding: 0.72rem;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.08),
+        0 30px 80px rgba(0,0,0,0.55),
+        inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+
+    .phone-shell::before {
+      content: "";
+      position: absolute;
+      top: 0.95rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 7.2rem;
+      height: 1.55rem;
+      background: #050506;
+      border-radius: 999px;
+      z-index: 5;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+    }
+
+    .screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 2.05rem;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .screen iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #000;
+    }
+
+    @media (max-width: 860px) {
+      body {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+      }
+      .copy { max-width: 36rem; }
+      .chips, .tabs { justify-content: center; }
+      .theme-toggle { position: static; margin-bottom: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <section class="copy">
+    <span class="eyebrow">SD-Phone · Preview</span>
+    <h1>Annonces <em>Entreprise</em></h1>
+    <p>
+      Formulaire avec aperçu live et bouton <strong>Valider l’annonce</strong>
+      (publication + notification ox_lib).
+    </p>
+    <div class="tabs" id="tabs">
+      <button type="button" data-view="list">Liste</button>
+      <button type="button" data-view="form" class="active">Valider</button>
+      <button type="button" data-view="detail">Détail</button>
+    </div>
+    <div class="chips">
+      <span class="chip">Valider → publish</span>
+      <span class="chip">ox_lib notify</span>
+      <span class="chip">Aperçu live</span>
+    </div>
+    <p class="hint">
+      Fichier : <code>preview/index.html</code> · NUI : <code>web/index.html?view=form&amp;demo=1</code>
+    </p>
+  </section>
+
+  <div class="phone-wrap">
+    <button class="theme-toggle" id="themeBtn" type="button">Thème clair</button>
+    <div class="phone-shell">
+      <div class="screen">
+        <iframe id="appFrame" src="../web/index.html?view=form&demo=1" title="Annonces app"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var frame = document.getElementById("appFrame");
+      var btn = document.getElementById("themeBtn");
+      var dark = true;
+      var views = {
+        list: "../web/index.html",
+        form: "../web/index.html?view=form&demo=1",
+        detail: "../web/index.html?view=detail"
+      };
+
+      function applyTheme() {
+        try {
+          var doc = frame.contentDocument || frame.contentWindow.document;
+          if (!doc || !doc.body) return;
+          doc.body.setAttribute("data-theme", dark ? "dark" : "light");
+          btn.textContent = dark ? "Thème clair" : "Thème sombre";
+        } catch (e) {}
+      }
+
+      frame.addEventListener("load", function () {
+        setTimeout(applyTheme, 120);
+      });
+
+      btn.addEventListener("click", function () {
+        dark = !dark;
+        applyTheme();
+      });
+
+      document.getElementById("tabs").addEventListener("click", function (e) {
+        var t = e.target.closest("button[data-view]");
+        if (!t) return;
+        document.querySelectorAll("#tabs button").forEach(function (b) {
+          b.classList.toggle("active", b === t);
+        });
+        frame.src = views[t.getAttribute("data-view")];
+      });
+    })();
+  </script>
+</body>
+</html>
