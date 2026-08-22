@@ -189,35 +189,64 @@ local function formatAnnouncement(row)
     }
 end
 
-local function notifyCompanyMembers(company, priority, title)
-    if not Config.Notifications or not Config.Notifications.Enabled then return end
-    if not Config.Notifications.Priorities[priority] then return end
-    if GetResourceState('sd-phone') ~= 'started' then return end
+--- Send an ox_lib notification to one player (client event, works with ox_lib).
+local function notifyOx(source, description, nType, title)
+    local cfg = Config.Notifications
+    if not cfg or not cfg.Enabled then return end
+    if not cfg.OxLib or cfg.OxLib.Enabled == false then return end
+    if not source then return end
 
-    local priorityLabel = priority
+    TriggerClientEvent('ox_lib:notify', source, {
+        title       = title or cfg.Title or 'Annonces',
+        description = description,
+        type        = nType or 'inform',
+        position    = cfg.OxLib.Position or 'top-right',
+        duration    = cfg.OxLib.Duration or 5000,
+    })
+end
+
+local function priorityLabelOf(priority)
     for _, entry in ipairs(Config.Priorities or {}) do
         if entry.value == priority then
-            priorityLabel = entry.label:lower()
-            break
+            return entry.label:lower()
         end
     end
+    return priority
+end
 
+--- Notify company members when an announcement is published.
+--- Always ox_lib (if enabled); SD-Phone banner only for configured priorities.
+local function notifyCompanyMembers(company, priority, title, excludeSource)
+    if not Config.Notifications or not Config.Notifications.Enabled then return end
+
+    local priorityLabel = priorityLabelOf(priority)
     local body = (Config.Notifications.Body or 'Une nouvelle annonce %s a été publiée par votre entreprise.')
         :format(priorityLabel)
+
+    local phonePriorities = Config.Notifications.PhonePriorities or Config.Notifications.Priorities or {}
+    local sendPhone = phonePriorities[priority] == true and GetResourceState('sd-phone') == 'started'
+    local notifyCoworkers = Config.Notifications.NotifyCoworkers ~= false
 
     local xPlayers = ESX.GetExtendedPlayers('job', company)
     for _, xPlayer in pairs(xPlayers) do
         local src = xPlayer.source
-        pcall(function()
-            exports['sd-phone']:notify(src, {
-                app   = Config.App.Identifier,
-                title = Config.Notifications.Title or 'Nouvelle annonce',
-                body  = body,
-                time  = 'now',
-                appId = Config.App.Identifier,
-            })
-        end)
-        -- Also push a live refresh into the open app UI
+
+        if notifyCoworkers and src ~= excludeSource then
+            notifyOx(src, body, priority == 'urgent' and 'error' or 'inform', Config.Notifications.Title)
+        end
+
+        if sendPhone then
+            pcall(function()
+                exports['sd-phone']:notify(src, {
+                    app   = Config.App.Identifier,
+                    title = Config.Notifications.Title or 'Nouvelle annonce',
+                    body  = body,
+                    time  = 'now',
+                    appId = Config.App.Identifier,
+                })
+            end)
+        end
+
         TriggerClientEvent('sd-company-announcements:client:refresh', src, {
             reason = 'published',
             title = title,
@@ -403,9 +432,13 @@ registerCallback('sd-company-announcements:createAnnouncement', function(source,
     end
 
     local row = getOwnedAnnouncement(insertId, company)
+    local msgs = (Config.Notifications and Config.Notifications.Messages) or {}
 
     if payload.status == 'published' then
-        notifyCompanyMembers(company, payload.priority, payload.title)
+        notifyOx(source, msgs.published or 'Annonce publiée.', 'success')
+        notifyCompanyMembers(company, payload.priority, payload.title, source)
+    else
+        notifyOx(source, msgs.saved or 'Annonce enregistrée.', 'success')
     end
 
     return {
@@ -468,11 +501,19 @@ registerCallback('sd-company-announcements:updateAnnouncement', function(source,
     )
 
     local updated = getOwnedAnnouncement(row.id, company)
+    local msgs = (Config.Notifications and Config.Notifications.Messages) or {}
+    local phonePriorities = (Config.Notifications and (Config.Notifications.PhonePriorities or Config.Notifications.Priorities)) or {}
 
     if previousStatus ~= 'published' and newStatus == 'published' then
-        notifyCompanyMembers(company, payload.priority, payload.title)
-    elseif newStatus == 'published' and payload.priority ~= row.priority and Config.Notifications.Priorities[payload.priority] then
-        notifyCompanyMembers(company, payload.priority, payload.title)
+        notifyOx(source, msgs.published or 'Annonce publiée.', 'success')
+        notifyCompanyMembers(company, payload.priority, payload.title, source)
+    elseif newStatus == 'published' and payload.priority ~= row.priority and phonePriorities[payload.priority] then
+        notifyOx(source, msgs.saved or 'Annonce enregistrée.', 'success')
+        notifyCompanyMembers(company, payload.priority, payload.title, source)
+    elseif newStatus == 'archived' and previousStatus ~= 'archived' then
+        notifyOx(source, msgs.archived or 'Annonce archivée.', 'inform')
+    else
+        notifyOx(source, msgs.saved or 'Annonce enregistrée.', 'success')
     end
 
     return {
@@ -505,6 +546,9 @@ registerCallback('sd-company-announcements:deleteAnnouncement', function(source,
         { row.id, company }
     )
 
+    local msgs = (Config.Notifications and Config.Notifications.Messages) or {}
+    notifyOx(source, msgs.deleted or 'Annonce supprimée.', 'success')
+
     return { ok = true, id = row.id }
 end)
 
@@ -533,7 +577,9 @@ registerCallback('sd-company-announcements:publishAnnouncement', function(source
     )
 
     local updated = getOwnedAnnouncement(row.id, company)
-    notifyCompanyMembers(company, updated.priority, updated.title)
+    local msgs = (Config.Notifications and Config.Notifications.Messages) or {}
+    notifyOx(source, msgs.published or 'Annonce publiée.', 'success')
+    notifyCompanyMembers(company, updated.priority, updated.title, source)
 
     return { ok = true, announcement = formatAnnouncement(updated) }
 end)
@@ -563,6 +609,9 @@ registerCallback('sd-company-announcements:archiveAnnouncement', function(source
     )
 
     local updated = getOwnedAnnouncement(row.id, company)
+    local msgs = (Config.Notifications and Config.Notifications.Messages) or {}
+    notifyOx(source, msgs.archived or 'Annonce archivée.', 'inform')
+
     return { ok = true, announcement = formatAnnouncement(updated) }
 end)
 

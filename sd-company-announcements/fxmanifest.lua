@@ -9,6 +9,7 @@ description 'Application Annonces Entreprise pour SD-Phone (ESX Legacy)'
 
 shared_scripts {
     '@es_extended/imports.lua',
+    '@ox_lib/init.lua',
     'config.lua',
 }
 
@@ -33,5 +34,6 @@ ui_page 'web/index.html'
 dependencies {
     'es_extended',
     'oxmysql',
+    'ox_lib',
     'sd-phone',
 }

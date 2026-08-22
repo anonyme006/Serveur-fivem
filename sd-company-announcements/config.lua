@@ -22,16 +22,37 @@ Config.Limits = {
 --- Durée de conservation des annonces archivées (jours). 0 = illimité.
 Config.RetentionDays = 0
 
---- Notifier les membres de l'entreprise lors d'une publication importante/urgente
+--- Notifications à la validation / publication
 Config.Notifications = {
     Enabled = true,
-    --- Priorités qui déclenchent une notification SD-Phone
-    Priorities = {
+
+    --- Feedback ox_lib pour l'auteur (enregistrer / publier / supprimer…)
+    OxLib = {
+        Enabled = true,
+        Position = 'top-right', -- top / top-right / top-left / bottom / …
+        Duration = 5000,
+    },
+
+    --- Notifier les collègues du même job quand une annonce est publiée
+    NotifyCoworkers = true,
+
+    --- Priorités qui déclenchent aussi une notification SD-Phone (bannière téléphone)
+    PhonePriorities = {
         important = true,
         urgent    = true,
     },
-    Title = 'Nouvelle annonce',
+
+    Title = 'Annonces',
     Body  = 'Une nouvelle annonce %s a été publiée par votre entreprise.',
+
+    --- Textes ox_lib (auteur)
+    Messages = {
+        saved     = 'Annonce enregistrée.',
+        published = 'Annonce publiée.',
+        archived  = 'Annonce archivée.',
+        deleted   = 'Annonce supprimée.',
+        error     = 'Action impossible.',
+    },
 }
 
 --- Types d'annonce (clé = valeur stockée en BDD)

@@ -10,8 +10,8 @@ Les employés autorisés créent, modifient, publient et suppriment des annonces
 |-----------------|-------------------------------------------|
 | `es_extended`   | ESX Legacy (jobs / grades / callbacks)    |
 | `oxmysql`       | Requêtes SQL                              |
+| `ox_lib`        | Notifications (`ox_lib:notify`)           |
 | `sd-phone`      | Shell téléphone + `addCustomApp` / notify |
-| `ox_lib`        | Optionnel (non requis)                    |
 
 **Non supporté :** QBCore / Qbox · RageUI
 
@@ -76,18 +76,15 @@ Sécurité serveur : job, grade, entreprise et `id` d’annonce sont toujours re
 
 ## Notifications
 
-À la publication d’une annonce **importante** ou **urgente**, les membres online du même job reçoivent une bannière SD-Phone :
+À la validation (enregistrer / publier / archiver / supprimer), l’auteur reçoit une notification **ox_lib**.
+
+Quand une annonce est **publiée**, les collègues du même job reçoivent aussi une notif ox_lib. Les priorités importante/urgente déclenchent en plus une bannière SD-Phone :
 
 ```lua
-exports['sd-phone']:notify(source, {
-    app   = 'company-announcements',
-    title = 'Nouvelle annonce',
-    body  = '...',
-    appId = 'company-announcements',
-})
+exports['sd-phone']:notify(source, { ... })
 ```
 
-Réglages : `Config.Notifications`.
+Réglages dans `Config.Notifications` (`OxLib`, `NotifyCoworkers`, `PhonePriorities`, `Messages`).
 
 ## Architecture
 
