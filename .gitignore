@@ -1,0 +1,14 @@
+# Dépendances officielles — ne pas committer les clones volumineux
+resources/[qbx]/*
+!resources/[qbx]/README.md
+resources/[ox]/*
+!resources/[ox]/README.md
+resources/[standalone]/*
+!resources/[standalone]/.gitkeep
+resources/[voice]/*
+!resources/[voice]/.gitkeep
+resources/[cfx-default]/
+.tmp-install/
+.idea/
+.vscode/
+*.log
