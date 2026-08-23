@@ -1,0 +1,86 @@
+:root {
+  --bg: rgba(10, 12, 16, 0.55);
+  --health: #3ecf8e;
+  --armor: #5b8def;
+  --hunger: #e6a23c;
+  --thirst: #4fc3f7;
+  --stress: #ef5350;
+  --text: #f2f4f8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Segoe UI", "Gill Sans", sans-serif;
+  color: var(--text);
+  overflow: hidden;
+  user-select: none;
+}
+.hidden { display: none !important; }
+
+#hud { width: 100vw; height: 100vh; position: relative; }
+
+.top-right {
+  position: absolute;
+  top: 2.5vh;
+  right: 2vw;
+  text-align: right;
+}
+.money {
+  background: var(--bg);
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+.money .label { opacity: 0.65; margin-right: 0.35rem; }
+.location {
+  font-size: 0.8rem;
+  opacity: 0.85;
+  text-shadow: 0 1px 3px rgba(0,0,0,.6);
+}
+
+.bottom-left {
+  position: absolute;
+  left: 2vw;
+  bottom: 3vh;
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bar {
+  height: 8px;
+  background: var(--bg);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.fill { height: 100%; width: 0%; transition: width 0.15s ease; border-radius: 6px; }
+.health { background: var(--health); }
+.armor { background: var(--armor); }
+.hunger { background: var(--hunger); }
+.thirst { background: var(--thirst); }
+.stress { background: var(--stress); }
+
+.mic {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #555; margin-top: 4px;
+}
+.mic.active { background: #3ecf8e; box-shadow: 0 0 8px #3ecf8e88; }
+
+.vehicle {
+  position: absolute;
+  right: 3vw;
+  bottom: 4vh;
+  text-align: center;
+  background: var(--bg);
+  padding: 0.8rem 1.2rem;
+  border-radius: 10px;
+}
+#speed { font-size: 2.2rem; font-weight: 600; line-height: 1; }
+.unit { font-size: 0.75rem; opacity: 0.7; }
+#fuel { margin-top: 0.35rem; font-size: 0.85rem; opacity: 0.9; }
+
+@media (min-aspect-ratio: 21/9) {
+  .bottom-left { left: 4vw; }
+  .vehicle { right: 5vw; }
+}

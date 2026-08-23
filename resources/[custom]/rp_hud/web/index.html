@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="hud" class="hidden">
+    <div class="top-right">
+      <div id="money" class="money hidden">
+        <div><span class="label">Cash</span> <span id="cash">0</span>$</div>
+        <div><span class="label">Banque</span> <span id="bank">0</span>$</div>
+      </div>
+      <div id="location" class="location"></div>
+    </div>
+    <div class="bottom-left">
+      <div class="bar"><div id="health" class="fill health"></div></div>
+      <div class="bar"><div id="armor" class="fill armor"></div></div>
+      <div class="bar"><div id="hunger" class="fill hunger"></div></div>
+      <div class="bar"><div id="thirst" class="fill thirst"></div></div>
+      <div class="bar"><div id="stress" class="fill stress"></div></div>
+      <div id="mic" class="mic"></div>
+    </div>
+    <div id="vehicle" class="vehicle hidden">
+      <div id="speed">0</div>
+      <div class="unit">km/h</div>
+      <div id="fuel">100%</div>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+</body>
+</html>

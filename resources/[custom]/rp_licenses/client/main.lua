@@ -1,0 +1,1 @@
+-- Affichage via menu joueur (rp_menu) ; callbacks uniquement ici

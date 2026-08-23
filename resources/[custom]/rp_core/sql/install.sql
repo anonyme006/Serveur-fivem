@@ -1,0 +1,2 @@
+-- rp_core n'ajoute pas de tables propres ; schéma réservé aux extensions.
+-- Voir sql/01_rp_custom.sql à la racine du projet.
