@@ -32,31 +32,42 @@ resources/
 
 ## Installation
 
-1. Cloner ce dépôt sur votre machine hébergeur FiveM.
-2. Installer les dépendances :
+### Windows (recommandé)
+
+Guide détaillé : **[docs/INSTALL_WINDOWS.md](docs/INSTALL_WINDOWS.md)**
+
+```powershell
+# Depuis la racine du repo
+Set-ExecutionPolicy -Scope Process Bypass
+.\scripts\install-dependencies.ps1
+```
+
+Ou via txAdmin → Popular Recipes → **QBox Framework**, puis copier `resources\[custom]` et `resources\[jobs]`.
+
+### Linux
 
 ```bash
 chmod +x scripts/install-dependencies.sh
 ./scripts/install-dependencies.sh
 ```
 
-   *Alternative :* txAdmin → Popular Recipes → **QBox Framework**, puis copier le dossier `resources/[custom]` et `resources/[jobs]` de ce repo.
+### Étapes communes
 
-3. Configurer `server.cfg` (`mysql_connection_string`, `sv_licenseKey`, Discord…).
-4. Importer SQL :
+1. Configurer `server.cfg` (`mysql_connection_string`, `sv_licenseKey`, Discord…).
+2. Importer SQL :
 
 ```text
 sql/00_qbox_recipe.sql   # (ou SQL de la recette txAdmin)
 sql/01_rp_custom.sql
 ```
 
-5. ACE admin dans `permissions.cfg` :
+3. ACE admin dans `permissions.cfg` :
 
 ```cfg
 add_principal identifier.license:VOTRE_LICENSE group.admin
 ```
 
-6. Démarrer FXServer avec ce `server.cfg`.
+4. Démarrer FXServer avec ce `server.cfg`.
 
 ## Ordre de démarrage
 
