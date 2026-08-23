@@ -8,22 +8,37 @@ Config.Notify = 'ox_lib'
 Config.Locale = 'fr'
 Config.DiscordLogs = true
 
---- Banque : renewed = Renewed-Banking (recette Qbox) | native = money bank Qbox
+--- Identité serveur (style cinéma / streamer)
+Config.Brand = {
+    name = 'Cinéma LS',
+    tagline = 'Écris ton histoire à Los Santos',
+    --- Accent cinéma : ambre chaud, pas violet
+    colors = {
+        bg = '#0a0b0d',
+        panel = '#12141a',
+        text = '#f4efe6',
+        muted = '#9a9388',
+        accent = '#c4a574',
+        danger = '#c45c5c',
+        success = '#6f9f7a',
+    },
+}
+
+--- Banque : renewed = Renewed-Banking | native = money bank Qbox
 Config.Banking = 'renewed'
 
---- Téléphone : npwd | lb-phone | sd-phone | none
-Config.Phone = 'npwd'
+--- Téléphone premium recommandé : lb-phone
+Config.Phone = 'lb-phone'
 
---- HUD custom (rp_hud). Si true, arrêtez qbx_hud dans server.cfg
-Config.UseCustomHud = false
+--- Activer la couche UI cinéma (stoppez qbx_hud si true)
+Config.UseCustomHud = true
 
---- Garages custom (rp_garages). Si true, arrêtez qbx_garages
+--- Garages : garder qbx_garages par défaut (qualité déjà bonne)
 Config.UseCustomGarages = false
 
---- Admin custom (rp_admin) en plus ou à la place de qbx_adminmenu
 Config.UseCustomAdmin = true
 
-Config.AutoSaveInterval = 10 -- minutes (relais info ; qbx_core gère la sauvegarde native)
+Config.AutoSaveInterval = 10
 
 Config.RequiredResources = {
     'oxmysql',
@@ -34,6 +49,6 @@ Config.RequiredResources = {
 }
 
 Config.NotifyDefaults = {
-    duration = 5000,
+    duration = 4500,
     position = 'top-right',
 }

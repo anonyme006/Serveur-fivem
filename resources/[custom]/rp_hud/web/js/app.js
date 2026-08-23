@@ -1,37 +1,44 @@
 const hud = document.getElementById('hud');
-const setWidth = (id, value) => {
+const setBar = (id, value) => {
   const el = document.getElementById(id);
-  if (el) el.style.width = Math.max(0, Math.min(100, value || 0)) + '%';
+  if (!el) return;
+  el.style.height = `${Math.max(0, Math.min(100, Number(value) || 0))}%`;
 };
 
-window.addEventListener('message', (e) => {
-  const { action, data, show } = e.data || {};
-  if (action === 'toggle') {
-    hud.classList.toggle('hidden', !show);
+window.addEventListener('message', (event) => {
+  const msg = event.data || {};
+  if (msg.action === 'toggle') {
+    hud.classList.toggle('hidden', !msg.show);
     return;
   }
-  if (action === 'update' && data) {
-    setWidth('health', data.health);
-    setWidth('armor', data.armor);
-    document.getElementById('mic').classList.toggle('active', !!data.talking);
-    if (data.street) document.getElementById('location').textContent = data.street;
+  if (msg.action === 'brand' && msg.name) {
+    document.getElementById('brand-name').textContent = msg.name;
+    return;
+  }
+  if (msg.action === 'update') {
+    const d = msg.data || {};
+    setBar('health', d.health);
+    setBar('armor', d.armor);
+    document.getElementById('mic').classList.toggle('active', !!d.talking);
+    if (typeof d.street === 'string') {
+      document.getElementById('location').textContent = d.street;
+    }
     const veh = document.getElementById('vehicle');
-    if (data.vehicle) {
+    if (d.vehicle) {
       veh.classList.remove('hidden');
-      document.getElementById('speed').textContent = data.speed || 0;
-      document.getElementById('fuel').textContent = Math.floor(data.fuel || 0) + '%';
+      document.getElementById('speed').textContent = d.speed || 0;
+      document.getElementById('fuel').style.width = `${Math.max(0, Math.min(100, d.fuel || 0))}%`;
     } else {
       veh.classList.add('hidden');
     }
   }
-  if (action === 'needs' && data) {
-    setWidth('hunger', data.hunger);
-    setWidth('thirst', data.thirst);
-    setWidth('stress', data.stress);
-    if (data.cash != null) {
-      document.getElementById('money').classList.remove('hidden');
-      document.getElementById('cash').textContent = data.cash;
-      document.getElementById('bank').textContent = data.bank;
+  if (msg.action === 'needs') {
+    const d = msg.data || {};
+    setBar('hunger', d.hunger);
+    setBar('thirst', d.thirst);
+    if (d.showStress) {
+      document.querySelector('[data-need="stress"]').classList.remove('hidden');
+      setBar('stress', d.stress);
     }
   }
 });

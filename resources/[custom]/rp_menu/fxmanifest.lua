@@ -3,8 +3,10 @@ game 'gta5'
 lua54 'yes'
 
 name 'rp_menu'
-description 'Menu joueur moderne (ox_lib)'
-version '1.0.0'
+description 'Menu joueur NUI cinéma / streamer'
+version '2.0.0'
+
+ui_page 'web/index.html'
 
 shared_scripts {
     '@ox_lib/init.lua',
@@ -18,6 +20,12 @@ client_scripts {
 
 server_scripts {
     'server/main.lua',
+}
+
+files {
+    'web/index.html',
+    'web/css/style.css',
+    'web/js/app.js',
 }
 
 dependencies {

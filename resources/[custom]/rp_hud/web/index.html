@@ -3,29 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <div id="hud" class="hidden">
-    <div class="top-right">
-      <div id="money" class="money hidden">
-        <div><span class="label">Cash</span> <span id="cash">0</span>$</div>
-        <div><span class="label">Banque</span> <span id="bank">0</span>$</div>
+    <div class="corner top-left">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <span id="brand-name">Cinéma LS</span>
       </div>
+    </div>
+
+    <div class="corner bottom-left">
+      <div class="needs" id="needs">
+        <div class="need" data-need="health"><i></i><b id="health"></b></div>
+        <div class="need" data-need="armor"><i></i><b id="armor"></b></div>
+        <div class="need" data-need="hunger"><i></i><b id="hunger"></b></div>
+        <div class="need" data-need="thirst"><i></i><b id="thirst"></b></div>
+        <div class="need hidden" data-need="stress"><i></i><b id="stress"></b></div>
+      </div>
+      <div id="mic" class="mic" title="Micro"></div>
       <div id="location" class="location"></div>
     </div>
-    <div class="bottom-left">
-      <div class="bar"><div id="health" class="fill health"></div></div>
-      <div class="bar"><div id="armor" class="fill armor"></div></div>
-      <div class="bar"><div id="hunger" class="fill hunger"></div></div>
-      <div class="bar"><div id="thirst" class="fill thirst"></div></div>
-      <div class="bar"><div id="stress" class="fill stress"></div></div>
-      <div id="mic" class="mic"></div>
-    </div>
+
     <div id="vehicle" class="vehicle hidden">
-      <div id="speed">0</div>
-      <div class="unit">km/h</div>
-      <div id="fuel">100%</div>
+      <div class="speed-wrap">
+        <span id="speed">0</span>
+        <small>km/h</small>
+      </div>
+      <div class="fuel-wrap">
+        <span class="fuel-label">ESS</span>
+        <div class="fuel-bar"><b id="fuel"></b></div>
+      </div>
     </div>
   </div>
   <script src="js/app.js"></script>
