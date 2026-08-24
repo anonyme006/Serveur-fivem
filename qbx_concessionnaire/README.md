@@ -21,9 +21,9 @@ ensure qbx_concessionnaire
 
 ## Utilisation
 
-- Blip concessionnaire → **E**
-- Menu ox_lib : catégories → véhicules → acheter
-- Recherche via le menu
+- **Point rouge** au sol → **E** ouvre le menu
+- **Points verts** = places de livraison du véhicule acheté
+- Menu ox_lib : catégories → véhicules → aperçu / acheter
 - Commande test : `/concessionnaire`
 
 ## Configuration
@@ -32,9 +32,8 @@ Fichier `config.lua` :
 
 | Option | Description |
 |--------|-------------|
-| `Config.Zones` | Position, marker, blip |
-| `Config.Preview` | Spawn + offset caméra |
-| `Config.PurchaseSpawn` | Spawn du véhicule acheté (dehors) |
+| `Config.Markers` | Disques plats rouge (menu) / vert (park) |
+| `Config.Zones` | `menu`, `parks`, `preview`, blip |
 | `Config.PaymentAccount` | `'bank'`, `'cash'` / `'money'` ou `'both'` |
 | `Config.DefaultGarage` | Garage enregistré en DB |
 | `Config.PurchaseState` | `0` sorti / `1` garage |

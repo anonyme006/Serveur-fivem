@@ -61,32 +61,24 @@ Fichiers :
 
 ## Utilisation
 
-- Aller sur un blip garage → **E**
-- À pied : liste des véhicules
-- En voiture (conducteur) : rangement
+- **Point rouge** au sol → **E** ouvre le menu
+- **Points verts** = places de spawn / rangement
+- À pied sur le rouge : liste des véhicules
+- En voiture près d’un vert : ranger le véhicule
 - Fourrière : récupération payante
 - Commande test : `/garage [nom]` (ex: `/garage pillbox`)
 
-## États DB
-
-| state | Signification |
-|------:|---------------|
-| 0 | Sorti |
-| 1 | En garage |
-| 2 | Fourrière |
-
 ## Config
 
-Éditez `config.lua` → `Config.Garages` :
+Éditez `config.lua` → `Config.Markers` + `Config.Garages` :
 
 ```lua
 {
     name = 'pillbox',
     label = 'Garage Pillbox',
     type = 'public', -- public | job | gang | impound
-    menu = vector3(...),
-    store = vector3(...),
-    spawns = { vector4(...), ... },
+    menu = vector3(...),          -- point rouge
+    parks = { vector4(...), ... }, -- points verts
     impoundPrice = 500, -- si type impound
     job = 'police',     -- si type job
     gang = 'ballas',    -- si type gang

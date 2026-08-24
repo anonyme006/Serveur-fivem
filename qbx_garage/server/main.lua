@@ -166,7 +166,7 @@ lib.callback.register('qbx_garage:server:takeOut', function(source, garageName, 
         end
     end
 
-    local spawns = garage.spawns or {}
+    local spawns = garage.parks or garage.spawns or {}
     local spawn = spawns[spawnIndex] or spawns[1]
     if not spawn then
         return { ok = false, message = 'error' }
@@ -214,8 +214,19 @@ lib.callback.register('qbx_garage:server:storeVehicle', function(source, garageN
         return { ok = false, message = 'error' }
     end
 
-    local storeCoords = garage.store or garage.menu
-    if not playerNear(source, storeCoords, Config.StoreDistance or 8.0) then
+    local storeCoords = garage.menu
+    -- Autoriser le rangement près du menu OU près d'une place verte
+    local nearStore = playerNear(source, storeCoords, Config.StoreDistance or 5.0)
+    if not nearStore and garage.parks then
+        for i = 1, #garage.parks do
+            local p = garage.parks[i]
+            if playerNear(source, p, Config.StoreDistance or 5.0) then
+                nearStore = true
+                break
+            end
+        end
+    end
+    if not nearStore then
         return { ok = false, message = 'too_far' }
     end
 

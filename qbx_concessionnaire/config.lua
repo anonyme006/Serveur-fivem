@@ -2,11 +2,29 @@ Config = {}
 
 Config.Locale = 'fr'
 
--- Marqueur / point d'ouverture du concessionnaire
+--[[
+    Marqueurs plats au sol (comme sur la photo)
+    type 25 = disque
+    rouge = ouvrir le menu
+    vert  = place de livraison / spawn après achat
+]]
+Config.Markers = {
+    menu = {
+        type = 25,
+        size = vector3(2.2, 2.2, 0.15),
+        color = { r = 220, g = 40, b = 40, a = 140 },
+    },
+    park = {
+        type = 25,
+        size = vector3(2.6, 2.6, 0.15),
+        color = { r = 40, g = 220, b = 80, a = 140 },
+    },
+}
+
 Config.Zones = {
     {
-        name = 'Concessionnaire Principal',
-        coords = vector3(-45.56, -1097.97, 26.42),
+        name = 'pdm',
+        label = 'Concessionnaire PDM',
         blip = {
             enabled = true,
             sprite = 326,
@@ -14,54 +32,43 @@ Config.Zones = {
             scale = 0.85,
             label = 'Concessionnaire',
         },
-        marker = {
-            type = 1,
-            size = vector3(1.8, 1.8, 0.6),
-            color = { r = 255, g = 200, b = 0, a = 120 },
-            bobUpAndDown = false,
-            faceCamera = false,
-            rotate = false,
+        -- Point rouge (ouvrir le menu)
+        menu = vector3(-45.56, -1097.97, 26.42),
+        drawDistance = 35.0,
+        interactDistance = 1.8,
+        -- Preview showroom
+        preview = {
+            coords = vector3(-44.20, -1097.10, 26.42),
+            heading = 70.0,
+            camera = {
+                offset = vector3(-4.8, -3.6, 1.6),
+                fov = 50.0,
+            },
         },
-        drawDistance = 25.0,
-        interactDistance = 2.0,
+        -- Points verts (livraison après achat)
+        parks = {
+            vector4(-31.15, -1090.72, 26.42, 340.0),
+            vector4(-33.80, -1091.60, 26.42, 340.0),
+            vector4(-36.40, -1092.50, 26.42, 340.0),
+        },
     },
 }
 
--- Position de prévisualisation du véhicule (showroom PDM)
--- camera.offset = décalage par rapport au véhicule (x, y, z)
-Config.Preview = {
-    coords = vector3(-44.20, -1097.10, 26.42),
-    heading = 70.0,
-    camera = {
-        offset = vector3(-4.8, -3.6, 1.6),
-        fov = 50.0,
-    },
-}
-
--- Spawn après achat
+-- Compat anciens noms Config.Preview / PurchaseSpawn (premier zone)
+Config.Preview = Config.Zones[1].preview
 Config.PurchaseSpawn = {
-    coords = vector3(-31.15, -1090.72, 26.42),
-    heading = 340.0,
+    coords = vector3(Config.Zones[1].parks[1].x, Config.Zones[1].parks[1].y, Config.Zones[1].parks[1].z),
+    heading = Config.Zones[1].parks[1].w,
 }
 
--- Paiement accepté : 'bank' | 'cash' | 'both' (priorité cash puis banque)
--- Alias 'money' accepté (= cash)
+-- Paiement : 'bank' | 'cash' | 'both' (alias 'money' = cash)
 Config.PaymentAccount = 'both'
-
--- Garage par défaut dans player_vehicles (si le véhicule est stocké)
-Config.DefaultGarage = 'pillboxgarage'
-
--- État à l'achat : 0 = sorti, 1 = en garage
-Config.PurchaseState = 0
-
--- Plaque générée (longueur max 8)
+Config.DefaultGarage = 'pillbox'
+Config.PurchaseState = 0 -- 0 sorti | 1 garage
 Config.PlatePrefix = 'VIBE'
 Config.PlateDigits = 4
-
--- Fermer le menu avec Échap
 Config.CloseWithEscape = true
 
--- Catégories affichées (ordre UI)
 Config.Categories = {
     { id = 'compacts', label = 'Compacts' },
     { id = 'sedans', label = 'Sedans' },
@@ -75,14 +82,6 @@ Config.Categories = {
     { id = 'offroad', label = 'Off-Road' },
     { id = 'vans', label = 'Vans' },
 }
-
---[[
-    Véhicules du catalogue.
-    model  = spawn name GTA
-    name   = nom affiché
-    category = id de Config.Categories
-    price  = prix d'achat
-]]
 Config.Vehicles = {
     -- Compacts
     { model = 'brioso2', name = 'Brioso 300', category = 'compacts', price = 21340 },

@@ -1,321 +1,371 @@
-local isOpen = false
 local previewVehicle = nil
 local previewCam = nil
+local previewActive = false
+local uiOpen = false
+local showingTextUI = false
 local currentZone = nil
-local selectedCategory = nil
-local isClosing = false
 
-local function notify(msg, nType)
+local function notify(description, nType)
     lib.notify({
         title = Translate('shop_title'),
-        description = msg,
+        description = description,
         type = nType or 'inform',
     })
 end
 
-local function formatMoney(amount)
-    local n = math.floor(tonumber(amount) or 0)
+local function formatMoney(n)
+    n = math.floor(tonumber(n) or 0)
     local s = tostring(n)
     local left, num, right = string.match(s, '^([^%d]*%d)(%d*)(.-)$')
     return left .. (num:reverse():gsub('(%d%d%d)', '%1,'):reverse()) .. right
 end
 
-local function deletePreview()
-    if previewVehicle then
-        if DoesEntityExist(previewVehicle) then
-            SetEntityAsMissionEntity(previewVehicle, true, true)
-            SetEntityCollision(previewVehicle, false, false)
-            DeleteVehicle(previewVehicle)
-            if DoesEntityExist(previewVehicle) then
-                DeleteEntity(previewVehicle)
-            end
-        end
-        previewVehicle = nil
-    end
+local function drawGroundMarker(coords, style)
+    if not coords or not style then return end
+    local z = (coords.z or 0.0) - 0.95
+    DrawMarker(
+        style.type or 25,
+        coords.x + 0.0, coords.y + 0.0, z,
+        0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0,
+        (style.size and style.size.x) or 2.5,
+        (style.size and style.size.y) or 2.5,
+        (style.size and style.size.z) or 0.15,
+        style.color.r, style.color.g, style.color.b, style.color.a,
+        false, false, 2, false, nil, nil, false
+    )
 end
 
-local function destroyCamera()
+local function isSpawnClear(coords, radius)
+    radius = radius or 2.6
+    return not IsAnyVehicleNearPoint(coords.x, coords.y, coords.z, radius)
+end
+
+local function findFreePark(zone)
+    local parks = zone and zone.parks or {}
+    for i = 1, #parks do
+        if isSpawnClear(parks[i]) then
+            return parks[i]
+        end
+    end
+    return parks[1]
+end
+
+local function destroyPreview()
     if previewCam then
-        RenderScriptCams(false, false, 0, true, true)
+        RenderScriptCams(false, true, 350, true, true)
         DestroyCam(previewCam, false)
         previewCam = nil
     end
-    ClearFocus()
-    RenderScriptCams(false, false, 0, true, true)
+
+    if previewVehicle and DoesEntityExist(previewVehicle) then
+        SetEntityAsMissionEntity(previewVehicle, true, true)
+        DeleteVehicle(previewVehicle)
+    end
+
+    previewVehicle = nil
+    previewActive = false
 end
 
-local function updateCameraToVehicle()
-    local vehCoords = Config.Preview.coords
-    if previewVehicle and DoesEntityExist(previewVehicle) then
-        vehCoords = GetEntityCoords(previewVehicle)
+local function createPreviewCamera(vehicle, zone)
+    if previewCam then
+        DestroyCam(previewCam, false)
+        previewCam = nil
     end
 
-    local offset = (Config.Preview.camera and Config.Preview.camera.offset) or vector3(-4.8, -3.6, 1.6)
-    local camPos = vector3(
-        vehCoords.x + offset.x,
-        vehCoords.y + offset.y,
-        vehCoords.z + offset.z
-    )
-    local lookAt = vector3(vehCoords.x, vehCoords.y, vehCoords.z + 0.55)
-    local fov = (Config.Preview.camera and Config.Preview.camera.fov) or 50.0
+    local preview = (zone and zone.preview) or Config.Preview
+    local offset = preview.camera and preview.camera.offset or vector3(-4.8, -3.6, 1.6)
+    local fov = preview.camera and preview.camera.fov or 50.0
+    local camCoords = GetOffsetFromEntityInWorldCoords(vehicle, offset.x, offset.y, offset.z)
 
-    if not previewCam then
-        previewCam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
-    end
-
-    SetCamCoord(previewCam, camPos.x, camPos.y, camPos.z)
-    PointCamAtCoord(previewCam, lookAt.x, lookAt.y, lookAt.z)
+    previewCam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
+    SetCamCoord(previewCam, camCoords.x, camCoords.y, camCoords.z)
+    PointCamAtEntity(previewCam, vehicle, 0.0, 0.0, 0.5, true)
     SetCamFov(previewCam, fov)
     SetCamActive(previewCam, true)
-    RenderScriptCams(true, true, 400, true, true)
+    RenderScriptCams(true, true, 450, true, true)
 end
 
-local function createCamera()
-    destroyCamera()
-    updateCameraToVehicle()
-end
-
-local function spawnPreview(model)
-    deletePreview()
+local function spawnPreviewVehicle(model, zone)
+    destroyPreview()
 
     local hash = joaat(model)
     if not IsModelInCdimage(hash) or not IsModelAVehicle(hash) then
+        notify(Translate('invalid_model'), 'error')
         return
     end
 
-    RequestModel(hash)
-    local timeout = GetGameTimer() + 5000
-    while not HasModelLoaded(hash) and GetGameTimer() < timeout do
-        Wait(10)
-    end
+    lib.requestModel(hash, 5000)
 
-    if not HasModelLoaded(hash) then
-        return
-    end
+    local preview = (zone and zone.preview) or Config.Preview
+    local coords = preview.coords
+    local heading = preview.heading or 0.0
 
-    local c = Config.Preview.coords
-    previewVehicle = CreateVehicle(hash, c.x + 0.0, c.y + 0.0, c.z + 0.0, Config.Preview.heading + 0.0, false, false)
-    SetEntityAsMissionEntity(previewVehicle, true, true)
-    SetVehicleOnGroundProperly(previewVehicle)
-    SetEntityInvincible(previewVehicle, true)
-    SetVehicleDoorsLocked(previewVehicle, 2)
-    FreezeEntityPosition(previewVehicle, true)
-    SetEntityCollision(previewVehicle, false, false)
-    SetEntityAlpha(previewVehicle, 230, false)
-    SetVehicleNumberPlateText(previewVehicle, 'PREVIEW')
+    previewVehicle = CreateVehicle(hash, coords.x, coords.y, coords.z, heading, false, false)
     SetModelAsNoLongerNeeded(hash)
 
-    updateCameraToVehicle()
-end
-
-local function releasePlayer()
-    local ped = PlayerPedId()
-    FreezeEntityPosition(ped, false)
-    ClearPedTasksImmediately(ped)
-    SetPlayerControl(PlayerId(), true, 0)
-    SetEveryoneIgnorePlayer(PlayerId(), false)
-    DisplayRadar(true)
-end
-
-local function closeShop()
-    if isClosing then return end
-    isClosing = true
-
-    isOpen = false
-    selectedCategory = nil
-
-    pcall(function() lib.hideContext() end)
-    pcall(function() lib.hideTextUI() end)
-
-    deletePreview()
-    destroyCamera()
-    releasePlayer()
-
-    isClosing = false
-end
-
-local function getCategoryLabel(categoryId)
-    for i = 1, #Config.Categories do
-        if Config.Categories[i].id == categoryId then
-            return Config.Categories[i].label
-        end
+    if not previewVehicle or previewVehicle == 0 then
+        notify(Translate('preview_failed'), 'error')
+        return
     end
-    return categoryId
+
+    SetEntityAsMissionEntity(previewVehicle, true, true)
+    SetVehicleOnGroundProperly(previewVehicle)
+    SetEntityCollision(previewVehicle, false, false)
+    SetEntityInvincible(previewVehicle, true)
+    FreezeEntityPosition(previewVehicle, true)
+    SetVehicleDoorsLocked(previewVehicle, 2)
+    SetVehicleEngineOn(previewVehicle, false, true, true)
+    SetVehicleDirtLevel(previewVehicle, 0.0)
+
+    createPreviewCamera(previewVehicle, zone)
+    previewActive = true
 end
 
-local function getVehiclesByCategory(categoryId, search)
+local function closeUi()
+    uiOpen = false
+    lib.hideContext(false)
+    if showingTextUI then
+        lib.hideTextUI()
+        showingTextUI = false
+    end
+    destroyPreview()
+end
+
+local function getVehiclesByCategory(category)
     local list = {}
-    local q = search and search:lower() or nil
     for i = 1, #Config.Vehicles do
-        local v = Config.Vehicles[i]
-        local catOk = not categoryId or v.category == categoryId
-        local searchOk = not q
-            or (v.name and v.name:lower():find(q, 1, true))
-            or (v.model and v.model:lower():find(q, 1, true))
-        if catOk and searchOk then
-            list[#list + 1] = v
+        local vehicle = Config.Vehicles[i]
+        if vehicle.category == category then
+            list[#list + 1] = vehicle
         end
     end
+
+    table.sort(list, function(a, b)
+        return a.price < b.price
+    end)
+
     return list
 end
 
-local openCategoriesMenu, openVehicleList, openVehicleActions
-
-local function buyVehicle(vehicle)
-    local confirm = lib.alertDialog({
-        header = Translate('shop_title'),
-        content = Translate('confirm_buy', vehicle.name, formatMoney(vehicle.price)),
-        centered = true,
-        cancel = true,
-        labels = {
-            confirm = Translate('buy'),
-            cancel = Translate('cancel'),
-        },
-    })
-
-    if confirm ~= 'confirm' then
-        openVehicleActions(vehicle)
+local function spawnPurchasedVehicle(data)
+    local hash = joaat(data.model)
+    if not IsModelInCdimage(hash) then
+        notify(Translate('purchase_failed'), 'error')
         return
     end
 
-    local result = lib.callback.await('qbx_concessionnaire:buyVehicle', false, vehicle.model)
-    if result and result.ok then
-        closeShop()
-        notify(Translate('purchase_success', result.name, formatMoney(result.price)), 'success')
-        notify(Translate('vehicle_out'), 'inform')
-    else
-        local reason = result and result.reason or 'purchase_failed'
-        if reason == 'money' then
-            notify(Translate('not_enough_money'), 'error')
-        else
-            local msg = Translate(reason)
-            if msg == reason then msg = Translate('purchase_failed') end
-            notify(msg, 'error')
-        end
-        openVehicleActions(vehicle)
+    lib.requestModel(hash, 5000)
+
+    local c = data.coords
+    local heading = data.heading or 0.0
+    local vehicle = CreateVehicle(hash, c.x, c.y, c.z, heading, true, false)
+    SetModelAsNoLongerNeeded(hash)
+
+    if not vehicle or vehicle == 0 then
+        notify(Translate('purchase_failed'), 'error')
+        return
     end
+
+    SetVehicleOnGroundProperly(vehicle)
+    SetEntityAsMissionEntity(vehicle, true, true)
+    SetVehicleHasBeenOwnedByPlayer(vehicle, true)
+    SetVehicleNeedsToBeHotwired(vehicle, false)
+    SetVehicleNumberPlateText(vehicle, data.plate)
+    SetVehicleEngineOn(vehicle, false, true, false)
+    SetVehicleDoorsLocked(vehicle, 1)
+    SetVehicleDirtLevel(vehicle, 0.0)
+
+    if GetResourceState('ox_fuel') == 'started' then
+        Entity(vehicle).state.fuel = 100
+    else
+        SetVehicleFuelLevel(vehicle, 100.0)
+    end
+
+    local netId = NetworkGetNetworkIdFromEntity(vehicle)
+    SetNetworkIdCanMigrate(netId, true)
+    TriggerServerEvent('qbx_concessionnaire:server:vehicleSpawned', data.plate, netId)
+    notify(Translate('vehicle_out'), 'success')
 end
 
-openVehicleActions = function(vehicle)
-    spawnPreview(vehicle.model)
-
+local function openVehicleActions(vehicle, zone)
     lib.registerContext({
-        id = 'qbx_concessionnaire_vehicle',
-        title = vehicle.name,
-        menu = 'qbx_concessionnaire_list',
-        onExit = closeShop,
+        id = 'qbx_dealership_vehicle_actions',
+        title = ('%s — $%s'):format(vehicle.name, formatMoney(vehicle.price)),
+        menu = 'qbx_dealership_vehicles',
         options = {
             {
-                title = Translate('buy'),
-                description = ('$%s'):format(formatMoney(vehicle.price)),
-                icon = 'cart-shopping',
-                iconColor = '#3dde6a',
-                onSelect = function()
-                    buyVehicle(vehicle)
-                end,
-            },
-            {
-                title = 'Prévisualiser',
-                description = vehicle.model,
+                title = Translate('preview'),
+                description = Translate('preview_desc'),
                 icon = 'eye',
                 onSelect = function()
-                    spawnPreview(vehicle.model)
-                    openVehicleActions(vehicle)
+                    spawnPreviewVehicle(vehicle.model, zone)
+                    openVehicleActions(vehicle, zone)
                 end,
             },
             {
-                title = 'Retour',
-                icon = 'arrow-left',
+                title = Translate('buy'),
+                description = Translate('buy_desc'),
+                icon = 'cart-shopping',
                 onSelect = function()
-                    openVehicleList(selectedCategory)
+                    local alert = lib.alertDialog({
+                        header = Translate('confirm_title'),
+                        content = Translate('confirm_buy', vehicle.name, formatMoney(vehicle.price)),
+                        centered = true,
+                        cancel = true,
+                    })
+
+                    if alert ~= 'confirm' then
+                        openVehicleActions(vehicle, zone)
+                        return
+                    end
+
+                    local park = findFreePark(zone)
+                    if not park then
+                        notify(Translate('spawn_blocked'), 'error')
+                        openVehicleActions(vehicle, zone)
+                        return
+                    end
+
+                    if not isSpawnClear(park) then
+                        notify(Translate('spawn_blocked'), 'error')
+                        openVehicleActions(vehicle, zone)
+                        return
+                    end
+
+                    local result = lib.callback.await('qbx_concessionnaire:buyVehicle', false, vehicle.model, {
+                        x = park.x,
+                        y = park.y,
+                        z = park.z,
+                        w = park.w,
+                    })
+
+                    if result and result.ok then
+                        closeUi()
+                        notify(Translate('purchase_success', result.name, formatMoney(result.price)), 'success')
+                    else
+                        local reason = result and result.reason or 'purchase_failed'
+                        if reason == 'money' then
+                            notify(Translate('not_enough_money'), 'error')
+                        else
+                            notify(Translate(reason), 'error')
+                        end
+                        openVehicleActions(vehicle, zone)
+                    end
+                end,
+            },
+            {
+                title = Translate('close'),
+                icon = 'xmark',
+                onSelect = function()
+                    closeUi()
                 end,
             },
         },
     })
 
-    lib.showContext('qbx_concessionnaire_vehicle')
+    lib.showContext('qbx_dealership_vehicle_actions')
 end
 
-openVehicleList = function(categoryId, search)
-    selectedCategory = categoryId
-    local vehicles = getVehiclesByCategory(categoryId, search)
+local function openVehicleList(categoryId, categoryLabel, zone)
+    local vehicles = getVehiclesByCategory(categoryId)
+    if #vehicles == 0 then
+        notify(Translate('no_vehicles'), 'error')
+        return
+    end
+
+    local options = {}
+    for i = 1, #vehicles do
+        local vehicle = vehicles[i]
+        options[#options + 1] = {
+            title = vehicle.name,
+            description = Translate('vehicle_price', formatMoney(vehicle.price)),
+            icon = 'car',
+            onSelect = function()
+                openVehicleActions(vehicle, zone)
+            end,
+        }
+    end
+
+    lib.registerContext({
+        id = 'qbx_dealership_vehicles',
+        title = categoryLabel,
+        menu = 'qbx_dealership_categories',
+        options = options,
+    })
+
+    lib.showContext('qbx_dealership_vehicles')
+end
+
+local function openSearchResults(query, zone)
+    local q = query:lower()
     local options = {}
 
-    if #vehicles == 0 then
-        options[#options + 1] = {
-            title = Translate('no_vehicles'),
-            icon = 'circle-xmark',
-            disabled = true,
-        }
-    else
-        for i = 1, #vehicles do
-            local v = vehicles[i]
+    for i = 1, #Config.Vehicles do
+        local vehicle = Config.Vehicles[i]
+        if vehicle.name:lower():find(q, 1, true) or vehicle.model:lower():find(q, 1, true) then
             options[#options + 1] = {
-                title = v.name,
-                description = ('%s — $%s'):format(getCategoryLabel(v.category), formatMoney(v.price)),
+                title = vehicle.name,
+                description = Translate('vehicle_price', formatMoney(vehicle.price)),
                 icon = 'car',
-                metadata = {
-                    { label = 'Prix', value = ('$%s'):format(formatMoney(v.price)) },
-                    { label = 'Modèle', value = v.model },
-                },
                 onSelect = function()
-                    openVehicleActions(v)
+                    openVehicleActions(vehicle, zone)
                 end,
             }
         end
     end
 
+    if #options == 0 then
+        notify(Translate('no_results'), 'error')
+        return
+    end
+
     lib.registerContext({
-        id = 'qbx_concessionnaire_list',
-        title = categoryId and getCategoryLabel(categoryId) or 'Résultats',
-        menu = 'qbx_concessionnaire_main',
-        onExit = closeShop,
+        id = 'qbx_dealership_search',
+        title = Translate('search_results'),
+        menu = 'qbx_dealership_categories',
         options = options,
     })
 
-    lib.showContext('qbx_concessionnaire_list')
-
-    if vehicles[1] then
-        spawnPreview(vehicles[1].model)
-    end
+    lib.showContext('qbx_dealership_search')
 end
 
-openCategoriesMenu = function()
+local function openDealershipMenu(zone)
+    if uiOpen then return end
+    zone = zone or currentZone or Config.Zones[1]
+    if not zone then return end
+
+    uiOpen = true
+    currentZone = zone
+
     local options = {
         {
-            title = 'Rechercher',
-            description = Translate('search_placeholder'),
+            title = Translate('search'),
+            description = Translate('search_desc'),
             icon = 'magnifying-glass',
             onSelect = function()
-                local input = lib.inputDialog(Translate('shop_title'), {
-                    {
-                        type = 'input',
-                        label = 'Recherche',
-                        placeholder = Translate('search_placeholder'),
-                        required = true,
-                        min = 1,
-                        max = 40,
-                    },
+                local input = lib.inputDialog(Translate('search'), {
+                    { type = 'input', label = Translate('search_placeholder'), required = true, min = 1 },
                 })
+
                 if input and input[1] then
-                    openVehicleList(nil, input[1])
+                    openSearchResults(input[1], zone)
                 else
-                    openCategoriesMenu()
+                    uiOpen = false
+                    openDealershipMenu(zone)
                 end
             end,
         },
     }
 
     for i = 1, #Config.Categories do
-        local cat = Config.Categories[i]
-        local count = #getVehiclesByCategory(cat.id)
+        local category = Config.Categories[i]
         options[#options + 1] = {
-            title = cat.label,
-            description = ('%s véhicules'):format(count),
+            title = category.label,
+            description = Translate('category_desc'),
             icon = 'tags',
-            arrow = true,
             onSelect = function()
-                openVehicleList(cat.id)
+                openVehicleList(category.id, category.label, zone)
             end,
         }
     end
@@ -323,143 +373,28 @@ openCategoriesMenu = function()
     options[#options + 1] = {
         title = Translate('close'),
         icon = 'xmark',
-        iconColor = '#ef4444',
         onSelect = function()
-            closeShop()
+            closeUi()
         end,
     }
 
     lib.registerContext({
-        id = 'qbx_concessionnaire_main',
-        title = Translate('shop_title'),
+        id = 'qbx_dealership_categories',
+        title = zone.label or Translate('shop_title'),
         options = options,
-        onExit = closeShop,
+        onExit = function()
+            closeUi()
+        end,
     })
 
-    lib.showContext('qbx_concessionnaire_main')
+    lib.showContext('qbx_dealership_categories')
 end
-
-local function openShop()
-    if isOpen then return end
-    if GetResourceState('ox_lib') ~= 'started' then
-        notify('ox_lib est requis pour ce concessionnaire', 'error')
-        return
-    end
-
-    isOpen = true
-    DisplayRadar(false)
-    createCamera()
-    openCategoriesMenu()
-
-    local first = Config.Vehicles[1]
-    if first then
-        spawnPreview(first.model)
-    end
-end
-
-CreateThread(function()
-    for i = 1, #Config.Zones do
-        local zone = Config.Zones[i]
-        if zone.blip and zone.blip.enabled then
-            local blip = AddBlipForCoord(zone.coords.x, zone.coords.y, zone.coords.z)
-            SetBlipSprite(blip, zone.blip.sprite)
-            SetBlipDisplay(blip, 4)
-            SetBlipScale(blip, zone.blip.scale)
-            SetBlipColour(blip, zone.blip.colour)
-            SetBlipAsShortRange(blip, true)
-            BeginTextCommandSetBlipName('STRING')
-            AddTextComponentSubstringPlayerName(zone.blip.label or Translate('blip_label'))
-            EndTextCommandSetBlipName(blip)
-        end
-    end
-end)
-
-CreateThread(function()
-    local showingTextUI = false
-
-    while true do
-        local sleep = 1000
-        local ped = PlayerPedId()
-        local coords = GetEntityCoords(ped)
-        local near = false
-
-        if not isOpen then
-            for i = 1, #Config.Zones do
-                local zone = Config.Zones[i]
-                local dist = #(coords - zone.coords)
-                if dist < zone.drawDistance then
-                    sleep = 0
-                    local m = zone.marker
-                    DrawMarker(
-                        m.type,
-                        zone.coords.x + 0.0, zone.coords.y + 0.0, zone.coords.z - 1.0,
-                        0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0,
-                        m.size.x + 0.0, m.size.y + 0.0, m.size.z + 0.0,
-                        m.color.r, m.color.g, m.color.b, m.color.a,
-                        m.bobUpAndDown == true, m.faceCamera == true, 2, m.rotate == true, nil, nil, false
-                    )
-
-                    if dist < zone.interactDistance then
-                        near = true
-                        currentZone = zone
-                        if not showingTextUI then
-                            lib.showTextUI(Translate('press_open'), {
-                                position = 'right-center',
-                                icon = 'car',
-                            })
-                            showingTextUI = true
-                        end
-
-                        if IsControlJustReleased(0, 38) then
-                            lib.hideTextUI()
-                            showingTextUI = false
-                            openShop()
-                        end
-                    end
-                end
-            end
-        else
-            sleep = 200
-        end
-
-        if showingTextUI and not near then
-            lib.hideTextUI()
-            showingTextUI = false
-        end
-
-        Wait(sleep)
-    end
-end)
 
 RegisterNetEvent('qbx_concessionnaire:client:spawnPurchased', function(data)
-    if not data or not data.model then return end
-
-    closeShop()
-    Wait(100)
-
-    local hash = joaat(data.model)
-    RequestModel(hash)
-    local timeout = GetGameTimer() + 5000
-    while not HasModelLoaded(hash) and GetGameTimer() < timeout do
-        Wait(10)
+    if type(data) ~= 'table' or not data.model or not data.plate or not data.coords then
+        return
     end
-    if not HasModelLoaded(hash) then return end
-
-    local c = data.coords
-    local vehicle = CreateVehicle(hash, c.x + 0.0, c.y + 0.0, c.z + 0.0, data.heading or 0.0, true, false)
-    SetVehicleNumberPlateText(vehicle, data.plate or '')
-    SetVehicleOnGroundProperly(vehicle)
-    SetEntityAsMissionEntity(vehicle, true, true)
-    SetVehicleHasBeenOwnedByPlayer(vehicle, true)
-    SetVehicleNeedsToBeHotwired(vehicle, false)
-    SetVehicleDoorsLocked(vehicle, 1)
-    SetVehicleEngineOn(vehicle, false, true, false)
-    SetModelAsNoLongerNeeded(hash)
-
-    local netId = NetworkGetNetworkIdFromEntity(vehicle)
-    TriggerEvent('qbx_concessionnaire:vehiclePurchased', vehicle, data.plate, data.model)
-    TriggerServerEvent('qbx_concessionnaire:server:vehicleSpawned', data.plate, netId)
+    spawnPurchasedVehicle(data)
 end)
 
 RegisterNetEvent('qbx_concessionnaire:client:giveKeys', function(netId, plate)
@@ -473,19 +408,114 @@ RegisterNetEvent('qbx_concessionnaire:client:giveKeys', function(netId, plate)
     TriggerEvent('vehiclekeys:client:SetOwner', plate)
 end)
 
-RegisterCommand('concessionnaire', function()
-    openShop()
-end, false)
-
-AddEventHandler('onResourceStop', function(res)
-    if res ~= GetCurrentResourceName() then return end
-    if isOpen then
-        lib.hideContext()
-        lib.hideTextUI()
+CreateThread(function()
+    for i = 1, #Config.Zones do
+        local zone = Config.Zones[i]
+        if zone.blip and zone.blip.enabled then
+            local blip = AddBlipForCoord(zone.menu.x, zone.menu.y, zone.menu.z)
+            SetBlipSprite(blip, zone.blip.sprite or 326)
+            SetBlipDisplay(blip, 4)
+            SetBlipScale(blip, zone.blip.scale or 0.85)
+            SetBlipColour(blip, zone.blip.colour or 5)
+            SetBlipAsShortRange(blip, true)
+            BeginTextCommandSetBlipName('STRING')
+            AddTextComponentSubstringPlayerName(zone.blip.label or zone.label or Translate('blip_label'))
+            EndTextCommandSetBlipName(blip)
+        end
     end
-    deletePreview()
-    destroyCamera()
 end)
 
-exports('OpenDealership', openShop)
-exports('CloseDealership', closeShop)
+CreateThread(function()
+    while true do
+        local sleep = 1000
+        local ped = PlayerPedId()
+        local coords = GetEntityCoords(ped)
+        local nearMenu = false
+        local nearZone = nil
+
+        for i = 1, #Config.Zones do
+            local zone = Config.Zones[i]
+            local menuDist = #(coords - zone.menu)
+            local drawDistance = zone.drawDistance or 35.0
+
+            if menuDist < drawDistance then
+                sleep = 0
+
+                -- Point rouge = menu
+                drawGroundMarker(zone.menu, Config.Markers.menu)
+
+                -- Points verts = places de livraison
+                local parks = zone.parks or {}
+                for p = 1, #parks do
+                    drawGroundMarker(parks[p], Config.Markers.park)
+                end
+
+                if menuDist < (zone.interactDistance or 1.8) then
+                    nearMenu = true
+                    nearZone = zone
+                end
+            end
+        end
+
+        if nearMenu and nearZone and not uiOpen then
+            currentZone = nearZone
+            if not showingTextUI then
+                lib.showTextUI(Translate('press_open'), { position = 'right-center', icon = 'shop' })
+                showingTextUI = true
+            end
+
+            if IsControlJustReleased(0, 38) then
+                if showingTextUI then
+                    lib.hideTextUI()
+                    showingTextUI = false
+                end
+                openDealershipMenu(nearZone)
+            end
+        elseif showingTextUI and not uiOpen then
+            lib.hideTextUI()
+            showingTextUI = false
+        end
+
+        if previewActive and previewVehicle and DoesEntityExist(previewVehicle) then
+            sleep = 0
+            DisableControlAction(0, 24, true)
+            DisableControlAction(0, 25, true)
+            DisableControlAction(0, 47, true)
+            DisableControlAction(0, 58, true)
+            DisableControlAction(0, 140, true)
+            DisableControlAction(0, 141, true)
+            DisableControlAction(0, 142, true)
+
+            if Config.CloseWithEscape and (IsControlJustReleased(0, 177) or IsControlJustReleased(0, 200)) then
+                closeUi()
+            end
+        end
+
+        Wait(sleep)
+    end
+end)
+
+RegisterCommand('concessionnaire', function()
+    openDealershipMenu(currentZone or Config.Zones[1])
+end, false)
+
+exports('OpenDealership', function(name)
+    if name then
+        for i = 1, #Config.Zones do
+            if Config.Zones[i].name == name then
+                openDealershipMenu(Config.Zones[i])
+                return
+            end
+        end
+    end
+    openDealershipMenu(currentZone or Config.Zones[1])
+end)
+
+exports('CloseDealership', function()
+    closeUi()
+end)
+
+AddEventHandler('onResourceStop', function(resourceName)
+    if resourceName ~= GetCurrentResourceName() then return end
+    closeUi()
+end)

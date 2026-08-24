@@ -17,6 +17,26 @@ local function normalizeAccount(account)
     return account or 'cash'
 end
 
+local function playerNearAnyZone(src, maxDist)
+    local ped = GetPlayerPed(src)
+    if not ped or ped == 0 then return false, nil end
+    local pcoords = GetEntityCoords(ped)
+
+    for i = 1, #Config.Zones do
+        local zone = Config.Zones[i]
+        local menu = zone.menu
+        local dx = pcoords.x - menu.x
+        local dy = pcoords.y - menu.y
+        local dz = pcoords.z - menu.z
+        local dist = maxDist or ((zone.interactDistance or 1.8) + 3.0)
+        if (dx * dx + dy * dy + dz * dz) <= (dist * dist) then
+            return true, zone
+        end
+    end
+
+    return false, nil
+end
+
 local function generatePlate()
     local chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     for _ = 1, 20 do
@@ -55,7 +75,6 @@ local function tryPay(Player, price)
         return false, nil
     end
 
-    -- both: cash first, then bank
     if Player.Functions.GetMoney('cash') >= price then
         Player.Functions.RemoveMoney('cash', price, 'concessionnaire')
         return true, 'cash'
@@ -74,11 +93,9 @@ local function refund(Player, account, price)
 end
 
 local function giveKeys(src, plate, model, netId)
-    -- qbx_vehiclekeys
     pcall(function()
         exports.qbx_vehiclekeys:GiveKeys(src, plate)
     end)
-    -- qb-vehiclekeys / legacy
     TriggerClientEvent('qb-vehiclekeys:client:AddKeys', src, plate)
     TriggerClientEvent('vehiclekeys:client:SetOwner', src, plate)
     pcall(function()
@@ -92,10 +109,42 @@ local function giveKeys(src, plate, model, netId)
     end
 end
 
-local function processPurchase(source, model)
+local function resolveSpawn(zone, spawn)
+    if type(spawn) == 'table' and spawn.x and spawn.y and spawn.z then
+        return {
+            coords = { x = spawn.x + 0.0, y = spawn.y + 0.0, z = spawn.z + 0.0 },
+            heading = (spawn.w or spawn.heading or 0.0) + 0.0,
+        }
+    end
+
+    if zone and zone.parks and zone.parks[1] then
+        local park = zone.parks[1]
+        return {
+            coords = { x = park.x, y = park.y, z = park.z },
+            heading = park.w or 0.0,
+        }
+    end
+
+    local fallback = Config.PurchaseSpawn
+    return {
+        coords = {
+            x = fallback.coords.x,
+            y = fallback.coords.y,
+            z = fallback.coords.z,
+        },
+        heading = fallback.heading or 0.0,
+    }
+end
+
+local function processPurchase(source, model, spawn)
     local Player = getPlayer(source)
     if not Player then
         return { ok = false, reason = 'purchase_failed' }
+    end
+
+    local near, zone = playerNearAnyZone(source)
+    if not near then
+        return { ok = false, reason = 'too_far' }
     end
 
     local vehicle = getVehicleByModel(model)
@@ -133,22 +182,24 @@ local function processPurchase(source, model)
         hash,
         json.encode(mods),
         plate,
-        Config.DefaultGarage or 'pillboxgarage',
+        Config.DefaultGarage or 'pillbox',
         100,
         1000.0,
         1000.0,
         Config.PurchaseState or 0,
     })
 
-    local spawn = Config.PurchaseSpawn
-    TriggerClientEvent('qbx_concessionnaire:client:spawnPurchased', source, {
-        model = vehicle.model,
-        plate = plate,
-        coords = { x = spawn.coords.x, y = spawn.coords.y, z = spawn.coords.z },
-        heading = spawn.heading,
-    })
+    local resolved = resolveSpawn(zone, spawn)
 
-    giveKeys(source, plate, vehicle.model)
+    if (Config.PurchaseState or 0) == 0 then
+        TriggerClientEvent('qbx_concessionnaire:client:spawnPurchased', source, {
+            model = vehicle.model,
+            plate = plate,
+            coords = resolved.coords,
+            heading = resolved.heading,
+        })
+        giveKeys(source, plate, vehicle.model)
+    end
 
     return {
         ok = true,
@@ -158,11 +209,11 @@ local function processPurchase(source, model)
     }
 end
 
-lib.callback.register('qbx_concessionnaire:buyVehicle', function(source, model)
+lib.callback.register('qbx_concessionnaire:buyVehicle', function(source, model, spawn)
     if type(model) ~= 'string' or #model < 1 or #model > 40 then
         return { ok = false, reason = 'purchase_failed' }
     end
-    return processPurchase(source, model)
+    return processPurchase(source, model, spawn)
 end)
 
 RegisterNetEvent('qbx_concessionnaire:server:vehicleSpawned', function(plate, netId)
