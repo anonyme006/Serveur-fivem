@@ -1,0 +1,41 @@
+-- =========================================================
+-- Qbox — SQL complet Serveur-fivem
+-- Importer UNE fois sur la base du serveur
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS `player_vehicles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `license` varchar(50) DEFAULT NULL,
+  `citizenid` varchar(50) DEFAULT NULL,
+  `vehicle` varchar(50) DEFAULT NULL,
+  `hash` varchar(50) DEFAULT NULL,
+  `mods` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `plate` varchar(15) NOT NULL,
+  `fakeplate` varchar(50) DEFAULT NULL,
+  `garage` varchar(50) DEFAULT 'pillbox',
+  `fuel` int(11) DEFAULT 100,
+  `engine` float DEFAULT 1000,
+  `body` float DEFAULT 1000,
+  `state` int(11) DEFAULT 1,
+  `depotprice` int(11) NOT NULL DEFAULT 0,
+  `drivingdistance` int(50) DEFAULT 0,
+  `status` text DEFAULT NULL,
+  `coords` text DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_player_vehicles_plate` (`plate`),
+  KEY `idx_player_vehicles_citizenid` (`citizenid`),
+  KEY `idx_player_vehicles_garage` (`garage`),
+  KEY `idx_player_vehicles_state` (`state`),
+  KEY `idx_player_vehicles_citizen_state` (`citizenid`, `state`),
+  KEY `idx_player_vehicles_citizen_garage` (`citizenid`, `garage`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*
+États (state) :
+  0 = véhicule sorti
+  1 = en garage
+  2 = fourrière
+
+Garages par défaut utilisés par qbx_garage :
+  pillbox, legion, motel, sapcounsel, impound
+*/
