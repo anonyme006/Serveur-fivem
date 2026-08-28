@@ -1,11 +1,11 @@
 ---@class OxInventoryQboxUiConfig
 ---@field AccentColor string
+---@field ShowHealth boolean
 ---@field ShowHunger boolean
 ---@field ShowThirst boolean
----@field ShowHealth boolean
 ---@field ShowArmor boolean
 ---@field ShowCharacter boolean
----@field EnableClothingSlots boolean
+---@field ShowClothing boolean
 ---@field EnableCharacterRotation boolean
 ---@field EnableCharacterZoom boolean
 ---@field CharacterBackground string
@@ -14,19 +14,18 @@
 
 Config = {
     AccentColor = '#d946ef',
+    ShowHealth = true,
     ShowHunger = true,
     ShowThirst = true,
-    ShowHealth = true,
     ShowArmor = true,
     ShowCharacter = true,
-    EnableClothingSlots = true,
+    ShowClothing = true,
     EnableCharacterRotation = true,
     EnableCharacterZoom = true,
     --- 'transparent' | 'dark'
     CharacterBackground = 'dark',
-    --- Pause menu ped slot (0-3). 2 = center-ish on most resolutions.
     CharacterPedSlot = 2,
-    --- ms between health/armor checks while inventory is open (hunger/thirst use state bags)
+    --- Filet de secours santé/armure (faim/soif = state bags qbx_core)
     StatusUpdateInterval = 500,
 }
 

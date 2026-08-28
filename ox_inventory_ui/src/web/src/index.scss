@@ -630,7 +630,6 @@ body.inv-dragging {
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
   padding: 2vh 2vw;
   box-sizing: border-box;
   background: transparent;
@@ -643,22 +642,37 @@ body.inv-dragging {
 
 .inventory-wrapper {
   flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
   align-items: stretch;
+  gap: clamp(16px, 2vw, 28px);
+}
+
+.inventory-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: stretch;
+  min-width: fit-content;
 }
 
 .inventory-center-column {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  min-width: clamp(280px, 34vw, 420px);
+  justify-content: center;
+  flex: 1;
+  min-width: clamp(320px, 38vw, 520px);
 }
 
-.inventory-player-column {
+.character-stage {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 1.2vw, 18px);
+  width: 100%;
 }
 
 .inventory-right-column {
@@ -666,11 +680,12 @@ body.inv-dragging {
   flex-direction: column;
   gap: 14px;
   align-items: stretch;
+  min-width: fit-content;
 }
 
 .player-status-panel {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 10px;
   padding: 12px 14px;
   border-radius: 10px;
@@ -678,6 +693,28 @@ body.inv-dragging {
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(12px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  min-width: clamp(200px, 22vh, 260px);
+}
+
+.player-stat {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &--pulse {
+    animation: statPulse 0.6s ease;
+  }
+}
+
+@keyframes statPulse {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.02);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--accent-color) 35%, transparent);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .player-stat-header {
@@ -712,7 +749,41 @@ body.inv-dragging {
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--accent-color), color-mix(in srgb, var(--accent-color) 60%, white));
-  transition: width 0.35s ease;
+  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.player-stat-blocks {
+  display: flex;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.player-stat-block {
+  flex: 1;
+  height: 6px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background 0.35s ease, transform 0.35s ease;
+
+  &--filled {
+    transform: scaleY(1.15);
+  }
+}
+
+.player-stat-blocks--health .player-stat-block--filled {
+  background: #ef4444;
+}
+
+.player-stat-blocks--armor .player-stat-block--filled {
+  background: #3b82f6;
+}
+
+.player-stat-blocks--hunger .player-stat-block--filled {
+  background: #f59e0b;
+}
+
+.player-stat-blocks--thirst .player-stat-block--filled {
+  background: #06b6d4;
 }
 
 .player-stat--health .player-stat-fill {
@@ -776,8 +847,11 @@ body.inv-dragging {
 .clothing-slots {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-width: clamp(150px, 14vw, 190px);
+  gap: 6px;
+  min-width: clamp(140px, 13vw, 175px);
+  max-height: clamp(420px, 52vh, 560px);
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .clothing-slot {

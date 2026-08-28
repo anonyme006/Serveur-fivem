@@ -25,31 +25,25 @@ Conserve **100 %** du fonctionnement natif d'ox_inventory (slots, drag & drop, c
 ### Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  NUI React (web/build)                                       │
-│  ├─ PlayerStatus (faim/soif/santé/armure)                   │
-│  ├─ ClothingSlots (gauche/droite)                           │
-│  ├─ CharacterPreview (zone transparente + souris)           │
-│  ├─ LeftInventory / RightInventory (ox_inventory natif)     │
-│  └─ InventoryControl (Utiliser, Échanger, Fermer…)           │
-├─────────────────────────────────────────────────────────────┤
-│  modules/qbox_ui/client.lua                                  │
-│  ├─ StateBag invOpen → ouverture/fermeture                  │
-│  ├─ ClonePed + GivePedToPauseMenu (personnage 3D réel)      │
-│  ├─ StateBags hunger/thirst (qbx_core)                      │
-│  ├─ Santé/armure (GetEntityHealth / GetPedArmour)           │
-│  └─ rcore_clothing (getPlayerSkin, saveCurrentSkin, CR)     │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────┬─────────────────────────────┬──────────────┐
+│ INVENTAIRE   │  Vêtements │ PED 3D │ Vêt. │  COFFRE/DROP │
+│ + Contrôles  │            (rcore)          │  / SHOP      │
+│ ❤️🍔💧🛡️ Stats│                             │              │
+└──────────────┴─────────────────────────────┴──────────────┘
 ```
 
 ### Faim / soif (Qbox)
 
-Les valeurs sont lues depuis :
+| Stat | Source primaire | Fallback |
+|------|-----------------|----------|
+| Faim | `LocalPlayer.state.hunger` (state bag qbx_core) | `QBX.PlayerData.metadata.hunger` |
+| Soif | `LocalPlayer.state.thirst` (state bag qbx_core) | `QBX.PlayerData.metadata.thirst` |
+| Santé | `GetEntityHealth` / `GetEntityMaxHealth` (temps réel) | `metadata.health` |
+| Armure | `GetPedArmour` (temps réel) | `metadata.armor` |
 
-1. **State bags** `LocalPlayer.state.hunger` / `thirst` (sync qbx_core)
-2. Fallback `QBX.PlayerData.metadata.hunger/thirst`
-
-Mise à jour **événementielle** (state bags + metadata) — pas de boucle permanente.
+Mise à jour :
+- **Faim/soif** : state bags + `qbx_core:client:onSetMetaData`
+- **Santé/armure** : dégâts (`CEventNetworkEntityDamage`) + intervalle léger (500 ms) inventaire ouvert uniquement
 
 ### Vêtements (rcore_clothing)
 
@@ -113,19 +107,21 @@ Mise à jour **événementielle** (state bags + metadata) — pas de boucle perm
 ```lua
 Config = {
     AccentColor = '#d946ef',
+    ShowHealth = true,
     ShowHunger = true,
     ShowThirst = true,
-    ShowHealth = true,
     ShowArmor = true,
     ShowCharacter = true,
-    EnableClothingSlots = true,
+    ShowClothing = true,
     EnableCharacterRotation = true,
     EnableCharacterZoom = true,
-    CharacterBackground = 'dark',      -- 'dark' | 'transparent'
+    CharacterBackground = 'dark',
     CharacterPedSlot = 2,
     StatusUpdateInterval = 500,
 }
 ```
+
+Les statistiques sont affichées **uniquement dans ox_inventory** (colonne gauche sous l'inventaire). Aucune modification du HUD principal n'est nécessaire.
 
 ---
 

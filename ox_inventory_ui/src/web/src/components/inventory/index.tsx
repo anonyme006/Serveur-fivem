@@ -69,18 +69,22 @@ const Inventory: React.FC = () => {
     <>
       <Fade in={inventoryVisible}>
         <div className="inventory-shell">
-          <PlayerStatus />
           <div className="inventory-wrapper">
-            {config.enableClothingSlots && <ClothingSlots slots={clothingSlots.left} side="left" />}
+            <div className="inventory-left-column">
+              <LeftInventory />
+              <InventoryControl />
+              <PlayerStatus />
+            </div>
+
             <div className="inventory-center-column">
-              <CharacterPreview />
-              <div className="inventory-player-column">
-                <LeftInventory />
-                <InventoryControl />
+              <div className="character-stage">
+                {config.showClothing && <ClothingSlots slots={clothingSlots.left} side="left" />}
+                {config.showCharacter && <CharacterPreview />}
+                {config.showClothing && <ClothingSlots slots={clothingSlots.right} side="right" />}
               </div>
             </div>
+
             <div className="inventory-right-column">
-              {config.enableClothingSlots && <ClothingSlots slots={clothingSlots.right} side="right" />}
               <RightInventory />
             </div>
           </div>

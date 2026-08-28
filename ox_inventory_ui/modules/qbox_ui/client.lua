@@ -7,22 +7,23 @@ local SLOT_DEFINITIONS = {
     mask = { label = 'Masque', icon = 'mask', kind = 'component', id = 1 },
     hat = { label = 'Chapeau', icon = 'hat', kind = 'prop', id = 0 },
     glasses = { label = 'Lunettes', icon = 'glasses', kind = 'prop', id = 1 },
+    ears = { label = 'Oreilles', icon = 'earrings', kind = 'prop', id = 2 },
     top = { label = 'Haut', icon = 'top', kind = 'component', id = 11 },
     vest = { label = 'Veste', icon = 'vest', kind = 'component', id = 9 },
+    torso = { label = 'Torse', icon = 'torso', kind = 'component', id = 8 },
+    arms = { label = 'Bras', icon = 'arms', kind = 'component', id = 3 },
     pants = { label = 'Pantalon', icon = 'pants', kind = 'component', id = 4 },
     shoes = { label = 'Chaussures', icon = 'shoes', kind = 'component', id = 6 },
-    chain = { label = 'Chaînes', icon = 'chain', kind = 'component', id = 7 },
-    earrings = { label = 'Boucles d\'oreilles', icon = 'earrings', kind = 'prop', id = 2 },
     bag = { label = 'Sac', icon = 'bag', kind = 'component', id = 5 },
-    belt = { label = 'Ceinture', icon = 'belt', kind = 'component', id = 8 },
+    chain = { label = 'Chaîne', icon = 'chain', kind = 'component', id = 7 },
     watch = { label = 'Montre', icon = 'watch', kind = 'prop', id = 6 },
     bracelet = { label = 'Bracelet', icon = 'bracelet', kind = 'prop', id = 7 },
-    decals = { label = 'Décalcomanies', icon = 'decals', kind = 'component', id = 10 },
+    belt = { label = 'Ceinture', icon = 'belt', kind = 'component', id = 10 },
     accessory = { label = 'Accessoires', icon = 'accessory', kind = 'component', id = 7 },
 }
 
-local LEFT_SLOTS = { 'mask', 'hat', 'glasses', 'top', 'vest', 'pants', 'shoes' }
-local RIGHT_SLOTS = { 'chain', 'earrings', 'bag', 'belt', 'watch', 'bracelet', 'decals', 'accessory' }
+local LEFT_SLOTS = { 'mask', 'hat', 'glasses', 'ears', 'top', 'vest', 'torso', 'arms' }
+local RIGHT_SLOTS = { 'pants', 'shoes', 'bag', 'chain', 'watch', 'bracelet', 'belt', 'accessory' }
 
 local previewPed
 local previewActive = false
@@ -124,12 +125,30 @@ local function getHealthPercent()
     local ped = cache.ped
     local health = GetEntityHealth(ped) - 100
     local maxHealth = GetEntityMaxHealth(ped) - 100
-    if maxHealth <= 0 then return 0 end
-    return clampPercent((health / maxHealth) * 100)
+
+    if maxHealth > 0 then
+        return clampPercent((health / maxHealth) * 100)
+    end
+
+    if QBX and QBX.PlayerData and QBX.PlayerData.metadata and QBX.PlayerData.metadata.health then
+        return clampPercent(QBX.PlayerData.metadata.health)
+    end
+
+    return 0
 end
 
 local function getArmorPercent()
-    return clampPercent(GetPedArmour(cache.ped))
+    local armour = GetPedArmour(cache.ped)
+
+    if armour > 0 then
+        return clampPercent(armour)
+    end
+
+    if QBX and QBX.PlayerData and QBX.PlayerData.metadata and QBX.PlayerData.metadata.armor then
+        return clampPercent(QBX.PlayerData.metadata.armor)
+    end
+
+    return 0
 end
 
 local function getHungerPercent()
@@ -167,7 +186,7 @@ local function buildStatusPayload()
             showHealth = Config.ShowHealth,
             showArmor = Config.ShowArmor,
             showCharacter = Config.ShowCharacter,
-            enableClothingSlots = Config.EnableClothingSlots,
+            showClothing = Config.ShowClothing,
             enableCharacterRotation = Config.EnableCharacterRotation,
             enableCharacterZoom = Config.EnableCharacterZoom,
             characterBackground = Config.CharacterBackground,
@@ -188,7 +207,7 @@ local function sendStatusUpdate()
 end
 
 local function sendClothingUpdate()
-    if not inventoryOpen or not Config.EnableClothingSlots then return end
+    if not inventoryOpen or not Config.ShowClothing then return end
     SendNUIMessage({
         action = 'updateClothingSlots',
         data = getClothingSlotsPayload(),
@@ -374,6 +393,14 @@ RegisterNetEvent('qbx_core:client:onSetMetaData', function(metadata)
     end
 end)
 
+AddEventHandler('gameEventTriggered', function(name, args)
+    if not inventoryOpen then return end
+
+    if name == 'CEventNetworkEntityDamage' and args[1] == cache.ped then
+        sendStatusUpdate()
+    end
+end)
+
 AddEventHandler('rcore_clothing:afterSkinLoaded', function()
     if inventoryOpen then
         refreshPreviewPed()
@@ -407,7 +434,7 @@ end)
 RegisterNUICallback('qboxUi:clickClothingSlot', function(data, cb)
     local slotId = data and data.id
 
-    if slotId and Config.EnableClothingSlots then
+    if slotId and Config.ShowClothing then
         handleClothingSlot(slotId)
         SetTimeout(250, function()
             if inventoryOpen then

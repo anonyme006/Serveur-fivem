@@ -5,7 +5,7 @@ export interface QboxUiConfig {
   showHealth: boolean;
   showArmor: boolean;
   showCharacter: boolean;
-  enableClothingSlots: boolean;
+  showClothing: boolean;
   enableCharacterRotation: boolean;
   enableCharacterZoom: boolean;
   characterBackground: 'transparent' | 'dark';
@@ -41,7 +41,7 @@ export const defaultQboxUiConfig: QboxUiConfig = {
   showHealth: true,
   showArmor: true,
   showCharacter: true,
-  enableClothingSlots: true,
+  showClothing: true,
   enableCharacterRotation: true,
   enableCharacterZoom: true,
   characterBackground: 'dark',

@@ -86,6 +86,16 @@ const icons: Record<string, React.ReactNode> = {
       <path d="M12 3l2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3 4-1-2-4Z" stroke="currentColor" strokeWidth="1.8" />
     </svg>
   ),
+  torso: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M9 5h6l2 4v10H7V9l2-4Z" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  ),
+  arms: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M4 10l3-3 2 2-2 2M20 10l-3-3-2 2 2 2M12 8v8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  ),
 };
 
 export const ClothingIcon: React.FC<{ name: string }> = ({ name }) => (
