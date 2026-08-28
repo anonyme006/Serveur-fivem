@@ -1,0 +1,60 @@
+:root {
+  --text: #f2f4f7;
+  --muted: rgba(242, 244, 247, 0.55);
+  --accent: #ff6b35;
+  --accent-soft: rgba(255, 107, 53, 0.35);
+  --glass: rgba(8, 10, 14, 0.42);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --font-ui: "Inter", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-ui);
+  user-select: none;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#hud-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.voice-indicator {
+  position: absolute;
+  left: clamp(1rem, 2.2vw, 2.5rem);
+  bottom: clamp(1rem, 3vh, 3rem);
+  width: clamp(8px, 0.55vw, 10px);
+  height: clamp(8px, 0.55vw, 10px);
+  border-radius: 50%;
+  background: rgba(242, 244, 247, 0.25);
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.voice-indicator.active {
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-soft);
+  transform: scale(1.15);
+}
+
+.no-anim *,
+.no-anim *::before,
+.no-anim *::after {
+  transition: none !important;
+  animation: none !important;
+}
