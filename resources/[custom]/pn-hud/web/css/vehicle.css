@@ -1,0 +1,322 @@
+.vehicle-hud {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(2rem, 8vh, 6rem);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.35rem, 0.8vh, 0.75rem);
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0;
+  filter: blur(4px);
+  transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
+}
+
+.vehicle-hud.visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateX(-50%) translateY(0);
+}
+
+.vehicle-hud.entering {
+  animation: vehicleEnter 0.45s ease forwards;
+}
+
+.vehicle-hud.leaving {
+  animation: vehicleLeave 0.35s ease forwards;
+}
+
+@keyframes vehicleEnter {
+  from { opacity: 0; transform: translateX(-50%) translateY(18px); filter: blur(4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); filter: blur(0); }
+}
+
+@keyframes vehicleLeave {
+  from { opacity: 1; transform: translateX(-50%) translateY(0); filter: blur(0); }
+  to { opacity: 0; transform: translateX(-50%) translateY(12px); filter: blur(3px); }
+}
+
+.vehicle-location {
+  font-size: clamp(0.65rem, 0.85vw, 0.78rem);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-align: center;
+  max-width: 40vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
+}
+
+.vehicle-cluster {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1.2vw, 1rem);
+}
+
+.signal {
+  width: clamp(1rem, 1.4vw, 1.35rem);
+  height: clamp(1rem, 1.4vw, 1.35rem);
+  color: rgba(242, 244, 247, 0.18);
+  opacity: 0.35;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.signal svg {
+  width: 100%;
+  height: 100%;
+}
+
+.signal.active {
+  color: #7dff9a;
+  opacity: 1;
+  animation: blink 0.9s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.dial-wrap {
+  position: relative;
+  width: clamp(7.5rem, 11vw, 10.5rem);
+  height: clamp(7.5rem, 11vw, 10.5rem);
+}
+
+.rpm-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.rpm-track,
+.rpm-fill {
+  fill: none;
+  stroke-width: 5;
+}
+
+.rpm-track {
+  stroke: rgba(255, 255, 255, 0.08);
+}
+
+.rpm-fill {
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-dasharray: 553;
+  stroke-dashoffset: 553;
+  filter: drop-shadow(0 0 6px var(--accent-soft));
+  transition: stroke-dashoffset 0.12s linear, stroke 0.2s ease;
+}
+
+.dial-core {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+}
+
+.gear-badge {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(calc(-100% - 0.35rem), -50%);
+  min-width: clamp(1.4rem, 2vw, 1.8rem);
+  height: clamp(1.4rem, 2vw, 1.8rem);
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: clamp(0.75rem, 1vw, 0.95rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: transform 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+
+.gear-badge.changed {
+  animation: gearPulse 0.25s ease;
+}
+
+@keyframes gearPulse {
+  0% { transform: translate(-100%, -50%) scale(1); }
+  50% { transform: translate(-100%, -50%) scale(1.12); color: var(--accent); }
+  100% { transform: translate(-100%, -50%) scale(1); }
+}
+
+.speed-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.speed-value {
+  font-family: var(--font-mono);
+  font-size: clamp(2rem, 3.2vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  transition: transform 0.12s ease, color 0.12s ease;
+}
+
+.speed-value.tick {
+  animation: speedTick 0.15s ease;
+}
+
+@keyframes speedTick {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); color: #fff; }
+  100% { transform: scale(1); }
+}
+
+.speed-unit {
+  margin-top: 0.15rem;
+  font-size: clamp(0.55rem, 0.75vw, 0.68rem);
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.status-icons {
+  position: absolute;
+  right: -0.2rem;
+  top: 50%;
+  transform: translate(100%, -50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.status-icon {
+  width: clamp(1rem, 1.3vw, 1.2rem);
+  height: clamp(1rem, 1.3vw, 1.2rem);
+  color: rgba(242, 244, 247, 0.35);
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.status-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.status-icon.active {
+  color: #fff;
+}
+
+.lights-icon.state-low { color: #9fd4ff; }
+.lights-icon.state-high { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.5); }
+
+.seatbelt-icon.unbuckled {
+  color: #ff6b35;
+  animation: seatbeltWarn 1.2s ease-in-out infinite;
+}
+
+@keyframes seatbeltWarn {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.94); }
+}
+
+.brake-icon.active {
+  color: #ff4d4d;
+}
+
+.vehicle-meta {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(8, 10, 14, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: clamp(0.62rem, 0.8vw, 0.72rem);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.meta-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.fuel-item.warning { color: #ffd166; animation: softPulse 1.4s ease-in-out infinite; }
+.fuel-item.critical { color: #ff4d4d; animation: softPulse 0.7s ease-in-out infinite; }
+
+.engine-item.warning { color: #ffd166; }
+.engine-item.critical { color: #ff4d4d; animation: softPulse 1s ease-in-out infinite; }
+
+@keyframes softPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.engine-bar {
+  width: clamp(2rem, 3vw, 2.8rem);
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.engine-bar span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #7dff9a, #ffd166);
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.engine-item.critical .engine-bar span,
+.engine-item.warning .engine-bar span {
+  background: linear-gradient(90deg, #ff6b35, #ff4d4d);
+}
+
+.doors-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  max-width: 50vw;
+}
+
+.door-chip {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  letter-spacing: 0.03em;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(242, 244, 247, 0.85);
+}
+
+@media (min-aspect-ratio: 21/9) {
+  .vehicle-hud {
+    bottom: clamp(2.5rem, 7vh, 5rem);
+  }
+}
+
+@media (min-width: 2560px) {
+  .dial-wrap {
+    width: clamp(8rem, 9vw, 11rem);
+    height: clamp(8rem, 9vw, 11rem);
+  }
+}

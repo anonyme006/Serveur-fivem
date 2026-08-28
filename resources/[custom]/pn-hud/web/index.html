@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/vehicle.css" />
+</head>
+<body>
+  <div id="hud-root" class="hidden">
+    <div id="voice-indicator" class="voice-indicator" aria-hidden="true"></div>
+  </div>
+
+  <div id="vehicle-hud" class="vehicle-hud hidden" aria-hidden="true">
+    <div id="vehicle-location" class="vehicle-location hidden"></div>
+
+    <div class="vehicle-cluster">
+      <div class="signal signal-left" id="signal-left" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <div class="dial-wrap">
+        <svg class="rpm-ring" viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="rpm-track" cx="100" cy="100" r="88" />
+          <circle class="rpm-fill" id="rpm-fill" cx="100" cy="100" r="88" />
+        </svg>
+
+        <div class="gear-badge" id="gear">N</div>
+
+        <div class="dial-core">
+          <div class="speed-block">
+            <span class="speed-value" id="speed">000</span>
+            <span class="speed-unit" id="speed-unit">KM/H</span>
+          </div>
+        </div>
+
+        <div class="status-icons">
+          <div class="status-icon lights-icon" id="lights-icon" title="Feux">
+            <svg viewBox="0 0 24 24"><path d="M9 18h6M10 14h4M12 2v2M5 9l1.5 1.5M19 9L17.5 10.5M4 14h2M18 14h2M12 6a4 4 0 0 0-2 7.5h4A4 4 0 0 0 12 6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div class="status-icon seatbelt-icon" id="seatbelt-icon" title="Ceinture">
+            <svg viewBox="0 0 24 24"><path d="M8 4l3 3M16 4l-3 3M6 14l4-2 2 4 4-2M4 20l6-6M20 20l-6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="status-icon brake-icon hidden" id="brake-icon" title="Frein">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="12" y="15" text-anchor="middle" font-size="8" fill="currentColor" font-family="Inter,sans-serif">B</text></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="signal signal-right" id="signal-right" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+
+    <div class="vehicle-meta">
+      <div class="meta-item fuel-item hidden" id="fuel-item">
+        <svg class="meta-icon" viewBox="0 0 24 24"><path d="M6 4h8v14H6zM14 8h2l2 3v7h-4V8zM8 8h4v3H8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <span id="fuel-text">--%</span>
+      </div>
+      <div class="meta-item engine-item hidden" id="engine-item">
+        <svg class="meta-icon" viewBox="0 0 24 24"><path d="M4 10h2V8h3V6h6v2h3v2h2v6h-2v2h-3v-2H9v2H6v-2H4v-6z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <div class="engine-bar"><span id="engine-fill"></span></div>
+        <span id="engine-text">--%</span>
+      </div>
+    </div>
+
+    <div class="doors-list hidden" id="doors-list"></div>
+  </div>
+
+  <script src="js/vehicle.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
