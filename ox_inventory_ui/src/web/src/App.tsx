@@ -14,6 +14,52 @@ import KeyPress from './components/utils/KeyPress';
 
 debugData([
   {
+    action: 'initQboxUi',
+    data: {
+      config: {
+        accentColor: '#d946ef',
+        showHunger: true,
+        showThirst: true,
+        showHealth: true,
+        showArmor: true,
+        showCharacter: true,
+        showClothing: true,
+        enableCharacterRotation: true,
+        enableCharacterZoom: true,
+        characterBackground: 'dark',
+      },
+      hunger: 82,
+      thirst: 67,
+      health: 100,
+      armor: 50,
+    },
+  },
+  {
+    action: 'updateClothingSlots',
+    data: {
+      left: [
+        { id: 'mask', label: 'Masque', icon: 'mask', equipped: false, drawable: 0, texture: 0, quantity: 0 },
+        { id: 'hat', label: 'Chapeau', icon: 'hat', equipped: true, drawable: 1, texture: 0, quantity: 1 },
+        { id: 'glasses', label: 'Lunettes', icon: 'glasses', equipped: false, drawable: -1, texture: 0, quantity: 0 },
+        { id: 'ears', label: 'Oreilles', icon: 'earrings', equipped: false, drawable: -1, texture: 0, quantity: 0 },
+        { id: 'top', label: 'Haut', icon: 'top', equipped: true, drawable: 4, texture: 0, quantity: 1 },
+        { id: 'vest', label: 'Veste', icon: 'vest', equipped: false, drawable: 0, texture: 0, quantity: 0 },
+        { id: 'torso', label: 'Torse', icon: 'torso', equipped: true, drawable: 2, texture: 0, quantity: 1 },
+        { id: 'arms', label: 'Bras', icon: 'arms', equipped: true, drawable: 1, texture: 0, quantity: 1 },
+      ],
+      right: [
+        { id: 'pants', label: 'Pantalon', icon: 'pants', equipped: true, drawable: 3, texture: 0, quantity: 1 },
+        { id: 'shoes', label: 'Chaussures', icon: 'shoes', equipped: true, drawable: 2, texture: 0, quantity: 1 },
+        { id: 'bag', label: 'Sac', icon: 'bag', equipped: false, drawable: 0, texture: 0, quantity: 0 },
+        { id: 'chain', label: 'Chaîne', icon: 'chain', equipped: true, drawable: 1, texture: 0, quantity: 1 },
+        { id: 'watch', label: 'Montre', icon: 'watch', equipped: false, drawable: -1, texture: 0, quantity: 0 },
+        { id: 'bracelet', label: 'Bracelet', icon: 'bracelet', equipped: false, drawable: -1, texture: 0, quantity: 0 },
+        { id: 'belt', label: 'Ceinture', icon: 'belt', equipped: false, drawable: 0, texture: 0, quantity: 0 },
+        { id: 'accessory', label: 'Accessoires', icon: 'accessory', equipped: false, drawable: 0, texture: 0, quantity: 0 },
+      ],
+    },
+  },
+  {
     action: 'setupInventory',
     data: {
       leftInventory: {
