@@ -34,8 +34,11 @@ ui_page 'web/index.html'
 
 files {
     'web/index.html',
+    'web/preview.html',
     'web/style.css',
+    'web/preview.css',
     'web/app.js',
+    'web/preview-boot.js',
     'web/assets/.gitkeep',
 }
 
