@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QBX Mechanic — Preview</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="preview.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body class="preview-mode">
+    <div class="preview-banner">PREVIEW — qbx-mechanic NUI (Étape 1)</div>
+
+    <div id="app">
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-wrench"></i>
+                <span id="shop-label">Benny's Motor Works</span>
+            </div>
+            <nav class="nav">
+                <button class="nav-item active" data-tab="vehicle"><i class="fa-solid fa-car"></i> Véhicule</button>
+                <button class="nav-item" data-tab="diagnostic"><i class="fa-solid fa-stethoscope"></i> Diagnostic</button>
+                <button class="nav-item" data-tab="actions"><i class="fa-solid fa-screwdriver-wrench"></i> Actions</button>
+                <button class="nav-item" data-tab="billing"><i class="fa-solid fa-file-invoice-dollar"></i> Facturation</button>
+            </nav>
+            <div class="sidebar-meta">
+                <div class="meta-row"><span>Mécanicien</span><strong>Jean Dupont</strong></div>
+                <div class="meta-row"><span>Grade</span><strong>Chef d'équipe</strong></div>
+                <div class="meta-row"><span>Service</span><strong class="badge-on">En service</strong></div>
+            </div>
+            <button id="btn-close" class="btn-close"><i class="fa-solid fa-xmark"></i> Fermer</button>
+        </aside>
+
+        <main class="content">
+            <header class="header">
+                <div>
+                    <h1 id="panel-title">Atelier mécanique</h1>
+                    <p id="panel-subtitle">Véhicule connecté — intervention en cours</p>
+                </div>
+                <div class="vehicle-chip">
+                    <i class="fa-solid fa-car-side"></i>
+                    <div>
+                        <strong id="veh-plate">LS42MECH</strong>
+                        <span id="veh-name">Bravado Banshee</span>
+                    </div>
+                </div>
+            </header>
+
+            <section id="panel-vehicle" class="panel active">
+                <div class="grid-2">
+                    <div class="card vehicle-card">
+                        <div class="card-head"><i class="fa-solid fa-circle-info"></i> Informations véhicule</div>
+                        <div class="stat-grid">
+                            <div class="stat"><span>Modèle</span><strong>Bravado Banshee</strong></div>
+                            <div class="stat"><span>Plaque</span><strong>LS42MECH</strong></div>
+                            <div class="stat"><span>Classe</span><strong>Sport</strong></div>
+                            <div class="stat"><span>Carburant</span><strong>68%</strong></div>
+                        </div>
+                    </div>
+                    <div class="card health-card">
+                        <div class="card-head"><i class="fa-solid fa-heart-pulse"></i> État général</div>
+                        <div class="bar-row"><span>Moteur</span><div class="bar"><div class="fill warn" style="width:82%"></div></div><em>82%</em></div>
+                        <div class="bar-row"><span>Carrosserie</span><div class="bar"><div class="fill warn" style="width:71%"></div></div><em>71%</em></div>
+                        <div class="bar-row"><span>Essence</span><div class="bar"><div class="fill ok" style="width:68%"></div></div><em>68%</em></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="panel-diagnostic" class="panel">
+                <div class="card">
+                    <div class="card-head"><i class="fa-solid fa-stethoscope"></i> Rapport diagnostic complet</div>
+                    <div class="diag-grid">
+                        <div class="diag-item"><span>Moteur</span><div class="bar"><div class="fill warn" style="width:82%"></div></div><em>82%</em></div>
+                        <div class="diag-item"><span>Carrosserie</span><div class="bar"><div class="fill warn" style="width:71%"></div></div><em>71%</em></div>
+                        <div class="diag-item"><span>Transmission</span><div class="bar"><div class="fill ok" style="width:91%"></div></div><em>91%</em></div>
+                        <div class="diag-item"><span>Freins</span><div class="bar"><div class="fill danger" style="width:63%"></div></div><em>63%</em></div>
+                        <div class="diag-item"><span>Suspension</span><div class="bar"><div class="fill ok" style="width:84%"></div></div><em>84%</em></div>
+                    </div>
+                    <div class="tires-block">
+                        <h3>Pneus</h3>
+                        <div class="tire-grid">
+                            <div><span>AVG</span><strong>92%</strong></div>
+                            <div><span>AVD</span><strong>87%</strong></div>
+                            <div><span>ARG</span><strong>76%</strong></div>
+                            <div><span>ARD</span><strong>81%</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="panel-actions" class="panel">
+                <div class="actions-grid">
+                    <button class="action-card"><i class="fa-solid fa-wrench"></i><span>Réparation</span><em>750$</em></button>
+                    <button class="action-card"><i class="fa-solid fa-car-burst"></i><span>Carrosserie</span><em>500$</em></button>
+                    <button class="action-card"><i class="fa-solid fa-gears"></i><span>Moteur</span><em>750$</em></button>
+                    <button class="action-card"><i class="fa-solid fa-circle-dot"></i><span>Pneus</span><em>300$</em></button>
+                    <button class="action-card"><i class="fa-solid fa-soap"></i><span>Nettoyage</span><em>200$</em></button>
+                    <button class="action-card"><i class="fa-solid fa-palette"></i><span>Peinture</span><em>800$</em></button>
+                    <button class="action-card"><i class="fa-solid fa-bolt"></i><span>Performance</span><em>1000$</em></button>
+                    <button class="action-card"><i class="fa-solid fa-sliders"></i><span>Customisation</span><em>1000$</em></button>
+                    <button class="action-card"><i class="fa-solid fa-clipboard-list"></i><span>Diagnostic</span><em>150$</em></button>
+                    <button class="action-card highlight"><i class="fa-solid fa-file-invoice-dollar"></i><span>Facturer</span><em>—</em></button>
+                </div>
+            </section>
+
+            <section id="panel-billing" class="panel">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-head"><i class="fa-solid fa-user"></i> Client</div>
+                        <div class="client-select">
+                            <div class="client-option selected"><i class="fa-solid fa-user"></i> Michael Smith <span>ID 12</span></div>
+                            <div class="client-option"><i class="fa-solid fa-user"></i> Sarah Johnson <span>ID 8</span></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-head"><i class="fa-solid fa-receipt"></i> Récapitulatif facture</div>
+                        <div class="invoice-lines">
+                            <div class="line"><span>Réparation moteur</span><strong>750$</strong></div>
+                            <div class="line"><span>Carrosserie</span><strong>500$</strong></div>
+                            <div class="line"><span>Diagnostic</span><strong>150$</strong></div>
+                            <div class="line total"><span>Total</span><strong>1 400$</strong></div>
+                        </div>
+                        <button class="btn-primary"><i class="fa-solid fa-paper-plane"></i> Envoyer la facture</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="preview-boot.js"></script>
+</body>
+</html>

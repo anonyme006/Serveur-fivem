@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QBX Mechanic</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div id="app" class="hidden">
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-wrench"></i>
+                <span id="shop-label">Mechanic</span>
+            </div>
+            <nav class="nav">
+                <button class="nav-item active" data-tab="vehicle"><i class="fa-solid fa-car"></i> Véhicule</button>
+                <button class="nav-item" data-tab="diagnostic"><i class="fa-solid fa-stethoscope"></i> Diagnostic</button>
+                <button class="nav-item" data-tab="actions"><i class="fa-solid fa-screwdriver-wrench"></i> Actions</button>
+                <button class="nav-item" data-tab="billing"><i class="fa-solid fa-file-invoice-dollar"></i> Facturation</button>
+            </nav>
+            <button id="btn-close" class="btn-close"><i class="fa-solid fa-xmark"></i> Fermer</button>
+        </aside>
+        <main class="content">
+            <header class="header">
+                <h1 id="panel-title">Atelier mécanique</h1>
+                <p id="panel-subtitle">Interface NUI — étape 6</p>
+            </header>
+            <section id="panel-vehicle" class="panel active"></section>
+            <section id="panel-diagnostic" class="panel"></section>
+            <section id="panel-actions" class="panel"></section>
+            <section id="panel-billing" class="panel"></section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
