@@ -13,7 +13,7 @@
 ---@field StatusUpdateInterval number
 
 Config = {
-    AccentColor = '#d946ef',
+    AccentColor = '#d4af37',
     ShowHealth = true,
     ShowHunger = true,
     ShowThirst = true,

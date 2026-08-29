@@ -16,6 +16,7 @@ import Fade from '../utils/transitions/Fade';
 import PlayerStatus from '../qbox/PlayerStatus';
 import CharacterPreview from '../qbox/CharacterPreview';
 import ClothingSlots from '../qbox/ClothingSlots';
+import RemoveOutfitButton from '../qbox/RemoveOutfitButton';
 import { setClothingSlots, setPlayerStatus } from '../../store/qboxUi';
 import { useAppSelector } from '../../store';
 import { selectClothingSlots, selectQboxUiConfig } from '../../store/qboxUi';
@@ -71,9 +72,9 @@ const Inventory: React.FC = () => {
         <div className="inventory-shell">
           <div className="inventory-wrapper">
             <div className="inventory-left-column">
-              <LeftInventory />
-              <InventoryControl />
-              <PlayerStatus />
+              <div className="inventory-panel inventory-panel--player">
+                <LeftInventory />
+              </div>
             </div>
 
             <div className="inventory-center-column">
@@ -82,10 +83,15 @@ const Inventory: React.FC = () => {
                 {config.showCharacter && <CharacterPreview />}
                 {config.showClothing && <ClothingSlots slots={clothingSlots.right} side="right" />}
               </div>
+              <PlayerStatus />
+              {config.showClothing && <RemoveOutfitButton />}
+              <InventoryControl />
             </div>
 
             <div className="inventory-right-column">
-              <RightInventory />
+              <div className="inventory-panel inventory-panel--secondary">
+                <RightInventory />
+              </div>
             </div>
           </div>
         </div>

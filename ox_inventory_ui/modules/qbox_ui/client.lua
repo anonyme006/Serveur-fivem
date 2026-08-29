@@ -7,23 +7,22 @@ local SLOT_DEFINITIONS = {
     mask = { label = 'Masque', icon = 'mask', kind = 'component', id = 1 },
     hat = { label = 'Chapeau', icon = 'hat', kind = 'prop', id = 0 },
     glasses = { label = 'Lunettes', icon = 'glasses', kind = 'prop', id = 1 },
-    ears = { label = 'Oreilles', icon = 'earrings', kind = 'prop', id = 2 },
     top = { label = 'Haut', icon = 'top', kind = 'component', id = 11 },
     vest = { label = 'Veste', icon = 'vest', kind = 'component', id = 9 },
-    torso = { label = 'Torse', icon = 'torso', kind = 'component', id = 8 },
-    arms = { label = 'Bras', icon = 'arms', kind = 'component', id = 3 },
     pants = { label = 'Pantalon', icon = 'pants', kind = 'component', id = 4 },
     shoes = { label = 'Chaussures', icon = 'shoes', kind = 'component', id = 6 },
+    chain = { label = 'Chaînes', icon = 'chain', kind = 'component', id = 7 },
+    ears = { label = 'Boucles d\'oreilles', icon = 'earrings', kind = 'prop', id = 2 },
     bag = { label = 'Sac', icon = 'bag', kind = 'component', id = 5 },
-    chain = { label = 'Chaîne', icon = 'chain', kind = 'component', id = 7 },
+    belt = { label = 'Ceinture', icon = 'belt', kind = 'component', id = 8 },
     watch = { label = 'Montre', icon = 'watch', kind = 'prop', id = 6 },
     bracelet = { label = 'Bracelet', icon = 'bracelet', kind = 'prop', id = 7 },
-    belt = { label = 'Ceinture', icon = 'belt', kind = 'component', id = 10 },
-    accessory = { label = 'Accessoires', icon = 'accessory', kind = 'component', id = 7 },
+    decals = { label = 'Décalque', icon = 'decals', kind = 'component', id = 10 },
+    arms = { label = 'Bras/Gants', icon = 'arms', kind = 'component', id = 3 },
 }
 
-local LEFT_SLOTS = { 'mask', 'hat', 'glasses', 'ears', 'top', 'vest', 'torso', 'arms' }
-local RIGHT_SLOTS = { 'pants', 'shoes', 'bag', 'chain', 'watch', 'bracelet', 'belt', 'accessory' }
+local LEFT_SLOTS = { 'mask', 'hat', 'glasses', 'top', 'vest', 'pants', 'shoes' }
+local RIGHT_SLOTS = { 'chain', 'ears', 'bag', 'belt', 'watch', 'bracelet', 'decals', 'arms' }
 
 local previewPed
 local previewActive = false
@@ -428,6 +427,33 @@ RegisterNUICallback('qboxUi:zoomCharacter', function(data, cb)
         previewZoom = lib.math.clamp((data.zoom or 1.0), 0.6, 1.6)
         refreshPreviewPed()
     end
+    cb({})
+end)
+
+RegisterNUICallback('qboxUi:removeOutfit', function(_, cb)
+    local ped = cache.ped
+
+    for i = 0, 11 do
+        if i ~= 2 then
+            SetPedComponentVariation(ped, i, 0, 0, 0)
+        end
+    end
+
+    for i = 0, 7 do
+        ClearPedProp(ped, i)
+    end
+
+    if GetResourceState('rcore_clothing') == 'started' then
+        TriggerEvent('rcore_clothing:saveCurrentSkin')
+    end
+
+    SetTimeout(250, function()
+        if inventoryOpen then
+            refreshPreviewPed()
+            sendClothingUpdate()
+        end
+    end)
+
     cb({})
 end)
 

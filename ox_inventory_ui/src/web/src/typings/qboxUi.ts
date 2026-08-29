@@ -35,7 +35,7 @@ export interface ClothingSlotsState {
 }
 
 export const defaultQboxUiConfig: QboxUiConfig = {
-  accentColor: '#d946ef',
+  accentColor: '#d4af37',
   showHunger: true,
   showThirst: true,
   showHealth: true,
