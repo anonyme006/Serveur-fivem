@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import InventoryComponent from './components/inventory';
 import useNuiEvent from './hooks/useNuiEvent';
 import { Items } from './store/items';
@@ -11,6 +12,8 @@ import DragPreview from './components/utils/DragPreview';
 import { fetchNui } from './utils/fetchNui';
 import { useDragDropManager } from 'react-dnd';
 import KeyPress from './components/utils/KeyPress';
+
+import { isEnvBrowser } from './utils/misc';
 
 debugData([
   {
@@ -154,6 +157,12 @@ const App: React.FC = () => {
   useNuiEvent('closeInventory', () => {
     manager.dispatch({ type: 'dnd-core/END_DRAG' });
   });
+
+  useEffect(() => {
+    if (isEnvBrowser()) {
+      document.body.style.background = '#1c1c1c';
+    }
+  }, []);
 
   return (
     <div className="app-wrapper">
