@@ -130,10 +130,6 @@ const CLOTHING_ICONS: Record<string, ClothingIcon> = {
   gloves: GlovesIcon,
   legs: LegsIcon,
   shoes: ShoesIcon,
-  chain: GenericClothingIcon,
-  watch: GenericClothingIcon,
-  bracelet: GenericClothingIcon,
-  decals: GenericClothingIcon,
 };
 
 export const getClothingIcon = (category: string): ClothingIcon => CLOTHING_ICONS[category] || GenericClothingIcon;

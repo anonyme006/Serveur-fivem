@@ -3,13 +3,12 @@
 .player-status-row {
   display: flex;
   flex-direction: row;
-  gap: 0.9259vh;
+  gap: 0.5556vh;
   width: 100%;
-  max-width: 44.4444vh;
-  padding: 0.7407vh 0.9259vh;
-  background: rgba(0, 0, 0, 0.55);
-  border: 0.0926vh solid rgba(255, 255, 255, 0.08);
-  border-radius: 0.3704vh;
+  max-width: calc(2 * 4.1667vh + var(--ox-ped-gap));
+  padding: 0.3704vh 0;
+  background: transparent;
+  border: none;
 }
 
 .player-stat-compact {
@@ -22,7 +21,7 @@
   }
 
   &--pulse .player-stat-compact-fill {
-    filter: brightness(1.25);
+    filter: brightness(1.2);
   }
 }
 
@@ -33,7 +32,7 @@
   }
 
   50% {
-    transform: scale(1.03);
+    transform: scale(1.04);
   }
 }
 
@@ -41,24 +40,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.3704vh;
-  font-size: 0.6667vh;
-  font-weight: 700;
+  margin-bottom: 0.2778vh;
+  font-size: 0.5556vh;
+  font-weight: 600;
 }
 
 .player-stat-compact-emoji {
-  font-size: 0.787vh;
+  font-size: 0.6481vh;
+  line-height: 1;
 }
 
 .player-stat-compact-value {
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.6296vh;
+  color: var(--ox-text-2, rgba(255, 255, 255, 0.75));
+  font-size: 0.5556vh;
 }
 
 .player-stat-compact-track {
-  height: 0.463vh;
+  height: 0.3704vh;
   border-radius: 0.1852vh;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
 }
 
@@ -81,32 +81,5 @@
 }
 
 .player-stat-compact--armor .player-stat-compact-fill {
-  background: #1565c0;
-}
-
-.remove-outfit-button {
-  padding: 0.7407vh 1.8519vh;
-  border-radius: 0.2778vh;
-  border: 0.0926vh solid rgba(255, 255, 255, 0.15);
-  background: rgba(0, 0, 0, 0.65);
-  color: #fff;
-  font-size: 0.787vh;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
-
-  &:hover {
-    border-color: var(--ox-main, #d4af37);
-    background: rgba(20, 20, 20, 0.9);
-  }
-}
-
-.inventory-centre-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.9259vh;
-  width: 100%;
+  background: var(--ox-main, #c0e00f);
 }

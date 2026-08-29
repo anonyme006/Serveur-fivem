@@ -5,8 +5,7 @@ import SettingsPanel from './SettingsPanel';
 import InventoryHotbar from './InventoryHotbar';
 import ClothingPanel from './ClothingPanel';
 import PlayerStatus from '../qbox/PlayerStatus';
-import RemoveOutfitButton from '../qbox/RemoveOutfitButton';
-import { useAppDispatch, useAppSelector } from '../../store';
+import { useAppDispatch } from '../../store';
 import { refreshSlots, setAdditionalMetadata, setContainerInventory, setupInventory } from '../../store/inventory';
 import { useExitListener } from '../../hooks/useExitListener';
 import type { Inventory as InventoryProps } from '../../typings';
@@ -23,7 +22,7 @@ import { Locale } from '../../store/locale';
 import { UiConfig } from '../../store/uiConfig';
 import { SettingsIcon } from '../utils/icons';
 import { fetchNui } from '../../utils/fetchNui';
-import { setPlayerStatus, selectQboxUiConfig } from '../../store/qboxUi';
+import { setPlayerStatus } from '../../store/qboxUi';
 import { PlayerStatusState } from '../../typings/qboxUi';
 
 const Inventory: React.FC = () => {
@@ -31,7 +30,6 @@ const Inventory: React.FC = () => {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const dispatch = useAppDispatch();
   const showBackpack = useShowBackpack();
-  const qboxConfig = useAppSelector(selectQboxUiConfig);
 
   useNuiEvent<boolean>('setInventoryVisible', setInventoryVisible);
   useNuiEvent<false>('closeInventory', () => {
@@ -87,11 +85,8 @@ const Inventory: React.FC = () => {
             </div>
 
             <div className="inventory-centre">
-              <div className="inventory-centre-stack">
-                {pedFocus && <ClothingPanel />}
-                <PlayerStatus />
-                {pedFocus && qboxConfig.showRemoveOutfit && <RemoveOutfitButton />}
-              </div>
+              {pedFocus && <ClothingPanel />}
+              <PlayerStatus />
               <InventoryControl />
             </div>
 

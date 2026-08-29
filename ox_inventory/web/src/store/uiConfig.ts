@@ -11,16 +11,16 @@ import {
 export let UiConfig: UiConfigShape = DEFAULT_UI_CONFIG;
 
 export const THEME_PRESETS: Readonly<Record<string, ThemeColors>> = {
-  gold: {
-    backgroundColor1: 'rgba(40, 34, 18, 0)',
-    backgroundColor2: 'rgba(50, 42, 20, 0.05)',
-    backgroundColor3: 'rgba(80, 68, 28, 0.12)',
-    rgbColor1: 'rgba(212, 175, 55, 0.12)',
-    rgbColor2: 'rgba(212, 175, 55, 0.06)',
-    mainColor: '#d4af37',
-    secondaryColor: '#8a7028',
-    textShadow: 'rgba(212, 175, 55, 0.36)',
-    photoShadowColor: 'rgba(212, 175, 55, 0.30)',
+  yellow: {
+    backgroundColor1: 'rgba(75, 83, 24, 0)',
+    backgroundColor2: 'rgba(71, 80, 18, 0.05)',
+    backgroundColor3: 'rgba(118, 134, 24, 0.1)',
+    rgbColor1: 'rgba(192, 224, 15, 0.10)',
+    rgbColor2: 'rgba(192, 224, 15, 0.05)',
+    mainColor: '#C0E00F',
+    secondaryColor: '#697A08',
+    textShadow: 'rgba(192, 224, 15, 0.36)',
+    photoShadowColor: 'rgba(192, 224, 15, 0.30)',
   },
   white: {
     backgroundColor1: 'rgba(74, 75, 74, 0)',
@@ -32,17 +32,6 @@ export const THEME_PRESETS: Readonly<Record<string, ThemeColors>> = {
     secondaryColor: '#757575ff',
     textShadow: 'rgba(226, 226, 226, 0.36)',
     photoShadowColor: 'rgba(221, 221, 221, 0.3)',
-  },
-  yellow: {
-    backgroundColor1: 'rgba(75, 83, 24, 0)',
-    backgroundColor2: 'rgba(71, 80, 18, 0.05)',
-    backgroundColor3: 'rgba(118, 134, 24, 0.1)',
-    rgbColor1: 'rgba(192, 224, 15, 0.10)',
-    rgbColor2: 'rgba(192, 224, 15, 0.05)',
-    mainColor: '#C0E00F',
-    secondaryColor: '#697A08',
-    textShadow: 'rgba(192, 224, 15, 0.36)',
-    photoShadowColor: 'rgba(192, 224, 15, 0.30)',
   },
   orange: {
     backgroundColor1: 'rgba(83, 55, 24, 0)',
@@ -101,7 +90,7 @@ export const THEME_PRESETS: Readonly<Record<string, ThemeColors>> = {
   },
 };
 
-export const THEME_PRESET_NAMES: readonly string[] = ['gold', 'white', 'yellow', 'orange', 'red', 'purple', 'blue', 'green'];
+export const THEME_PRESET_NAMES: readonly string[] = ['yellow', 'white', 'orange', 'red', 'purple', 'blue', 'green'];
 
 export const CUSTOM_THEME_NAME = 'custom';
 

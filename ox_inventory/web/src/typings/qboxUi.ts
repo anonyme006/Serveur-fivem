@@ -1,10 +1,8 @@
 export interface QboxUiConfig {
-  accentColor: string;
   showHunger: boolean;
   showThirst: boolean;
   showHealth: boolean;
   showArmor: boolean;
-  showRemoveOutfit: boolean;
 }
 
 export interface PlayerStatusState {
@@ -16,12 +14,10 @@ export interface PlayerStatusState {
 }
 
 export const defaultQboxUiConfig: QboxUiConfig = {
-  accentColor: '#d4af37',
   showHunger: true,
   showThirst: true,
   showHealth: true,
-  showArmor: true,
-  showRemoveOutfit: true,
+  showArmor: false,
 };
 
 export const defaultPlayerStatus: PlayerStatusState = {

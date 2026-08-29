@@ -32,17 +32,13 @@ local function getHealthPercent()
 end
 
 local function getArmorPercent()
-    local armour = GetPedArmour(cache.ped)
+    return clampPercent(GetPedArmour(cache.ped))
+end
 
-    if armour > 0 then
-        return clampPercent(armour)
-    end
-
-    if QBX and QBX.PlayerData and QBX.PlayerData.metadata and QBX.PlayerData.metadata.armor then
-        return clampPercent(QBX.PlayerData.metadata.armor)
-    end
-
-    return 0
+---Armure visible uniquement quand un gilet pare-balles est activé (armure > 0).
+---@return boolean
+local function isArmorActive()
+    return GetPedArmour(cache.ped) > 0
 end
 
 local function getHungerPercent()
@@ -76,12 +72,10 @@ end
 local function buildStatusPayload()
     return {
         config = {
-            accentColor = Config.AccentColor,
             showHunger = Config.ShowHunger,
             showThirst = Config.ShowThirst,
             showHealth = Config.ShowHealth,
-            showArmor = Config.ShowArmor,
-            showRemoveOutfit = Config.ShowRemoveOutfit,
+            showArmor = isArmorActive(),
         },
         hunger = getHungerPercent(),
         thirst = getThirstPercent(),
@@ -156,26 +150,6 @@ AddEventHandler('gameEventTriggered', function(name, args)
     if name == 'CEventNetworkEntityDamage' and args[1] == cache.ped then
         sendStatusUpdate()
     end
-end)
-
-RegisterNUICallback('qboxUi:removeOutfit', function(_, cb)
-    local ped = cache.ped
-
-    for i = 0, 11 do
-        if i ~= 2 then
-            SetPedComponentVariation(ped, i, 0, 0, 0)
-        end
-    end
-
-    for i = 0, 7 do
-        ClearPedProp(ped, i)
-    end
-
-    if GetResourceState('rcore_clothing') == 'started' then
-        TriggerEvent('rcore_clothing:saveCurrentSkin')
-    end
-
-    cb({})
 end)
 
 RegisterNUICallback('qboxUi:requestInit', function(_, cb)

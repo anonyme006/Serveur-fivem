@@ -245,7 +245,7 @@ do
     local default = {
         layout = 'slots',
         pedPreview = {
-            mode = 'clone',
+            mode = 'silhouette',
             distance = 2.4,
             height = -0.9,
             side = 0.0,
@@ -272,30 +272,22 @@ do
         clothing = {
             enabled = true,
             slots = {
-                { name = 'mask',      label = 'Masque',              side = 'left'  },
-                { name = 'hat',       label = 'Chapeau',             side = 'left'  },
-                { name = 'glasses',   label = 'Lunettes',            side = 'left'  },
-                { name = 'torso',     label = 'Haut',                side = 'left'  },
-                { name = 'armour',    label = 'Veste',               side = 'left'  },
-                { name = 'legs',      label = 'Pantalon',            side = 'left'  },
-                { name = 'shoes',     label = 'Chaussures',          side = 'left'  },
-                { name = 'earpiece',  label = 'Boucles d\'oreilles', side = 'right' },
-                { name = 'backpack',  label = 'Sac',                 side = 'right' },
-                { name = 'belt',      label = 'Ceinture',            side = 'right' },
-                { name = 'gloves',    label = 'Bras/Gants',          side = 'right' },
-                { name = 'chain',     label = 'Chaînes',             side = 'right' },
-                { name = 'watch',     label = 'Montre',              side = 'right' },
-                { name = 'bracelet',  label = 'Bracelet',            side = 'right' },
-                { name = 'decals',    label = 'Décalque',            side = 'right' },
+                { name = 'hat',      label = 'Hat',      side = 'left'  },
+                { name = 'glasses',  label = 'Glasses',  side = 'left'  },
+                { name = 'mask',     label = 'Mask',     side = 'left'  },
+                { name = 'earpiece', label = 'Earpiece', side = 'left'  },
+                { name = 'torso',    label = 'Torso',    side = 'left'  },
+                { name = 'armour',   label = 'Armour',   side = 'right' },
+                { name = 'backpack', label = 'Backpack', side = 'right' },
+                { name = 'gloves',   label = 'Gloves',   side = 'right' },
+                { name = 'legs',     label = 'Legs',     side = 'right' },
+                { name = 'shoes',    label = 'Shoes',    side = 'right' },
             },
         },
         qboxUi = {
-            accentColor = '#d4af37',
             showHealth = true,
             showHunger = true,
             showThirst = true,
-            showArmor = true,
-            showRemoveOutfit = true,
             statusUpdateInterval = 500,
         },
         rarity = {
@@ -310,18 +302,18 @@ do
                 mythic    = { label = 'Mythic',    color = '#FB7185', order = 6 },
             },
         },
-        theme = 'gold',
+        theme = 'yellow',
         themes = {
-            gold = {
-                backgroundColor1 = 'rgba(40, 34, 18, 0)',
-                backgroundColor2 = 'rgba(50, 42, 20, 0.05)',
-                backgroundColor3 = 'rgba(80, 68, 28, 0.12)',
-                rgbColor1        = 'rgba(212, 175, 55, 0.12)',
-                rgbColor2        = 'rgba(212, 175, 55, 0.06)',
-                mainColor        = '#d4af37',
-                secondaryColor   = '#8a7028',
-                textShadow       = 'rgba(212, 175, 55, 0.36)',
-                photoShadowColor = 'rgba(212, 175, 55, 0.30)',
+            yellow = {
+                backgroundColor1 = 'rgba(75, 83, 24, 0)',
+                backgroundColor2 = 'rgba(71, 80, 18, 0.05)',
+                backgroundColor3 = 'rgba(118, 134, 24, 0.1)',
+                rgbColor1        = 'rgba(192, 224, 15, 0.10)',
+                rgbColor2        = 'rgba(192, 224, 15, 0.05)',
+                mainColor        = '#C0E00F',
+                secondaryColor   = '#697A08',
+                textShadow       = 'rgba(192, 224, 15, 0.36)',
+                photoShadowColor = 'rgba(192, 224, 15, 0.30)',
             },
             white = {
                 backgroundColor1 = 'rgba(74, 75, 74, 0)',
@@ -400,9 +392,9 @@ do
     end
 
     if type(ui.themes[ui.theme]) ~= 'table' then
-        warn(("unknown inventory theme '%s' - falling back to 'gold'"):format(tostring(ui.theme)))
-        ui.themes.gold = ui.themes.gold or default.themes.gold
-        ui.theme = 'gold'
+        warn(("unknown inventory theme '%s' - falling back to 'yellow'"):format(tostring(ui.theme)))
+        ui.themes.yellow = ui.themes.yellow or default.themes.yellow
+        ui.theme = 'yellow'
     end
 
     local slots = {}
