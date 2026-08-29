@@ -1,0 +1,85 @@
+@use './tokens';
+
+.player-status-row {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5556vh;
+  width: 100%;
+  max-width: calc(2 * 4.1667vh + var(--ox-ped-gap));
+  padding: 0.3704vh 0;
+  background: transparent;
+  border: none;
+}
+
+.player-stat-compact {
+  flex: 1;
+  min-width: 0;
+  transition: transform 0.25s ease;
+
+  &--pulse {
+    animation: statPulse 0.5s ease;
+  }
+
+  &--pulse .player-stat-compact-fill {
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes statPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.player-stat-compact-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.2778vh;
+  font-size: 0.5556vh;
+  font-weight: 600;
+}
+
+.player-stat-compact-emoji {
+  font-size: 0.6481vh;
+  line-height: 1;
+}
+
+.player-stat-compact-value {
+  color: var(--ox-text-2, rgba(255, 255, 255, 0.75));
+  font-size: 0.5556vh;
+}
+
+.player-stat-compact-track {
+  height: 0.3704vh;
+  border-radius: 0.1852vh;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.player-stat-compact-fill {
+  height: 100%;
+  border-radius: 0.1852vh;
+  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.player-stat-compact--health .player-stat-compact-fill {
+  background: #e53935;
+}
+
+.player-stat-compact--hunger .player-stat-compact-fill {
+  background: #f5a623;
+}
+
+.player-stat-compact--thirst .player-stat-compact-fill {
+  background: #4fc3f7;
+}
+
+.player-stat-compact--armor .player-stat-compact-fill {
+  background: var(--ox-main, #c0e00f);
+}

@@ -1,0 +1,67 @@
+name: Check upstream
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read our version
+        id: ours
+        run: |
+          OURS=$(grep -oP "^version\s+'\K[^']+" fxmanifest.lua)
+          echo "version=$OURS" >> "$GITHUB_OUTPUT"
+          echo "This fork is on $OURS"
+
+      - name: Read upstream version and commits
+        id: theirs
+        run: |
+          git remote add upstream https://github.com/CommunityOx/ox_inventory.git || true
+          git fetch --quiet upstream main
+
+          THEIRS=$(git show upstream/main:fxmanifest.lua | grep -oP "^version\s+'\K[^']+")
+          echo "version=$THEIRS" >> "$GITHUB_OUTPUT"
+
+          BUMP=$(git log upstream/main --format='%H' -S"$THEIRS" -- fxmanifest.lua | head -1)
+          {
+            echo 'commits<<EOF'
+            git log --format='- %h %s' "$BUMP..upstream/main"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Upstream is on $THEIRS"
+
+      - name: Report
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OURS: ${{ steps.ours.outputs.version }}
+          THEIRS: ${{ steps.theirs.outputs.version }}
+          COMMITS: ${{ steps.theirs.outputs.commits }}
+        run: |
+          if [ "$OURS" = "$THEIRS" ] && [ -z "$COMMITS" ]; then
+            echo "Up to date with upstream $THEIRS. Nothing to report."
+            exit 0
+          fi
+
+          TITLE="Upstream ox_inventory has changes (ours $OURS, theirs $THEIRS)"
+          BODY=$(printf 'This fork does not share git history with upstream, so these cannot be merged. Port them by hand.\n\n**Our version:** %s\n**Upstream version:** %s\n\n**Unreleased upstream commits:**\n%s\n\nCompare: https://github.com/CommunityOx/ox_inventory/compare/v%s...main\n' "$OURS" "$THEIRS" "${COMMITS:-none}" "$THEIRS")
+
+          EXISTING=$(gh issue list --label upstream --state open --json number --jq '.[0].number')
+
+          if [ -n "$EXISTING" ]; then
+            gh issue edit "$EXISTING" --title "$TITLE" --body "$BODY"
+          else
+            gh label create upstream --description "Upstream sync" --color ededed || true
+            gh issue create --title "$TITLE" --body "$BODY" --label upstream
+          fi
