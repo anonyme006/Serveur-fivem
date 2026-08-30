@@ -5,7 +5,7 @@ lua54 'yes'
 name 'core_garage'
 author 'VIBE'
 description 'Garage premium ESX Legacy — public, personnel, entreprise, métier, fourrière, bateau, avion, hélico'
-version '1.0.0'
+version '1.1.0'
 
 shared_scripts {
     '@es_extended/imports.lua',
@@ -16,12 +16,14 @@ shared_scripts {
 }
 
 client_scripts {
+    '@menuv/menuv.lua',
     'client/main.lua',
+    'client/spawn.lua',
+    'client/nui.lua',
+    'client/admin.lua',
+    'client/menuv.lua',
     'client/garage.lua',
     'client/store.lua',
-    'client/spawn.lua',
-    'client/admin.lua',
-    'client/nui.lua',
 }
 
 server_scripts {
@@ -51,4 +53,5 @@ dependencies {
     'oxmysql',
     'ox_lib',
     'ox_target',
+    'menuv',
 }

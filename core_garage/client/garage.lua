@@ -52,6 +52,13 @@ local function openGarage(name)
         return
     end
 
+    CoreGarage.currentGarage = name
+
+    if CoreGarageMenu and CoreGarageMenu.UseForGarage() then
+        CoreGarageMenu.OpenGarage(name)
+        return
+    end
+
     local result = lib.callback.await('core_garage:openGarage', false, name)
     if not result or not result.ok then
         CoreGarage.Notify(_(result and result.error or 'error'), 'error')

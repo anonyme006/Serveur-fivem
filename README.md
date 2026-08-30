@@ -15,6 +15,7 @@ ensure es_extended
 ensure oxmysql
 ensure ox_lib
 ensure ox_target
+ensure menuv
 ensure core_garage
 ```
 

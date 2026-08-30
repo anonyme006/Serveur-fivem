@@ -9,6 +9,27 @@ Config.Locale = 'fr'
 Config.Debug = false
 
 --[[--------------------------------------------------------------------------
+    MenuV (style Marlowe Vineyard)
+    Interface garage / admin via MenuV au lieu de NUI / ox_lib context
+---------------------------------------------------------------------------]]
+Config.MenuV = {
+    enabled = true,
+    -- 'menuv' | 'nui' — interface joueur à l'ouverture d'un garage
+    garageInterface = 'menuv',
+    -- 'menuv' | 'ox_lib' — menu /garageadmin
+    adminInterface = 'menuv',
+    Position = 'bottomright',
+    Theme = 'native',
+    Size = 'size-125',
+    Namespace = 'core_garage',
+    Colors = {
+        Red = 56,
+        Green = 189,
+        Blue = 248,
+    },
+}
+
+--[[--------------------------------------------------------------------------
     Général
 ---------------------------------------------------------------------------]]
 Config.General = {

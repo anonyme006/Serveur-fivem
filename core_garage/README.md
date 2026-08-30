@@ -8,6 +8,7 @@ Garage premium pour **ESX Legacy 1.12+** — public, personnel, entreprise, mét
 - `oxmysql`
 - `ox_lib`
 - `ox_target`
+- `menuv` (ThymonA/menuv)
 - OneSync Infinity
 - Lua 5.4
 
@@ -22,10 +23,31 @@ ensure es_extended
 ensure oxmysql
 ensure ox_lib
 ensure ox_target
+ensure menuv
 ensure core_garage
 ```
 
-4. Configurer `config.lua` (garages, prix, blips, jobs, UI…)
+4. Configurer `config.lua` (garages, prix, blips, jobs, UI, MenuV…)
+
+## MenuV (style Marlowe Vineyard)
+
+Par défaut, `core_garage` utilise **MenuV** pour l’interface joueur et l’admin (comme Marlowe Vineyard).
+
+```lua
+Config.MenuV = {
+    enabled = true,
+    garageInterface = 'menuv',  -- 'menuv' | 'nui'
+    adminInterface = 'menuv',   -- 'menuv' | 'ox_lib'
+    Position = 'bottomright',
+    Theme = 'native',
+    Size = 'size-125',
+    Colors = { Red = 56, Green = 189, Blue = 248 },
+}
+```
+
+- **Garage** : menu principal → « Mes véhicules » (liste dynamique) + « Ranger le véhicule »
+- **Admin** : `/garageadmin` → navigation MenuV (formulaires via ox_lib inputDialog)
+- Pour retrouver la **NUI premium**, mettre `garageInterface = 'nui'`
 
 ## Fonctionnalités
 
@@ -33,6 +55,7 @@ ensure core_garage
 |--------|--------|
 | Garages | 8 types, blips/markers, accès job/gang, activation SQL |
 | NUI | Image, plaque, moteur/carrosserie/essence, km, assurance, statut, recherche, tri |
+| MenuV | Interface garage + admin style Marlowe Vineyard (configurable) |
 | Sortie | ProgressBar, anim portail, spawn OneSync, anti-dupe, props complets, clés |
 | Rangement | `ox_target` sans être assis, moteur coupé, sauvegarde complète |
 | Fourrière | Véhicule détruit → fourrière, prix/délai, réduction assurance |
