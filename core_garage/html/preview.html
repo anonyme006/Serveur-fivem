@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>core_garage — Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { background: #050a12; }
+    .preview-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100000;
+      display: flex; gap: .75rem; align-items: center; justify-content: center;
+      padding: .55rem 1rem; background: rgba(8,12,20,.92);
+      border-bottom: 1px solid rgba(56,189,248,.2); backdrop-filter: blur(8px);
+      font-family: 'Outfit', sans-serif; font-size: .82rem; color: #8b9bb4;
+      pointer-events: auto;
+    }
+    .preview-bar strong { color: #38bdf8; font-weight: 600; }
+    .preview-bar button {
+      border: 1px solid rgba(56,189,248,.35); background: rgba(56,189,248,.12);
+      color: #e8eef7; border-radius: 999px; padding: .35rem .85rem; cursor: pointer;
+      font: inherit; font-size: .78rem;
+    }
+    .preview-bar button:hover { background: rgba(56,189,248,.22); }
+    #app { padding-top: 3rem; }
+  </style>
+</head>
+<body>
+  <div class="preview-bar">
+    <strong>core_garage</strong>
+    <span>Preview NUI réelle — Garage Légion Square</span>
+    <button type="button" id="btn-impound">Fourrière</button>
+    <button type="button" id="btn-garage">Garage public</button>
+  </div>
+
+  <div id="app" class="hidden" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <main class="panel" role="dialog" aria-labelledby="garage-title">
+      <header class="panel__header">
+        <div class="panel__brand">
+          <div class="panel__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path d="M3 11.5 12 4l9 7.5" />
+              <path d="M5 10.5V20h14v-9.5" />
+              <path d="M9 20v-5h6v5" />
+            </svg>
+          </div>
+          <div>
+            <p class="panel__eyebrow" id="garage-type">Garage</p>
+            <h1 class="panel__title" id="garage-title">Garage</h1>
+          </div>
+        </div>
+        <div class="panel__toolbar">
+          <label class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+            </svg>
+            <input id="search" type="search" placeholder="Rechercher…" autocomplete="off" />
+          </label>
+          <div class="sort" role="group" aria-label="Tri">
+            <button class="sort__btn is-active" data-sort="name" type="button">Nom</button>
+            <button class="sort__btn" data-sort="category" type="button">Catégorie</button>
+            <button class="sort__btn" data-sort="date" type="button">Date</button>
+          </div>
+          <button class="icon-btn" id="btn-close" type="button" aria-label="Fermer" data-close>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+      </header>
+      <section class="grid-wrap">
+        <div id="vehicle-grid" class="grid"></div>
+        <div id="empty-state" class="empty hidden">
+          <div class="empty__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M3 13h18l-1.5-4.5A2 2 0 0 0 17.6 7H6.4a2 2 0 0 0-1.9 1.5L3 13Z" />
+              <path d="M5 13v5h2v-2h10v2h2v-5" />
+              <circle cx="7.5" cy="16.5" r="1.5" /><circle cx="16.5" cy="16.5" r="1.5" />
+            </svg>
+          </div>
+          <p id="empty-label">Aucun véhicule</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <template id="tpl-card">
+    <article class="card" tabindex="0">
+      <div class="card__media">
+        <img class="card__img" alt="" loading="lazy" />
+        <div class="card__media-fade"></div>
+        <span class="badge badge--status"></span>
+      </div>
+      <div class="card__body">
+        <div class="card__top">
+          <h2 class="card__name"></h2>
+          <span class="card__plate"></span>
+        </div>
+        <p class="card__category"></p>
+        <div class="meters">
+          <div class="meter" data-meter="engine">
+            <div class="meter__row"><span class="meter__label">Moteur</span><span class="meter__val"></span></div>
+            <div class="meter__bar"><i></i></div>
+          </div>
+          <div class="meter" data-meter="body">
+            <div class="meter__row"><span class="meter__label">Carrosserie</span><span class="meter__val"></span></div>
+            <div class="meter__bar"><i></i></div>
+          </div>
+          <div class="meter" data-meter="fuel">
+            <div class="meter__row"><span class="meter__label">Réservoir</span><span class="meter__val"></span></div>
+            <div class="meter__bar"><i></i></div>
+          </div>
+        </div>
+        <div class="card__meta">
+          <div class="meta">
+            <span class="meta__label">Kilométrage</span>
+            <span class="meta__value meta--mileage"></span>
+          </div>
+          <div class="meta">
+            <span class="meta__label">Assurance</span>
+            <span class="meta__value meta--insurance"></span>
+          </div>
+        </div>
+        <button class="card__cta" type="button"></button>
+      </div>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+  <script>
+    const garageData = {
+      public: {
+        garage: { name: 'legion_public', label: 'Garage Légion Square', type: 'public' },
+        isImpound: false,
+        vehicles: [
+          { id: 1, plate: 'ABC 123', name: 'Obey 9F', modelName: 'ninef', categoryLabel: 'Sport', engine: 92, body: 88, fuel: 74, mileageLabel: '12 450 km', insured: true, status: 'stored', image: 'https://docs.fivem.net/vehicles/ninef.webp' },
+          { id: 2, plate: 'RP 7742', name: 'Bravado Buffalo', modelName: 'buffalo', categoryLabel: 'Muscle', engine: 67, body: 54, fuel: 41, mileageLabel: '28 901 km', insured: false, status: 'stored', image: 'https://docs.fivem.net/vehicles/buffalo.webp' },
+          { id: 3, plate: 'KEV 006', name: 'Ma Sultan RS', modelName: 'sultanrs', categoryLabel: 'Sport', engine: 100, body: 97, fuel: 88, mileageLabel: '3 210 km', insured: true, status: 'out', image: 'https://docs.fivem.net/vehicles/sultanrs.webp' },
+          { id: 4, plate: 'LS 0192', name: 'Vapid Dominator', modelName: 'dominator', categoryLabel: 'Muscle', engine: 81, body: 79, fuel: 62, mileageLabel: '45 672 km', insured: true, status: 'stored', image: 'https://docs.fivem.net/vehicles/dominator.webp' },
+          { id: 5, plate: 'MAR 007', name: 'Benefactor Schafter', modelName: 'schafter2', categoryLabel: 'Berline', engine: 95, body: 91, fuel: 55, mileageLabel: '8 120 km', insured: true, status: 'stored', image: 'https://docs.fivem.net/vehicles/schafter2.webp' },
+          { id: 6, plate: 'VIN 404', name: 'Dinka Blista', modelName: 'blista', categoryLabel: 'Compact', engine: 58, body: 62, fuel: 33, mileageLabel: '61 004 km', insured: false, status: 'stored', image: 'https://docs.fivem.net/vehicles/blista.webp' },
+        ],
+      },
+      impound: {
+        garage: { name: 'impound_public', label: 'Fourrière Centrale', type: 'impound', impoundPrice: 1500 },
+        isImpound: true,
+        vehicles: [
+          { id: 10, plate: 'WRECK 01', name: 'Obey 9F', modelName: 'ninef', categoryLabel: 'Sport', engine: 12, body: 8, fuel: 5, mileageLabel: '19 880 km', insured: true, status: 'impound', impoundFee: 750, image: 'https://docs.fivem.net/vehicles/ninef.webp' },
+          { id: 11, plate: 'LOST 99', name: 'Pegassi Zentorno', modelName: 'zentorno', categoryLabel: 'Super', engine: 22, body: 15, fuel: 0, mileageLabel: '7 442 km', insured: false, status: 'impound', impoundFee: 1500, image: 'https://docs.fivem.net/vehicles/zentorno.webp' },
+        ],
+      },
+    };
+
+    function openPreview(mode) {
+      const data = garageData[mode] || garageData.public;
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {
+          action: 'open',
+          payload: {
+            garage: data.garage,
+            vehicles: data.vehicles,
+            locale: {},
+            ui: {
+              accent: '#38bdf8', accentSoft: 'rgba(56, 189, 248, 0.15)',
+              bg: '#0b1220', panel: '#121a2b', text: '#e8eef7', muted: '#8b9bb4',
+              success: '#34d399', warning: '#fbbf24', danger: '#f87171', radius: '14px',
+            },
+            isImpound: data.isImpound,
+          },
+        },
+      }));
+    }
+
+    window.addEventListener('load', () => {
+      const params = new URLSearchParams(location.search);
+      const mode = params.get('mode') === 'impound' ? 'impound' : 'public';
+      openPreview(mode);
+      document.getElementById('btn-garage').onclick = () => { history.replaceState(null, '', '?mode=public'); openPreview('public'); };
+      document.getElementById('btn-impound').onclick = () => { history.replaceState(null, '', '?mode=impound'); openPreview('impound'); };
+    });
+  </script>
+</body>
+</html>
