@@ -1,4 +1,4 @@
-# Rex Diner v2.1.0 — Horny's & Greasy Joe's
+# Qbox Restaurants v2.1.0 — Horny's & Greasy Joe's
 
 Script restaurant **Qbox** complet — tablette NUI, craft, ventes, factures, stock, livraisons.
 
@@ -14,8 +14,8 @@ Sans ESX / QBCore legacy / RageUI / MenuV.
 
 ## Installation
 
-1. Placez `rex_diner` dans vos resources
-2. Importez `sql/rex_diner.sql`
+1. Placez `qbox-restaurants` dans vos resources
+2. Importez `sql/qbox_restaurants.sql`
 3. Ajoutez les jobs : `install/qbox_job.lua` → `qbx_core/shared/jobs.lua`
 4. Ajoutez les items : `install/ox_inventory_items.lua` → `ox_inventory/data/items.lua`
 5. Ajustez les positions dans `config.lua` selon vos MLO
@@ -27,7 +27,7 @@ ensure ox_lib
 ensure ox_target
 ensure ox_inventory
 ensure qbx_core
-ensure rex_diner
+ensure qbox-restaurants
 ```
 
 ## Commandes
@@ -77,7 +77,7 @@ Les produits et recettes sont filtrés par restaurant via le champ `restaurants`
 ## Structure
 
 ```
-rex_diner/
+qbox-restaurants/
 ├── fxmanifest.lua · config.lua
 ├── shared/ · client/ · server/
 ├── web/ · sql/ · install/

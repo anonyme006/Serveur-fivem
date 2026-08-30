@@ -1,4 +1,4 @@
-RegisterNetEvent('rex_diner:client:invoicePrompt', function(invoice)
+RegisterNetEvent('qbox_restaurants:client:invoicePrompt', function(invoice)
     if not invoice or not invoice.id then return end
 
     local choice = lib.alertDialog({
@@ -15,8 +15,8 @@ RegisterNetEvent('rex_diner:client:invoicePrompt', function(invoice)
     })
 
     if choice ~= 'confirm' then
-        lib.callback.await('rex_diner:cancelInvoice', false, invoice.id)
-        Rex.Notify('Factures', 'Facture refusée.', 'inform')
+        lib.callback.await('qbox_restaurants:cancelInvoice', false, invoice.id)
+        Rest.Notify('Factures', 'Facture refusée.', 'inform')
         return
     end
 
@@ -33,24 +33,24 @@ RegisterNetEvent('rex_diner:client:invoicePrompt', function(invoice)
         },
     })
     if not method then
-        lib.callback.await('rex_diner:cancelInvoice', false, invoice.id)
+        lib.callback.await('qbox_restaurants:cancelInvoice', false, invoice.id)
         return
     end
 
-    local result = lib.callback.await('rex_diner:payInvoice', false, {
+    local result = lib.callback.await('qbox_restaurants:payInvoice', false, {
         invoiceId = invoice.id,
         paymentMethod = method[1],
     })
     if not result or not result.ok then
-        Rex.Notify('Factures', result and result.message or 'Échec.', 'error')
+        Rest.Notify('Factures', result and result.message or 'Échec.', 'error')
     end
 end)
 
-function Rex.OpenBillingDialog()
+function Rest.OpenBillingDialog()
     if not Config.EnableBilling then return end
-    local players = lib.callback.await('rex_diner:getNearbyPlayers', false) or {}
+    local players = lib.callback.await('qbox_restaurants:getNearbyPlayers', false) or {}
     if #players == 0 then
-        Rex.Notify('Factures', 'Aucun joueur proche.', 'error')
+        Rest.Notify('Factures', 'Aucun joueur proche.', 'error')
         return
     end
     local opts = {}
@@ -63,10 +63,10 @@ function Rex.OpenBillingDialog()
         { type = 'input', label = 'Raison', required = true },
     })
     if not input then return end
-    local result = lib.callback.await('rex_diner:createInvoice', false, {
+    local result = lib.callback.await('qbox_restaurants:createInvoice', false, {
         targetId = input[1], amount = input[2], reason = input[3],
     })
     if not result or not result.ok then
-        Rex.Notify('Factures', result and result.error or 'Échec.', 'error')
+        Rest.Notify('Factures', result and result.error or 'Échec.', 'error')
     end
 end

@@ -1,8 +1,8 @@
 --- Paiement direct hors tablette (optionnel)
-function Rex.OpenNearbyPayment(cart, discount)
-    local players = lib.callback.await('rex_diner:getNearbyPlayers', false) or {}
+function Rest.OpenNearbyPayment(cart, discount)
+    local players = lib.callback.await('qbox_restaurants:getNearbyPlayers', false) or {}
     if #players == 0 then
-        Rex.Notify('Caisse', 'Aucun client à proximité.', 'error')
+        Rest.Notify('Caisse', 'Aucun client à proximité.', 'error')
         return
     end
 
@@ -27,19 +27,19 @@ function Rex.OpenNearbyPayment(cart, discount)
                     },
                 })
                 if not method then return end
-                local result = lib.callback.await('rex_diner:processSale', false, {
+                local result = lib.callback.await('qbox_restaurants:processSale', false, {
                     targetId = p.id,
                     cart = cart,
                     paymentMethod = method[1],
                     discount = discount or 0,
                 })
                 if not result or not result.ok then
-                    Rex.Notify('Caisse', result and result.error or 'Refusé.', 'error')
+                    Rest.Notify('Caisse', result and result.error or 'Refusé.', 'error')
                 end
             end,
         }
     end
 
-    lib.registerContext({ id = 'rex_diner_pay', title = 'CLIENT', options = options })
-    lib.showContext('rex_diner_pay')
+    lib.registerContext({ id = 'qbox_restaurants_pay', title = 'CLIENT', options = options })
+    lib.showContext('qbox_restaurants_pay')
 end

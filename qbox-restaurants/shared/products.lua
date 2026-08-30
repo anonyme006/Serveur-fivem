@@ -232,13 +232,13 @@ Config.Products = Products
 
 ---@param id string
 ---@return table|nil
-function Rex.GetProduct(id)
+function Rest.GetProduct(id)
     return Products[id]
 end
 
 ---@param restaurantKey string|nil
 ---@return table[]
-function Rex.GetSellableProducts(restaurantKey)
+function Rest.GetSellableProducts(restaurantKey)
     local list = {}
     for id, product in pairs(Products) do
         if product.sellable ~= false and product.available ~= false then

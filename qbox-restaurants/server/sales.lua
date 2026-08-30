@@ -7,7 +7,7 @@ local function buildCart(cart, restaurantKey)
         local entry = cart[i]
         local productId = type(entry.id) == 'string' and entry.id or entry.productId
         local qty = math.floor(tonumber(entry.quantity) or 0)
-        local product = productId and Rex.GetProduct(productId)
+        local product = productId and Rest.GetProduct(productId)
         if not product or product.sellable == false or product.available == false then
             return false, 'Produit invalide.'
         end
@@ -31,9 +31,9 @@ local function buildCart(cart, restaurantKey)
     return true, { lines = lines, subtotal = subtotal }
 end
 
-function Rex.ProcessSale(source, targetId, cart, paymentMethod, discountPercent)
-    if not Rex.Cooldown(source, 'sale') then return false, 'Patientez.' end
-    local ok, err, ctx = Rex.Authorize(source, 'sales')
+function Rest.ProcessSale(source, targetId, cart, paymentMethod, discountPercent)
+    if not Rest.Cooldown(source, 'sale') then return false, 'Patientez.' end
+    local ok, err, ctx = Rest.Authorize(source, 'sales')
     if not ok then return false, err end
 
     targetId = tonumber(targetId)
@@ -63,30 +63,30 @@ function Rex.ProcessSale(source, targetId, cart, paymentMethod, discountPercent)
     if total < 1 then return false, 'Montant invalide.' end
 
     paymentMethod = paymentMethod == 'bank' and 'bank' or 'cash'
-    if not Rex.GetPlayer(targetId) then return false, 'Client introuvable.' end
+    if not Rest.GetPlayer(targetId) then return false, 'Client introuvable.' end
 
-    local targetName = Rex.GetName(targetId)
-    local targetCid = Rex.GetCitizenId(targetId)
+    local targetName = Rest.GetName(targetId)
+    local targetCid = Rest.GetCitizenId(targetId)
 
-    if not Rex.RemoveMoney(targetId, paymentMethod, total, 'rex_diner:sale') then
+    if not Rest.RemoveMoney(targetId, paymentMethod, total, 'qbox_restaurants:sale') then
         return false, ('Fonds insuffisants (%s).'):format(paymentMethod)
     end
 
-    local rate = Rex.GetCommissionRate(ctx.grade)
+    local rate = Rest.GetCommissionRate(ctx.grade)
     local commission = math.floor(total * rate)
     local society = total - commission
 
     if commission > 0 then
-        Rex.AddMoney(source, 'bank', commission, 'rex_diner:commission')
+        Rest.AddMoney(source, 'bank', commission, 'qbox_restaurants:commission')
     end
     if society > 0 then
-        Rex.AddSociety(Rex.SocietyAccount(ctx.key), society, 'sale')
+        Rest.AddSociety(Rest.SocietyAccount(ctx.key), society, 'sale')
     end
 
-    Rex.EnsureEmployee(ctx.key, ctx.citizenid, ctx.name, ctx.grade)
+    Rest.EnsureEmployee(ctx.key, ctx.citizenid, ctx.name, ctx.grade)
 
     local saleId = MySQL.insert.await([[
-        INSERT INTO rex_diner_sales
+        INSERT INTO qbox_restaurants_sales
             (restaurant, employee_identifier, employee_name, customer_identifier, customer_name,
              amount, commission, commission_rate, payment_method, discount)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -99,13 +99,13 @@ function Rex.ProcessSale(source, targetId, cart, paymentMethod, discountPercent)
         for i = 1, #payload.lines do
             local l = payload.lines[i]
             MySQL.insert.await([[
-                INSERT INTO rex_diner_sale_items
+                INSERT INTO qbox_restaurants_sale_items
                     (sale_id, product_id, product_label, quantity, unit_price, total_price)
                 VALUES (?, ?, ?, ?, ?, ?)
             ]], { saleId, l.productId, l.label, l.quantity, l.unitPrice, l.totalPrice })
         end
         MySQL.update.await([[
-            UPDATE rex_diner_employees
+            UPDATE qbox_restaurants_employees
             SET total_sales = total_sales + ?, total_commission = total_commission + ?
             WHERE restaurant = ? AND identifier = ?
         ]], { total, commission, ctx.key, ctx.citizenid })
@@ -118,10 +118,10 @@ function Rex.ProcessSale(source, targetId, cart, paymentMethod, discountPercent)
     local summary = table.concat(parts, ' ')
     local payLabel = paymentMethod == 'bank' and 'par carte en sans contact' or 'en espèces'
 
-    Rex.Notify(source, 'TPE — Paiement reçu',
-        ('%s a payé %s (%s) %s.'):format(targetName, Rex.FormatMoney(total), summary, payLabel), 'success')
-    Rex.Notify(targetId, 'Paiement',
-        ('Vous avez payé %s à %s.'):format(Rex.FormatMoney(total), ctx.restaurant.label), 'inform')
+    Rest.Notify(source, 'TPE — Paiement reçu',
+        ('%s a payé %s (%s) %s.'):format(targetName, Rest.FormatMoney(total), summary, payLabel), 'success')
+    Rest.Notify(targetId, 'Paiement',
+        ('Vous avez payé %s à %s.'):format(Rest.FormatMoney(total), ctx.restaurant.label), 'inform')
 
     return true, {
         saleId = saleId,
@@ -132,13 +132,13 @@ function Rex.ProcessSale(source, targetId, cart, paymentMethod, discountPercent)
     }
 end
 
-function Rex.GetSales(restaurantKey, filters)
+function Rest.GetSales(restaurantKey, filters)
     filters = filters or {}
     local query = [[
         SELECT s.*,
             (SELECT GROUP_CONCAT(CONCAT(product_label, ' x', quantity) SEPARATOR ', ')
-             FROM rex_diner_sale_items si WHERE si.sale_id = s.id) AS items_summary
-        FROM rex_diner_sales s WHERE s.restaurant = ?
+             FROM qbox_restaurants_sale_items si WHERE si.sale_id = s.id) AS items_summary
+        FROM qbox_restaurants_sales s WHERE s.restaurant = ?
     ]]
     local params = { restaurantKey }
 
@@ -161,10 +161,10 @@ function Rex.GetSales(restaurantKey, filters)
     return MySQL.query.await(query, params) or {}
 end
 
-function Rex.GetStats(restaurantKey, citizenid)
+function Rest.GetStats(restaurantKey, citizenid)
     local function agg(extra, params)
         local row = MySQL.single.await(
-            ('SELECT COALESCE(SUM(amount),0) AS total, COUNT(*) AS count FROM rex_diner_sales WHERE restaurant = ? %s'):format(extra),
+            ('SELECT COALESCE(SUM(amount),0) AS total, COUNT(*) AS count FROM qbox_restaurants_sales WHERE restaurant = ? %s'):format(extra),
             params
         )
         return tonumber(row and row.total) or 0, tonumber(row and row.count) or 0
@@ -177,15 +177,15 @@ function Rex.GetStats(restaurantKey, citizenid)
 
     local delivery = MySQL.single.await([[
         SELECT COUNT(*) AS count, COALESCE(SUM(o.total_cost),0) AS total
-        FROM rex_diner_deliveries d
-        JOIN rex_diner_orders o ON o.id = d.order_id
+        FROM qbox_restaurants_deliveries d
+        JOIN qbox_restaurants_orders o ON o.id = d.order_id
         WHERE d.restaurant = ? AND d.status = 'completed'
     ]], { restaurantKey })
 
     local commission, mySales = 0, 0
     if citizenid then
         local emp = MySQL.single.await(
-            'SELECT total_commission, total_sales FROM rex_diner_employees WHERE restaurant = ? AND identifier = ? LIMIT 1',
+            'SELECT total_commission, total_sales FROM qbox_restaurants_employees WHERE restaurant = ? AND identifier = ? LIMIT 1',
             { restaurantKey, citizenid }
         )
         commission = tonumber(emp and emp.total_commission) or 0
@@ -194,8 +194,8 @@ function Rex.GetStats(restaurantKey, citizenid)
 
     local topProducts = MySQL.query.await([[
         SELECT product_id, product_label, SUM(quantity) AS qty, SUM(total_price) AS revenue
-        FROM rex_diner_sale_items si
-        JOIN rex_diner_sales s ON s.id = si.sale_id
+        FROM qbox_restaurants_sale_items si
+        JOIN qbox_restaurants_sales s ON s.id = si.sale_id
         WHERE s.restaurant = ?
         GROUP BY product_id, product_label
         ORDER BY qty DESC LIMIT 8
@@ -203,7 +203,7 @@ function Rex.GetStats(restaurantKey, citizenid)
 
     local chartWeek = MySQL.query.await([[
         SELECT DATE(created_at) AS day, COALESCE(SUM(amount),0) AS total, COUNT(*) AS count
-        FROM rex_diner_sales
+        FROM qbox_restaurants_sales
         WHERE restaurant = ? AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
         GROUP BY DATE(created_at) ORDER BY day ASC
     ]], { restaurantKey }) or {}

@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'rex_diner'
+name 'qbox-restaurants'
 author 'Serveur FiveM'
 description 'Système de restaurant multi-établissements — Horny\'s & Greasy Joe\'s'
 version '2.1.0'

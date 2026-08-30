@@ -1,3 +1,3 @@
 # Serveur-fivem
 
-Resource restaurant Qbox : `rex_diner` (Horny's Burgers + Greasy Joe's Diner).
+Resource restaurant Qbox : `qbox-restaurants` (Horny's Burgers + Greasy Joe's Diner).

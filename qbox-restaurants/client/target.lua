@@ -1,7 +1,7 @@
 local zones = {}
 
 local function can(permission)
-    return select(1, Rex.GetLocalJob()) ~= nil and (not permission or Rex.Can(permission))
+    return select(1, Rest.GetLocalJob()) ~= nil and (not permission or Rest.Can(permission))
 end
 
 local function zone(loc, options)
@@ -26,14 +26,14 @@ CreateThread(function()
                     icon = 'fas fa-cash-register',
                     label = 'Ouvrir la caisse',
                     canInteract = function() return can('sales') end,
-                    onSelect = function() Rex.OpenTablet('sales') end,
+                    onSelect = function() Rest.OpenTablet('sales') end,
                 },
                 {
                     name = key .. '_tab',
                     icon = 'fas fa-tablet-screen-button',
                     label = 'Ouvrir la tablette',
                     canInteract = function() return can('tablet') end,
-                    onSelect = function() Rex.OpenTablet('dashboard') end,
+                    onSelect = function() Rest.OpenTablet('dashboard') end,
                 },
             })
         end
@@ -45,14 +45,14 @@ CreateThread(function()
                     icon = 'fas fa-utensils',
                     label = 'Ouvrir la cuisine',
                     canInteract = function() return can('kitchen') end,
-                    onSelect = function() Rex.OpenCraftMenu() end,
+                    onSelect = function() Rest.OpenCraftMenu() end,
                 },
                 {
                     name = key .. '_rec',
                     icon = 'fas fa-book',
                     label = 'Recettes',
                     canInteract = function() return can('recipes') end,
-                    onSelect = function() Rex.OpenTablet('recipes') end,
+                    onSelect = function() Rest.OpenTablet('recipes') end,
                 },
             })
         end
@@ -64,14 +64,14 @@ CreateThread(function()
                     icon = 'fas fa-box',
                     label = 'Ouvrir le stock',
                     canInteract = function() return can('stock') end,
-                    onSelect = function() TriggerServerEvent('rex_diner:server:openStash') end,
+                    onSelect = function() TriggerServerEvent('qbox_restaurants:server:openStash') end,
                 },
                 {
                     name = key .. '_stock',
                     icon = 'fas fa-clipboard-list',
                     label = 'Gestion du stock',
                     canInteract = function() return can('stock') end,
-                    onSelect = function() Rex.OpenTablet('stock') end,
+                    onSelect = function() Rest.OpenTablet('stock') end,
                 },
             })
         end
@@ -83,7 +83,7 @@ CreateThread(function()
                     icon = 'fas fa-briefcase',
                     label = 'Bureau patron',
                     canInteract = function() return can('employees') or can('settings') end,
-                    onSelect = function() Rex.OpenTablet('employees') end,
+                    onSelect = function() Rest.OpenTablet('employees') end,
                 },
             })
         end
@@ -95,7 +95,7 @@ CreateThread(function()
                     icon = 'fas fa-shirt',
                     label = 'Prendre / quitter le service',
                     canInteract = function() return can('service') end,
-                    onSelect = function() Rex.ToggleService() end,
+                    onSelect = function() Rest.ToggleService() end,
                 },
             })
         end
@@ -106,15 +106,15 @@ CreateThread(function()
                     name = key .. '_del_done',
                     icon = 'fas fa-truck',
                     label = 'Déposer la livraison',
-                    canInteract = function() return can('deliveries') and Rex.CurrentDelivery ~= nil end,
-                    onSelect = function() Rex.CompleteDelivery() end,
+                    canInteract = function() return can('deliveries') and Rest.CurrentDelivery ~= nil end,
+                    onSelect = function() Rest.CompleteDelivery() end,
                 },
                 {
                     name = key .. '_del_list',
                     icon = 'fas fa-list',
                     label = 'Voir les livraisons',
                     canInteract = function() return can('deliveries') end,
-                    onSelect = function() Rex.OpenTablet('deliveries') end,
+                    onSelect = function() Rest.OpenTablet('deliveries') end,
                 },
             })
         end

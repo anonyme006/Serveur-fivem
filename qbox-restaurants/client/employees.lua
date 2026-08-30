@@ -1,11 +1,11 @@
-function Rex.OpenHireDialog()
-    if not Rex.Can('employees') then
-        Rex.Notify('Employés', 'Permission refusée.', 'error')
+function Rest.OpenHireDialog()
+    if not Rest.Can('employees') then
+        Rest.Notify('Employés', 'Permission refusée.', 'error')
         return
     end
-    local players = lib.callback.await('rex_diner:getNearbyPlayers', false) or {}
+    local players = lib.callback.await('qbox_restaurants:getNearbyPlayers', false) or {}
     if #players == 0 then
-        Rex.Notify('Employés', 'Aucun joueur proche.', 'error')
+        Rest.Notify('Employés', 'Aucun joueur proche.', 'error')
         return
     end
     local playerOpts, gradeOpts = {}, {}
@@ -27,8 +27,8 @@ function Rex.OpenHireDialog()
         { type = 'select', label = 'Grade', options = gradeOpts, required = true, default = 0 },
     })
     if not input then return end
-    local result = lib.callback.await('rex_diner:hireEmployee', false, {
+    local result = lib.callback.await('qbox_restaurants:hireEmployee', false, {
         targetId = input[1], grade = input[2],
     })
-    Rex.Notify('Employés', result and result.message or 'Erreur', result and result.ok and 'success' or 'error')
+    Rest.Notify('Employés', result and result.message or 'Erreur', result and result.ok and 'success' or 'error')
 end

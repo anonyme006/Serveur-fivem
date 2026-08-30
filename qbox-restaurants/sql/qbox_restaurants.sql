@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `rex_diner_sales` (
+CREATE TABLE IF NOT EXISTS `qbox_restaurants_sales` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `restaurant` VARCHAR(64) NOT NULL,
     `employee_identifier` VARCHAR(64) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `rex_diner_sales` (
     KEY `idx_customer` (`customer_identifier`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `rex_diner_sale_items` (
+CREATE TABLE IF NOT EXISTS `qbox_restaurants_sale_items` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `sale_id` INT UNSIGNED NOT NULL,
     `product_id` VARCHAR(64) NOT NULL,
@@ -28,10 +28,10 @@ CREATE TABLE IF NOT EXISTS `rex_diner_sale_items` (
     PRIMARY KEY (`id`),
     KEY `idx_sale` (`sale_id`),
     KEY `idx_product` (`product_id`),
-    CONSTRAINT `fk_rex_sale_items` FOREIGN KEY (`sale_id`) REFERENCES `rex_diner_sales` (`id`) ON DELETE CASCADE
+    CONSTRAINT `fk_qbox_sale_items` FOREIGN KEY (`sale_id`) REFERENCES `qbox_restaurants_sales` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `rex_diner_employees` (
+CREATE TABLE IF NOT EXISTS `qbox_restaurants_employees` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `restaurant` VARCHAR(64) NOT NULL,
     `identifier` VARCHAR(64) NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `rex_diner_employees` (
     KEY `idx_identifier` (`identifier`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `rex_diner_invoices` (
+CREATE TABLE IF NOT EXISTS `qbox_restaurants_invoices` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `restaurant` VARCHAR(64) NOT NULL,
     `issuer_identifier` VARCHAR(64) NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `rex_diner_invoices` (
     KEY `idx_issuer` (`issuer_identifier`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `rex_diner_stock` (
+CREATE TABLE IF NOT EXISTS `qbox_restaurants_stock` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `restaurant` VARCHAR(64) NOT NULL,
     `item` VARCHAR(64) NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `rex_diner_stock` (
     UNIQUE KEY `uniq_restaurant_item` (`restaurant`, `item`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `rex_diner_orders` (
+CREATE TABLE IF NOT EXISTS `qbox_restaurants_orders` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `restaurant` VARCHAR(64) NOT NULL,
     `ordered_by` VARCHAR(64) NOT NULL,
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `rex_diner_orders` (
     KEY `idx_restaurant_status` (`restaurant`, `status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `rex_diner_order_items` (
+CREATE TABLE IF NOT EXISTS `qbox_restaurants_order_items` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `order_id` INT UNSIGNED NOT NULL,
     `item` VARCHAR(64) NOT NULL,
@@ -99,10 +99,10 @@ CREATE TABLE IF NOT EXISTS `rex_diner_order_items` (
     `unit_price` INT UNSIGNED NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     KEY `idx_order` (`order_id`),
-    CONSTRAINT `fk_rex_order_items` FOREIGN KEY (`order_id`) REFERENCES `rex_diner_orders` (`id`) ON DELETE CASCADE
+    CONSTRAINT `fk_qbox_order_items` FOREIGN KEY (`order_id`) REFERENCES `qbox_restaurants_orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `rex_diner_deliveries` (
+CREATE TABLE IF NOT EXISTS `qbox_restaurants_deliveries` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `order_id` INT UNSIGNED NOT NULL,
     `restaurant` VARCHAR(64) NOT NULL,
@@ -115,10 +115,10 @@ CREATE TABLE IF NOT EXISTS `rex_diner_deliveries` (
     KEY `idx_order` (`order_id`),
     KEY `idx_driver` (`driver_identifier`),
     KEY `idx_restaurant_status` (`restaurant`, `status`),
-    CONSTRAINT `fk_rex_deliveries` FOREIGN KEY (`order_id`) REFERENCES `rex_diner_orders` (`id`) ON DELETE CASCADE
+    CONSTRAINT `fk_qbox_deliveries` FOREIGN KEY (`order_id`) REFERENCES `qbox_restaurants_orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `rex_diner_service` (
+CREATE TABLE IF NOT EXISTS `qbox_restaurants_service` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `restaurant` VARCHAR(64) NOT NULL,
     `identifier` VARCHAR(64) NOT NULL,
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `rex_diner_service` (
     KEY `idx_restaurant_date` (`restaurant`, `started_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `rex_diner_settings` (
+CREATE TABLE IF NOT EXISTS `qbox_restaurants_settings` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `restaurant` VARCHAR(64) NOT NULL,
     `setting_key` VARCHAR(64) NOT NULL,

@@ -3,7 +3,7 @@
   const content = document.getElementById('content');
   const modal = document.getElementById('modal');
   const box = document.getElementById('modal-box');
-  const res = typeof GetParentResourceName === 'function' ? GetParentResourceName() : 'rex_diner';
+  const res = typeof GetParentResourceName === 'function' ? GetParentResourceName() : 'qbox-restaurants';
 
   const S = {
     open: false,
@@ -556,7 +556,7 @@
         grade: 1, gradeLabel: 'Employé', onDuty: true,
         commissionRate: 0.25, commissionPercent: 25, avatar: 'P',
       },
-      restaurant: { key: 'rex_diner', label: 'Rex Diner', job: 'rex_diner' },
+      restaurant: { key: 'hornys', label: "Horny's Burgers", job: 'hornys' },
       permissions: {
         tablet: true, sales: true, service: true, recipes: true, billing: true,
         kitchen: true, employees: true, stock: true, orders: true, deliveries: true,
@@ -648,12 +648,12 @@
     const nuiRef = { fn: previewNui };
     // Override fetch-based nui: wrap existing function name in closure by replacing event handlers after open
     // Simplest: assign to outer nui via eval-style — redefine by posting open then patching
-    Object.defineProperty(window, '__rexNui', { get: () => nuiRef.fn });
+    Object.defineProperty(window, '__qboxRestNui', { get: () => nuiRef.fn });
 
     // Patch: replace nui calls by swapping the const binding isn't possible; instead intercept fetch
     const realFetch = window.fetch.bind(window);
     window.fetch = async (url, opts) => {
-      if (typeof url === 'string' && url.includes('https://rex_diner/')) {
+      if (typeof url === 'string' && url.includes('https://qbox-restaurants/')) {
         const event = url.split('/').pop();
         const body = opts && opts.body ? JSON.parse(opts.body) : {};
         const result = await previewNui(event, body);
@@ -682,7 +682,7 @@
 
   function ConfigPatchNotes() {
     return [{ version: '2.0.0', date: '19/08/2026', notes: [
-      'Refonte complète du resource rex_diner',
+      'Refonte complète du resource qbox-restaurants',
       'Tablette NUI premium multi-pages',
       'Ventes, factures, craft, stock et livraisons',
     ]}];

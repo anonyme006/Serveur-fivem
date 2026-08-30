@@ -1,13 +1,13 @@
 local deliveryBlip, deliveryVehicle
 
-function Rex.OpenCraftMenu()
-    if not Rex.Can('kitchen') then
-        Rex.Notify('Cuisine', 'Permission refusée.', 'error')
+function Rest.OpenCraftMenu()
+    if not Rest.Can('kitchen') then
+        Rest.Notify('Cuisine', 'Permission refusée.', 'error')
         return
     end
 
     local options = {}
-    for _, recipe in ipairs(Rex.GetRecipeList()) do
+    for _, recipe in ipairs(Rest.GetRecipeList()) do
         local parts = {}
         for _, ing in ipairs(recipe.ingredients) do
             parts[#parts + 1] = ('%sx %s'):format(ing.amount, ing.label)
@@ -17,24 +17,24 @@ function Rex.OpenCraftMenu()
             description = table.concat(parts, ' · ') .. ('\n⏱ %ss'):format(math.floor((recipe.time or 0) / 1000)),
             icon = 'utensils',
             onSelect = function()
-                local result = lib.callback.await('rex_diner:startCraft', false, recipe.id)
+                local result = lib.callback.await('qbox_restaurants:startCraft', false, recipe.id)
                 if not result or not result.ok then
-                    Rex.Notify('Cuisine', result and result.error or 'Impossible.', 'error')
+                    Rest.Notify('Cuisine', result and result.error or 'Impossible.', 'error')
                     return
                 end
-                Rex.RunCraft(result.craft)
+                Rest.RunCraft(result.craft)
             end,
         }
     end
 
-    lib.registerContext({ id = 'rex_diner_craft', title = '🍳 Cuisine', options = options })
-    lib.showContext('rex_diner_craft')
+    lib.registerContext({ id = 'qbox_restaurants_craft', title = '🍳 Cuisine', options = options })
+    lib.showContext('qbox_restaurants_craft')
 end
 
-function Rex.RunCraft(craft)
+function Rest.RunCraft(craft)
     if not craft or not craft.recipeId then return end
-    if Rex.IsTabletOpen then
-        Rex.CloseTablet()
+    if Rest.IsTabletOpen then
+        Rest.CloseTablet()
         Wait(200)
     end
 
@@ -48,22 +48,22 @@ function Rex.RunCraft(craft)
     })
 
     if not ok then
-        TriggerServerEvent('rex_diner:server:cancelCraft')
-        Rex.Notify('Cuisine', 'Préparation annulée.', 'error')
+        TriggerServerEvent('qbox_restaurants:server:cancelCraft')
+        Rest.Notify('Cuisine', 'Préparation annulée.', 'error')
         return
     end
 
-    local result = lib.callback.await('rex_diner:finishCraft', false, {
+    local result = lib.callback.await('qbox_restaurants:finishCraft', false, {
         recipeId = craft.recipeId,
         useStock = craft.useStock == true,
     })
     if not result or not result.ok then
-        Rex.Notify('Cuisine', result and result.message or 'Échec.', 'error')
+        Rest.Notify('Cuisine', result and result.message or 'Échec.', 'error')
     end
 end
 
-function Rex.StartDelivery(data)
-    Rex.CurrentDelivery = data
+function Rest.StartDelivery(data)
+    Rest.CurrentDelivery = data
     if deliveryBlip and DoesBlipExist(deliveryBlip) then RemoveBlip(deliveryBlip) end
 
     local pickup = data.pickup
@@ -88,11 +88,11 @@ function Rex.StartDelivery(data)
         SetModelAsNoLongerNeeded(model)
     end
 
-    Rex.Notify('Livraisons', 'Récupérez la commande puis déposez au restaurant.', 'inform')
+    Rest.Notify('Livraisons', 'Récupérez la commande puis déposez au restaurant.', 'inform')
 
     CreateThread(function()
         local switched = false
-        while Rex.CurrentDelivery and Rex.CurrentDelivery.deliveryId == data.deliveryId do
+        while Rest.CurrentDelivery and Rest.CurrentDelivery.deliveryId == data.deliveryId do
             Wait(1000)
             if not switched and pickup and data.dropoff then
                 if #(GetEntityCoords(cache.ped) - vec3(pickup.x, pickup.y, pickup.z)) < 20.0 then
@@ -105,7 +105,7 @@ function Rex.StartDelivery(data)
                     BeginTextCommandSetBlipName('STRING')
                     AddTextComponentSubstringPlayerName('Dépôt restaurant')
                     EndTextCommandSetBlipName(deliveryBlip)
-                    Rex.Notify('Livraisons', 'Retournez au restaurant.', 'success')
+                    Rest.Notify('Livraisons', 'Retournez au restaurant.', 'success')
                     switched = true
                 end
             end
@@ -113,17 +113,17 @@ function Rex.StartDelivery(data)
     end)
 end
 
-function Rex.CompleteDelivery()
-    if not Rex.CurrentDelivery then
-        Rex.Notify('Livraisons', 'Aucune livraison.', 'error')
+function Rest.CompleteDelivery()
+    if not Rest.CurrentDelivery then
+        Rest.Notify('Livraisons', 'Aucune livraison.', 'error')
         return
     end
-    local result = lib.callback.await('rex_diner:completeDelivery', false, Rex.CurrentDelivery.deliveryId)
+    local result = lib.callback.await('qbox_restaurants:completeDelivery', false, Rest.CurrentDelivery.deliveryId)
     if not result or not result.ok then
-        Rex.Notify('Livraisons', result and result.message or 'Échec.', 'error')
+        Rest.Notify('Livraisons', result and result.message or 'Échec.', 'error')
         return
     end
     if deliveryBlip and DoesBlipExist(deliveryBlip) then RemoveBlip(deliveryBlip) deliveryBlip = nil end
     if deliveryVehicle and DoesEntityExist(deliveryVehicle) then DeleteEntity(deliveryVehicle) deliveryVehicle = nil end
-    Rex.CurrentDelivery = nil
+    Rest.CurrentDelivery = nil
 end

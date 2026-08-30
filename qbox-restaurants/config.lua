@@ -77,17 +77,17 @@ Config.PatchNotes = {
         version = '2.1.0',
         date = '30/08/2026',
         notes = {
+            'Renommage du resource en qbox-restaurants',
             'Configuration Horny\'s Burgers (Mirror Park)',
             'Configuration Greasy Joe\'s Diner (La Puerta)',
             'Menus et recettes par établissement',
-            'Jobs Qbox hornys + greasy_joes',
         },
     },
     {
         version = '2.0.0',
         date = '19/08/2026',
         notes = {
-            'Refonte complète du resource rex_diner',
+            'Refonte complète du resource qbox-restaurants',
             'Tablette NUI premium multi-pages',
             'Ventes, factures, craft, stock et livraisons',
             'Architecture multi-restaurants',

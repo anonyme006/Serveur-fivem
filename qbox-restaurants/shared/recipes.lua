@@ -171,13 +171,13 @@ Config.Recipes = Recipes
 
 ---@param id string
 ---@return table|nil
-function Rex.GetRecipe(id)
+function Rest.GetRecipe(id)
     return Recipes[id]
 end
 
 ---@param restaurantKey string|nil
 ---@return table[]
-function Rex.GetRecipeList(restaurantKey)
+function Rest.GetRecipeList(restaurantKey)
     local list = {}
     for id, recipe in pairs(Recipes) do
         if not restaurantKey or not recipe.restaurants or recipe.restaurants[restaurantKey] then

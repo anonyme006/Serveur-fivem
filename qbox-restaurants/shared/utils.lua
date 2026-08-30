@@ -1,14 +1,14 @@
-Rex = Rex or {}
+Rest = Rest or {}
 
-function Rex.Debug(...)
+function Rest.Debug(...)
     if Config.Debug then
-        print('[rex_diner]', ...)
+        print('[qbox-restaurants]', ...)
     end
 end
 
 ---@param jobName string|nil
 ---@return string|nil, table|nil
-function Rex.GetRestaurantByJob(jobName)
+function Rest.GetRestaurantByJob(jobName)
     if not jobName then return nil, nil end
     for key, restaurant in pairs(Config.Restaurants) do
         if restaurant.job == jobName then
@@ -20,33 +20,33 @@ end
 
 ---@param key string
 ---@return table|nil
-function Rex.GetRestaurant(key)
+function Rest.GetRestaurant(key)
     return Config.Restaurants[key]
 end
 
 ---@param grade number
 ---@param permission string
 ---@return boolean
-function Rex.HasPermission(grade, permission)
+function Rest.HasPermission(grade, permission)
     local perms = Config.Permissions[grade] or Config.Permissions[0]
     return perms and perms[permission] == true
 end
 
 ---@param grade number
 ---@return number
-function Rex.GetCommissionRate(grade)
+function Rest.GetCommissionRate(grade)
     return Config.Commission[grade] or Config.Commission[0] or 0.10
 end
 
 ---@param grade number
 ---@return string
-function Rex.GetGradeLabel(grade)
+function Rest.GetGradeLabel(grade)
     return Config.GradeLabels[grade] or ('Grade %s'):format(grade)
 end
 
 ---@param amount number
 ---@return string
-function Rex.FormatMoney(amount)
+function Rest.FormatMoney(amount)
     amount = math.floor(tonumber(amount) or 0)
     local formatted = tostring(amount):reverse():gsub('(%d%d%d)', '%1 '):reverse():gsub('^ ', '')
     return ('%s %s'):format(formatted, Config.Currency or '$')
@@ -54,7 +54,7 @@ end
 
 ---@param seconds number
 ---@return string
-function Rex.FormatDuration(seconds)
+function Rest.FormatDuration(seconds)
     seconds = math.max(0, math.floor(tonumber(seconds) or 0))
     local h = math.floor(seconds / 3600)
     local m = math.floor((seconds % 3600) / 60)
