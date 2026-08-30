@@ -10,5 +10,14 @@ window.SERENITY_LOADING = {
         'Un serveur, une communauté : Serenity V.',
     ],
     tipInterval: 6500,
-    showMusicHint: false,
+    music: {
+        enabled: true,
+        file: 'audio/loading.mp3',
+        volume: 0.35,
+        loop: true,
+        autoplay: true,
+        defaultOn: true,
+        labelOn: 'SON : ON',
+        labelOff: 'SON : OFF',
+    },
 };

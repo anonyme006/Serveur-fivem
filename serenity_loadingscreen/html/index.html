@@ -25,6 +25,12 @@
     <p class="tip" id="tip"></p>
   </main>
 
+  <button type="button" class="sound-toggle" id="soundToggle" aria-pressed="true" aria-label="Activer ou couper la musique">
+    SON : ON
+  </button>
+
+  <audio id="loadingMusic" preload="auto" loop></audio>
+
   <section class="load-dock" aria-label="Chargement du serveur">
     <p class="load-status" id="loadLabel">Connexion au serveur…</p>
     <div class="bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">

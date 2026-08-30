@@ -246,6 +246,54 @@ html, body {
   animation: pulse 2s ease-in-out infinite;
 }
 
+.sound-toggle {
+  position: fixed;
+  z-index: 20;
+  top: 1.25rem;
+  right: 1.25rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid rgba(255, 119, 0, 0.45);
+  border-radius: 999px;
+  background: rgba(6, 10, 18, 0.82);
+  color: rgba(244, 247, 251, 0.72);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 1.2s ease 0.25s both;
+}
+
+.sound-toggle:hover {
+  color: #fff;
+  border-color: rgba(255, 149, 0, 0.75);
+  box-shadow: 0 0 18px rgba(255, 119, 0, 0.25);
+}
+
+.sound-toggle.is-on {
+  color: #ffe08a;
+  border-color: rgba(255, 149, 0, 0.85);
+  box-shadow: 0 0 14px rgba(255, 119, 0, 0.3);
+}
+
+.sound-toggle.is-off {
+  color: rgba(244, 247, 251, 0.45);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: none;
+}
+
+.sound-toggle:focus-visible {
+  outline: 2px solid rgba(255, 149, 0, 0.85);
+  outline-offset: 3px;
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }

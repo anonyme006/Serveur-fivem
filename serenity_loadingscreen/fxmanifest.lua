@@ -17,6 +17,7 @@ files {
     'html/app.js',
     'html/config.js',
     'html/logo.jpg',
+    'html/audio/loading.mp3',
 }
 
 client_script 'client.lua'

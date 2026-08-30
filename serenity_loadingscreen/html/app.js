@@ -8,6 +8,9 @@
   const barTrack = document.querySelector('.bar-track');
   const canvas = document.getElementById('particles');
   const ctx = canvas.getContext('2d');
+  const musicEl = document.getElementById('loadingMusic');
+  const soundToggle = document.getElementById('soundToggle');
+  const musicCfg = cfg.music || {};
 
   if (taglineEl && cfg.tagline) {
     taglineEl.textContent = cfg.tagline;
@@ -122,6 +125,77 @@
     tipIndex = (tipIndex + 1) % tips.length;
     showTip(tipIndex);
   }, cfg.tipInterval || 6500);
+
+  // Musique de chargement
+  let soundOn = musicCfg.defaultOn !== false;
+
+  function updateSoundButton() {
+    if (!soundToggle) return;
+
+    const labelOn = musicCfg.labelOn || 'SON : ON';
+    const labelOff = musicCfg.labelOff || 'SON : OFF';
+
+    soundToggle.textContent = soundOn ? labelOn : labelOff;
+    soundToggle.classList.toggle('is-on', soundOn);
+    soundToggle.classList.toggle('is-off', !soundOn);
+    soundToggle.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+  }
+
+  function playMusic() {
+    if (!musicEl || !musicCfg.enabled) return Promise.resolve();
+
+    return musicEl.play().catch(() => {
+      soundOn = false;
+      updateSoundButton();
+    });
+  }
+
+  function pauseMusic() {
+    if (!musicEl) return;
+    musicEl.pause();
+  }
+
+  function toggleSound() {
+    soundOn = !soundOn;
+    updateSoundButton();
+
+    if (soundOn) {
+      playMusic();
+    } else {
+      pauseMusic();
+    }
+  }
+
+  if (musicEl && musicCfg.enabled && musicCfg.file) {
+    musicEl.src = musicCfg.file;
+    musicEl.loop = musicCfg.loop !== false;
+    musicEl.volume = typeof musicCfg.volume === 'number'
+      ? Math.max(0, Math.min(1, musicCfg.volume))
+      : 0.35;
+
+    updateSoundButton();
+
+    if (soundToggle) {
+      soundToggle.addEventListener('click', toggleSound);
+    }
+
+    if (musicCfg.autoplay !== false && soundOn) {
+      const startMusic = () => playMusic();
+
+      if (document.readyState === 'complete') {
+        startMusic();
+      } else {
+        window.addEventListener('load', startMusic, { once: true });
+      }
+
+      // CEF peut bloquer l'autoplay : réessayer au premier clic
+      document.addEventListener('click', () => {
+        if (soundOn && musicEl.paused) playMusic();
+      }, { once: true });
+    }
+  } else if (soundToggle) {
+    soundToggle.hidden = true;
+  }
 
   // Particles
   const particles = [];
