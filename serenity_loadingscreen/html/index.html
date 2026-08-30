@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Serenity V RP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true">
+    <div class="glow glow-sunset"></div>
+    <div class="glow glow-cyan"></div>
+    <div class="grain"></div>
+    <canvas id="particles"></canvas>
+  </div>
+
+  <main class="stage">
+    <header class="brand">
+      <img
+        class="logo"
+        src="logo.jpg"
+        alt="Serenity V RP"
+        draggable="false"
+      />
+      <p class="tagline" id="tagline">Bienvenue à Los Santos</p>
+    </header>
+
+    <section class="load" aria-label="Chargement">
+      <div class="load-meta">
+        <span class="load-label" id="loadLabel">Connexion au serveur…</span>
+        <span class="load-pct" id="loadPct">0%</span>
+      </div>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="bar-fill" id="barFill"></div>
+        <div class="bar-shine"></div>
+      </div>
+      <p class="tip" id="tip"></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span class="dot"></span>
+    <span>SERENITY V · RP</span>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
