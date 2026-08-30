@@ -1,0 +1,19 @@
+{
+  "roles": {
+    "admin": ["ROLE_ID_ADMIN"],
+    "moderator": ["ROLE_ID_MODO"],
+    "staff": ["ROLE_ID_STAFF"]
+  },
+  "channels": {
+    "logs_connect": "CHANNEL_ID_CONNEXIONS",
+    "logs_chat": "CHANNEL_ID_CHAT",
+    "logs_death": "CHANNEL_ID_MORTS",
+    "logs_staff": "CHANNEL_ID_STAFF",
+    "logs_economy": "CHANNEL_ID_ECO",
+    "logs_reports": "CHANNEL_ID_REPORTS",
+    "status": "CHANNEL_ID_STATUS",
+    "announce": "CHANNEL_ID_ANNONCES"
+  },
+  "statusIntervalMs": 60000,
+  "embedColor": 5867518
+}
