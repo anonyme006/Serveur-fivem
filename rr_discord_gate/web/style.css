@@ -1,0 +1,347 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&display=swap');
+
+:root {
+  --bg-0: #050505;
+  --bg-1: #0d0d0d;
+  --panel: rgba(12, 12, 14, 0.94);
+  --line: rgba(255, 255, 255, 0.09);
+  --text: #f4f4f4;
+  --muted: #9a9a9a;
+  --red: #e61e25;
+  --red-deep: #9b1218;
+  --discord: #5865f2;
+  --discord-hover: #4752c4;
+  --ok: #3dd68c;
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  font-family: 'Rajdhani', sans-serif;
+  color: var(--text);
+  background: transparent;
+  overflow: hidden;
+  user-select: none;
+}
+
+.hidden { display: none !important; }
+
+#app {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(ellipse 65% 50% at 50% 18%, rgba(230, 30, 37, 0.22), transparent 58%),
+    radial-gradient(ellipse 50% 40% at 80% 90%, rgba(88, 101, 242, 0.12), transparent 55%),
+    linear-gradient(165deg, #050505 0%, #121214 48%, #050505 100%);
+  animation: fadeIn 0.45s ease both;
+}
+
+.screen {
+  width: min(520px, 100%);
+}
+
+#screen-characters {
+  width: min(640px, 100%);
+}
+
+.screen.hidden { display: none !important; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--red);
+  padding: 2.1rem 2rem 1.75rem;
+  box-shadow: var(--shadow);
+  text-align: center;
+  animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.panel.denied { padding-top: 1.75rem; }
+
+.characters-panel {
+  text-align: left;
+}
+
+.title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.85rem, 4vw, 2.35rem);
+  letter-spacing: 0.06em;
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: 0.65rem;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.45;
+  margin-top: 0.85rem;
+  margin-bottom: 1.35rem;
+}
+
+.role-name {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 1.12rem;
+}
+
+.icon-badge {
+  font-size: 2rem;
+  margin-bottom: 0.55rem;
+  animation: pop 0.45s ease both;
+}
+
+/* Spinner */
+.spinner {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 1.25rem;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  border-top-color: var(--red);
+  animation: spin 0.85s linear infinite;
+}
+
+.spinner--sm {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border-width: 2px;
+}
+
+/* Success checks */
+.checks {
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+  text-align: left;
+}
+
+.checks li {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 1.12rem;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: rise 0.45s ease forwards;
+}
+
+.checks li:nth-child(2) { animation-delay: 0.22s; }
+
+.check-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(61, 214, 140, 0.15);
+  color: var(--ok);
+  display: grid;
+  place-items: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease 0.55s both;
+}
+
+/* Discord button */
+.btn-discord {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.95rem 1.2rem;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(180deg, var(--discord) 0%, var(--discord-hover) 100%);
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 10px 28px rgba(88, 101, 242, 0.28);
+}
+
+.btn-discord:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.btn-discord:active {
+  transform: translateY(0);
+}
+
+.btn-discord--sm {
+  width: auto;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  box-shadow: none;
+}
+
+.discord-icon {
+  display: grid;
+  place-items: center;
+}
+
+.btn-ghost {
+  margin-top: 0.75rem;
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-ghost:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* Characters */
+.chars-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.eyebrow {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.45rem;
+  letter-spacing: 0.14em;
+  color: var(--red);
+  margin-bottom: 0.15rem;
+}
+
+.chars-head .title {
+  font-size: 1.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.chars-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.chars-list {
+  display: grid;
+  gap: 0.65rem;
+  margin-bottom: 0.9rem;
+}
+
+.char-slot {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  padding: 0.95rem 1rem;
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  animation: rise 0.45s ease both;
+}
+
+.char-slot:hover {
+  border-color: rgba(230, 30, 37, 0.55);
+  background: rgba(230, 30, 37, 0.08);
+  transform: translateY(-1px);
+}
+
+.char-slot strong {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.char-slot span {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.char-empty {
+  padding: 1.2rem 1rem;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  text-align: center;
+  font-size: 0.98rem;
+}
+
+.btn-create {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(230, 30, 37, 0.45);
+  background: rgba(230, 30, 37, 0.1);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.02rem;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.btn-create:hover {
+  background: rgba(230, 30, 37, 0.2);
+  transform: translateY(-1px);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 560px) {
+  .chars-head {
+    flex-direction: column;
+  }
+
+  .btn-discord--sm {
+    width: 100%;
+  }
+
+  .panel {
+    padding: 1.6rem 1.2rem 1.35rem;
+  }
+}
