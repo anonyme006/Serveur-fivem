@@ -75,6 +75,11 @@ StockItems = {
     coffee_bean  = { label = 'Café (grain)',     icon = '☕', max = 100, min = 10, orderPrice = 9 },
     cola_syrup   = { label = 'Sirop cola',       icon = '🥤', max = 100, min = 10, orderPrice = 8 },
     water        = { label = 'Eau',              icon = '💧', max = 200, min = 30, orderPrice = 2 },
+    egg          = { label = 'Œuf',              icon = '🥚', max = 150, min = 20, orderPrice = 5 },
+    bacon        = { label = 'Bacon',            icon = '🥓', max = 120, min = 15, orderPrice = 10 },
+    ice          = { label = 'Glaçons',          icon = '🧊', max = 100, min = 15, orderPrice = 3 },
+    syrup        = { label = 'Sirop',            icon = '🍯', max = 80,  min = 10, orderPrice = 6 },
+    orange       = { label = 'Orange',           icon = '🍊', max = 120, min = 15, orderPrice = 4 },
 }
 
 Config.StockItems = StockItems

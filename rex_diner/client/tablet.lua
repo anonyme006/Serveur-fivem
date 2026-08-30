@@ -40,12 +40,12 @@ function Rex.ToggleService()
     end
 end
 
-RegisterCommand(Config.TabletCommand or 'diner', function()
+RegisterCommand(Config.TabletCommand or 'restaurant', function()
     if Rex.IsTabletOpen then Rex.CloseTablet() else Rex.OpenTablet('dashboard') end
 end, false)
 
 if Config.TabletKey and Config.TabletKey ~= '' then
-    RegisterKeyMapping(Config.TabletCommand or 'diner', 'Ouvrir tablette restaurant', 'keyboard', Config.TabletKey)
+    RegisterKeyMapping(Config.TabletCommand or 'restaurant', 'Ouvrir tablette restaurant', 'keyboard', Config.TabletKey)
 end
 
 local function cb(name, handler)

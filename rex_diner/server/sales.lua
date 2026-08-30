@@ -1,4 +1,4 @@
-local function buildCart(cart)
+local function buildCart(cart, restaurantKey)
     if type(cart) ~= 'table' or #cart == 0 then
         return false, 'Ticket vide.'
     end
@@ -10,6 +10,9 @@ local function buildCart(cart)
         local product = productId and Rex.GetProduct(productId)
         if not product or product.sellable == false or product.available == false then
             return false, 'Produit invalide.'
+        end
+        if restaurantKey and product.restaurants and not product.restaurants[restaurantKey] then
+            return false, 'Produit non disponible dans cet établissement.'
         end
         if qty < 1 or qty > 100 then
             return false, 'Quantité invalide.'
@@ -43,7 +46,7 @@ function Rex.ProcessSale(source, targetId, cart, paymentMethod, discountPercent)
         return false, 'Client trop loin.'
     end
 
-    local valid, payload = buildCart(cart)
+    local valid, payload = buildCart(cart, ctx.key)
     if not valid then return false, payload end
 
     discountPercent = math.floor(tonumber(discountPercent) or 0)

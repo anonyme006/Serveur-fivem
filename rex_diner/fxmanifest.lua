@@ -3,9 +3,9 @@ game 'gta5'
 lua54 'yes'
 
 name 'rex_diner'
-author 'Rex Diner'
-description 'Système de restaurant multi-établissements pour Qbox'
-version '2.0.0'
+author 'Serveur FiveM'
+description 'Système de restaurant multi-établissements — Horny\'s & Greasy Joe\'s'
+version '2.1.0'
 
 shared_scripts {
     '@ox_lib/init.lua',

@@ -1,6 +1,10 @@
-# Rex Diner v2.0.0
+# Rex Diner v2.1.0 — Horny's & Greasy Joe's
 
 Script restaurant **Qbox** complet — tablette NUI, craft, ventes, factures, stock, livraisons.
+
+Établissements configurés :
+- **Horny's Burgers** (Mirror Park) — job `hornys`
+- **Greasy Joe's Diner** (La Puerta) — job `greasy_joes`
 
 Stack : `qbx_core` · `ox_inventory` · `ox_lib` · `ox_target` · `oxmysql`
 
@@ -12,9 +16,9 @@ Sans ESX / QBCore legacy / RageUI / MenuV.
 
 1. Placez `rex_diner` dans vos resources
 2. Importez `sql/rex_diner.sql`
-3. Ajoutez le job : `install/qbox_job.lua` → `qbx_core/shared/jobs.lua`
+3. Ajoutez les jobs : `install/qbox_job.lua` → `qbx_core/shared/jobs.lua`
 4. Ajoutez les items : `install/ox_inventory_items.lua` → `ox_inventory/data/items.lua`
-5. Configurez les positions dans `config.lua`
+5. Ajustez les positions dans `config.lua` selon vos MLO
 6. `server.cfg` :
 
 ```cfg
@@ -30,7 +34,7 @@ ensure rex_diner
 
 | Action | Touche / commande |
 |--------|-------------------|
-| Tablette | `F6` / `/diner` |
+| Tablette | `F6` / `/restaurant` |
 | Service | Vestiaire (ox_target) |
 | Cuisine | Zone cuisine |
 | Caisse | Zone caisse |
@@ -43,7 +47,17 @@ Permissions dans `Config.Permissions`. Commissions dans `Config.Commission`.
 
 ## Multi-restaurants
 
-Ajoutez une entrée dans `Config.Restaurants` avec `job`, `label`, `locations`, `stash`.
+Chaque établissement a son propre job, stock SQL, société et menu dans `Config.Restaurants`.
+Les produits et recettes sont filtrés par restaurant via le champ `restaurants` dans `shared/products.lua` et `shared/recipes.lua`.
+
+### MLO supportés
+
+| Établissement | MLO recommandé | Emplacement |
+|---------------|----------------|-------------|
+| Horny's | Gabz / DRC Horny's | Mirror Park |
+| Greasy Joe's | MXC Greasy Joe's Drive-in | La Puerta |
+
+> Les coordonnées dans `config.lua` sont des points de départ. Ajustez-les in-game avec un outil coords si votre MLO diffère.
 
 ## Sécurité
 

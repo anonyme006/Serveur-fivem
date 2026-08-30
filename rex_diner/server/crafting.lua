@@ -8,6 +8,9 @@ function Rex.StartCraft(source, recipeId)
 
     local recipe = Rex.GetRecipe(recipeId)
     if not recipe then return false, 'Recette introuvable.' end
+    if recipe.restaurants and not recipe.restaurants[ctx.key] then
+        return false, 'Recette non disponible dans cet établissement.'
+    end
     if ctx.grade < (recipe.grade or 0) then return false, 'Grade insuffisant.' end
 
     local hasInv = Rex.HasItems(source, recipe.ingredients)
@@ -41,6 +44,10 @@ function Rex.FinishCraft(source, recipeId, useStock)
     if not recipe then
         Rex.ActiveCrafts[source] = nil
         return false, 'Recette introuvable.'
+    end
+    if recipe.restaurants and not recipe.restaurants[ctx.key] then
+        Rex.ActiveCrafts[source] = nil
+        return false, 'Recette non disponible dans cet établissement.'
     end
 
     local removed

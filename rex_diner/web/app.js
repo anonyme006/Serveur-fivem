@@ -57,7 +57,7 @@
     document.getElementById('avatar').textContent = p.avatar || 'R';
     document.getElementById('uname').textContent = p.name || 'Employé';
     document.getElementById('ugrade').textContent = p.gradeLabel || 'Grade';
-    document.getElementById('brand').textContent = `${(S.data?.restaurant?.label || 'REX DINER').toUpperCase()} — GESTION`;
+    document.getElementById('brand').textContent = `${(S.data?.restaurant?.label || 'RESTAURANT').toUpperCase()} — GESTION`;
     document.querySelectorAll('.link').forEach((el) => {
       const perm = el.dataset.perm;
       const page = el.dataset.nav;

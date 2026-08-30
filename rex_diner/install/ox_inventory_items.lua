@@ -3,6 +3,7 @@
 ]]
 
 return {
+    -- Ingrédients communs
     ['bread'] = { label = 'Pain', weight = 100, stack = true, close = true, description = 'Pain burger' },
     ['meat'] = { label = 'Viande', weight = 150, stack = true, close = true, description = 'Viande fraîche' },
     ['cheese'] = { label = 'Fromage', weight = 80, stack = true, close = true, description = 'Fromage' },
@@ -16,41 +17,77 @@ return {
     ['coffee_bean'] = { label = 'Café (grain)', weight = 80, stack = true, close = true, description = 'Grains de café' },
     ['cola_syrup'] = { label = 'Sirop cola', weight = 150, stack = true, close = true, description = 'Sirop cola' },
     ['water'] = { label = 'Eau', weight = 100, stack = true, close = true, description = 'Eau' },
+    ['egg'] = { label = 'Œuf', weight = 60, stack = true, close = true, description = 'Œuf frais' },
+    ['bacon'] = { label = 'Bacon', weight = 100, stack = true, close = true, description = 'Bacon fumé' },
+    ['ice'] = { label = 'Glaçons', weight = 50, stack = true, close = true, description = 'Glaçons' },
+    ['syrup'] = { label = 'Sirop', weight = 150, stack = true, close = true, description = 'Sirop érable' },
+    ['orange'] = { label = 'Orange', weight = 80, stack = true, close = true, description = 'Orange fraîche' },
 
-    ['burger_classic'] = {
-        label = 'Burger Classic', weight = 300, stack = true, close = true, description = 'Burger classic',
+    -- Horny's Burgers
+    ['hornys_burger_classic'] = {
+        label = 'Burger Classic', weight = 300, stack = true, close = true, description = 'Burger classique Horny\'s',
         client = { status = { hunger = 250000 }, anim = 'eating', prop = 'burger', usetime = 2500 },
     },
-    ['burger_dino'] = {
-        label = 'Burger Dino', weight = 350, stack = true, close = true, description = 'Burger dino',
-        client = { status = { hunger = 300000 }, anim = 'eating', prop = 'burger', usetime = 2500 },
+    ['hornys_burger_bone'] = {
+        label = 'Burger The Beef with the Bone', weight = 350, stack = true, close = true, description = 'Signature Horny\'s',
+        client = { status = { hunger = 320000 }, anim = 'eating', prop = 'burger', usetime = 2500 },
     },
-    ['rex_fries'] = {
-        label = 'Frites', weight = 200, stack = true, close = true, description = 'Frites',
+    ['hornys_fries'] = {
+        label = 'Frites Horny\'s', weight = 200, stack = true, close = true, description = 'Frites croustillantes',
         client = { status = { hunger = 150000 }, anim = 'eating', usetime = 2000 },
     },
-    ['rex_dessert'] = {
-        label = 'Dessert Dino', weight = 180, stack = true, close = true, description = 'Dessert',
-        client = { status = { hunger = 120000 }, anim = 'eating', usetime = 2000 },
+    ['hornys_nuggets'] = {
+        label = 'Nuggets', weight = 180, stack = true, close = true, description = '6 nuggets croustillants',
+        client = { status = { hunger = 180000 }, anim = 'eating', usetime = 2000 },
     },
-    ['rex_coffee'] = {
-        label = 'Café', weight = 150, stack = true, close = true, description = 'Café',
-        client = { status = { thirst = 100000 }, anim = 'drinking', usetime = 2000 },
+    ['hornys_tacos'] = {
+        label = 'Tacos Horny\'s', weight = 250, stack = true, close = true, description = 'Tacos maison',
+        client = { status = { hunger = 220000 }, anim = 'eating', usetime = 2500 },
     },
-    ['rex_cola'] = {
-        label = 'Cola', weight = 200, stack = true, close = true, description = 'Cola',
+    ['hornys_milkshake'] = {
+        label = 'Milkshake', weight = 250, stack = true, close = true, description = 'Milkshake onctueux',
+        client = { status = { thirst = 200000 }, anim = 'drinking', usetime = 2000 },
+    },
+    ['hornys_cola'] = {
+        label = 'Cola', weight = 200, stack = true, close = true, description = 'Cola frais',
         client = { status = { thirst = 180000 }, anim = 'drinking', usetime = 2000 },
     },
-    ['rex_plat'] = {
-        label = 'Plat du jour', weight = 400, stack = true, close = true, description = 'Plat',
-        client = { status = { hunger = 350000 }, anim = 'eating', usetime = 3000 },
+    ['hornys_menu_combo'] = {
+        label = 'Menu Combo Horny\'s', weight = 700, stack = true, close = true, description = 'Burger, frites et boisson',
+        client = { status = { hunger = 450000, thirst = 150000 }, anim = 'eating', usetime = 3500 },
     },
-    ['formula_mini_dino'] = {
-        label = 'Formule Mini Dino', weight = 600, stack = true, close = true, description = 'Menu enfant',
-        client = { status = { hunger = 400000, thirst = 150000 }, anim = 'eating', usetime = 3500 },
+
+    -- Greasy Joe's Diner
+    ['greasy_breakfast'] = {
+        label = 'Petit-déjeuner complet', weight = 450, stack = true, close = true, description = 'Œufs, bacon, toast',
+        client = { status = { hunger = 400000 }, anim = 'eating', usetime = 3000 },
     },
-    ['formula_jurassic_royal'] = {
-        label = 'Formule Jurassic Royal', weight = 800, stack = true, close = true, description = 'Menu royal',
-        client = { status = { hunger = 500000, thirst = 200000 }, anim = 'eating', usetime = 4000 },
+    ['greasy_pancakes'] = {
+        label = 'Pancakes', weight = 300, stack = true, close = true, description = 'Stack de pancakes au sirop',
+        client = { status = { hunger = 280000 }, anim = 'eating', usetime = 2500 },
+    },
+    ['greasy_bacon_eggs'] = {
+        label = 'Bacon & Œufs', weight = 320, stack = true, close = true, description = 'Œufs au plat et bacon',
+        client = { status = { hunger = 300000 }, anim = 'eating', usetime = 2500 },
+    },
+    ['greasy_burger'] = {
+        label = 'Burger Diner', weight = 320, stack = true, close = true, description = 'Burger style diner',
+        client = { status = { hunger = 280000 }, anim = 'eating', prop = 'burger', usetime = 2500 },
+    },
+    ['greasy_fries'] = {
+        label = 'Frites maison', weight = 200, stack = true, close = true, description = 'Frites épaisses',
+        client = { status = { hunger = 150000 }, anim = 'eating', usetime = 2000 },
+    },
+    ['greasy_coffee'] = {
+        label = 'Café', weight = 150, stack = true, close = true, description = 'Café chaud',
+        client = { status = { thirst = 100000 }, anim = 'drinking', usetime = 2000 },
+    },
+    ['greasy_orange_juice'] = {
+        label = 'Jus d\'orange', weight = 200, stack = true, close = true, description = 'Jus pressé',
+        client = { status = { thirst = 180000 }, anim = 'drinking', usetime = 2000 },
+    },
+    ['greasy_milkshake'] = {
+        label = 'Milkshake Diner', weight = 250, stack = true, close = true, description = 'Milkshake style 50\'s',
+        client = { status = { thirst = 200000 }, anim = 'drinking', usetime = 2000 },
     },
 }

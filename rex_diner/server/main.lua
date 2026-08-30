@@ -251,5 +251,5 @@ CreateThread(function()
     for key in pairs(Config.Restaurants) do
         if Rex.InitStock then Rex.InitStock(key) end
     end
-    print('[rex_diner] v2.0.0 démarré')
+    print('[rex_diner] v2.1.0 démarré — Horny\'s & Greasy Joe\'s')
 end)
