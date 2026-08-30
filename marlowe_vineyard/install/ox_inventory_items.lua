@@ -1,0 +1,51 @@
+return {
+    ['grape'] = {
+        label = 'Raisin',
+        weight = 50,
+        stack = true,
+        close = true,
+        description = 'Raisin fraîchement récolté au domaine Marlowe.',
+    },
+    ['grape_juice'] = {
+        label = 'Jus de raisin',
+        weight = 200,
+        stack = true,
+        close = true,
+        description = 'Jus de raisin pressé, prêt pour la vinification.',
+    },
+    ['wine_red'] = {
+        label = 'Vin rouge',
+        weight = 500,
+        stack = true,
+        close = true,
+        description = 'Vin rouge Marlowe Vineyard.',
+    },
+    ['wine_white'] = {
+        label = 'Vin blanc',
+        weight = 500,
+        stack = true,
+        close = true,
+        description = 'Vin blanc Marlowe Vineyard.',
+    },
+    ['wine_rose'] = {
+        label = 'Vin rosé',
+        weight = 500,
+        stack = true,
+        close = true,
+        description = 'Vin rosé Marlowe Vineyard.',
+    },
+    ['wine_bottle_filled'] = {
+        label = 'Bouteille remplie',
+        weight = 300,
+        stack = true,
+        close = true,
+        description = 'Bouteille de vin sans étiquette.',
+    },
+    ['wine_bottle_labeled'] = {
+        label = 'Bouteille Marlowe',
+        weight = 300,
+        stack = true,
+        close = true,
+        description = 'Bouteille étiquetée Marlowe Vineyard, prête à livrer.',
+    },
+}
