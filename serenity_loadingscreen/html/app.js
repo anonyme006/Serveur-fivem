@@ -5,7 +5,7 @@
   const labelEl = document.getElementById('loadLabel');
   const pctEl = document.getElementById('loadPct');
   const barFill = document.getElementById('barFill');
-  const bar = document.querySelector('.bar');
+  const barTrack = document.querySelector('.bar-track');
   const canvas = document.getElementById('particles');
   const ctx = canvas.getContext('2d');
 
@@ -15,21 +15,30 @@
 
   const stages = [
     { min: 0, label: 'Connexion au serveur…' },
-    { min: 15, label: 'Chargement des assets…' },
-    { min: 40, label: 'Initialisation de la session…' },
-    { min: 70, label: 'Préparation de Los Santos…' },
-    { min: 90, label: 'Presque prêt…' },
+    { min: 12, label: 'Établissement de la connexion…' },
+    { min: 35, label: 'Chargement des ressources…' },
+    { min: 60, label: 'Initialisation de la session…' },
+    { min: 85, label: 'Presque prêt…' },
   ];
 
   let progress = 0;
+  let gotNativeProgress = false;
   let tipIndex = 0;
   const tips = Array.isArray(cfg.tips) && cfg.tips.length ? cfg.tips : ['Bienvenue sur Serenity V RP'];
 
-  function setProgress(value) {
+  function setProgress(value, fromNative) {
+    if (fromNative) gotNativeProgress = true;
+
     progress = Math.max(0, Math.min(100, value));
-    barFill.style.width = progress + '%';
-    pctEl.textContent = Math.floor(progress) + '%';
-    bar.setAttribute('aria-valuenow', String(Math.floor(progress)));
+    const pct = Math.floor(progress);
+
+    barFill.style.width = pct + '%';
+    pctEl.textContent = pct + '%';
+    barTrack.setAttribute('aria-valuenow', String(pct));
+
+    if (pct > 0) {
+      barTrack.classList.remove('is-loading');
+    }
 
     for (let i = stages.length - 1; i >= 0; i--) {
       if (progress >= stages[i].min) {
@@ -38,6 +47,67 @@
       }
     }
   }
+
+  function extractFraction(data) {
+    if (!data) return null;
+    if (typeof data.loadFraction === 'number') return data.loadFraction;
+    if (typeof data.progress === 'number') return data.progress;
+    if (typeof data.count === 'number' && typeof data.total === 'number' && data.total > 0) {
+      return data.count / data.total;
+    }
+    return null;
+  }
+
+  function handleProgress(data) {
+    const fraction = extractFraction(data);
+    if (fraction === null) return;
+    setProgress(fraction * 100, true);
+  }
+
+  const handlers = {
+    loadProgress: handleProgress,
+    onLogLine(data) {
+      if (data && data.message) {
+        labelEl.textContent = String(data.message).slice(0, 80);
+      }
+    },
+    startInitFunctionOrder: handleProgress,
+    initFunctionInvoking: handleProgress,
+    initFunctionInvoked: handleProgress,
+    endInitFunction: handleProgress,
+    startDataFileEntries: handleProgress,
+    performMapLoadFunction: handleProgress,
+    onDataFileEntry: handleProgress,
+  };
+
+  window.addEventListener('message', (event) => {
+    const data = event.data;
+    if (!data) return;
+
+    if (typeof data.loadFraction === 'number') {
+      handleProgress(data);
+      return;
+    }
+
+    const fn = handlers[data.eventName] || handlers[data.type];
+    if (fn) fn(data);
+  });
+
+  // Pulse orange visible tant que la barre est à 0
+  barTrack.classList.add('is-loading');
+
+  // Fallback : avance la barre si FiveM n'envoie pas loadProgress tout de suite
+  const fallback = setInterval(() => {
+    if (gotNativeProgress) {
+      clearInterval(fallback);
+      return;
+    }
+    if (progress >= 96) {
+      clearInterval(fallback);
+      return;
+    }
+    setProgress(progress + 1.8);
+  }, 220);
 
   function showTip(index) {
     tipEl.classList.add('is-fading');
@@ -53,38 +123,7 @@
     showTip(tipIndex);
   }, cfg.tipInterval || 6500);
 
-  // FiveM load progress events
-  const handlers = {
-    loadProgress(data) {
-      const loadFraction = data && typeof data.loadFraction === 'number'
-        ? data.loadFraction
-        : 0;
-      setProgress(loadFraction * 100);
-    },
-    onLogLine() {},
-  };
-
-  window.addEventListener('message', (event) => {
-    const data = event.data;
-    if (!data) return;
-    const fn = handlers[data.eventName];
-    if (fn) fn(data);
-  });
-
-  // Fallback preview hors FiveM
-  if (!window.invokeNative) {
-    let fake = 0;
-    const id = setInterval(() => {
-      fake += Math.random() * 4 + 1.2;
-      if (fake >= 100) {
-        fake = 100;
-        clearInterval(id);
-      }
-      setProgress(fake);
-    }, 180);
-  }
-
-  // Particles — billets / poussière lumineuse
+  // Particles
   const particles = [];
   const COUNT = 28;
 
@@ -123,7 +162,7 @@
       ctx.beginPath();
       ctx.fillStyle = p.gold
         ? `rgba(245, 197, 66, ${p.a})`
-        : `rgba(90, 210, 255, ${p.a})`;
+        : `rgba(255, 140, 40, ${p.a})`;
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fill();
     }

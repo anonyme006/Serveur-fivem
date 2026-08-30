@@ -19,27 +19,18 @@
 
   <main class="stage">
     <header class="brand">
-      <img
-        class="logo"
-        src="logo.jpg"
-        alt="Serenity V RP"
-        draggable="false"
-      />
+      <img class="logo" src="logo.jpg" alt="Serenity V RP" draggable="false" />
       <p class="tagline" id="tagline">Bienvenue à Los Santos</p>
     </header>
-
     <p class="tip" id="tip"></p>
   </main>
 
   <section class="load-dock" aria-label="Chargement du serveur">
-    <div class="load-meta">
-      <span class="load-label" id="loadLabel">Connexion au serveur…</span>
-      <span class="load-pct" id="loadPct">0%</span>
-    </div>
-    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <p class="load-status" id="loadLabel">Connexion au serveur…</p>
+    <div class="bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <div class="bar-fill" id="barFill"></div>
-      <div class="bar-shine"></div>
     </div>
+    <p class="load-percent" id="loadPct">0%</p>
     <div class="footer">
       <span class="dot"></span>
       <span>SERENITY V · RP</span>
