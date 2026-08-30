@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restaurant — Tablette</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="hidden">
+    <div class="shell">
+      <div class="bezel">
+        <div class="camera"></div>
+        <div class="screen">
+          <header class="topbar">
+            <div class="left">
+              <button class="chip" data-nav="dashboard"><i class="fa-solid fa-house"></i><span>Dashboard</span></button>
+              <button class="icon" id="btn-refresh" title="Actualiser"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+            <div class="right">
+              <button class="ghost" id="btn-patch"><i class="fa-regular fa-file-lines"></i><span>Patch Notes</span></button>
+              <div class="pill"><i class="fa-solid fa-wifi"></i> En ligne</div>
+              <div class="user">
+                <div class="avatar" id="avatar">R</div>
+                <div><strong id="uname">Employé</strong><small id="ugrade">Grade</small></div>
+              </div>
+              <button class="icon" id="btn-close"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
+          </header>
+
+          <aside class="side">
+            <button class="link active" data-nav="dashboard"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></button>
+            <button class="link" data-nav="sales"><i class="fa-solid fa-cash-register"></i><span>Caisse</span></button>
+            <button class="link" data-nav="products"><i class="fa-solid fa-burger"></i><span>Produits</span></button>
+            <button class="link" data-nav="recipes" data-perm="recipes"><i class="fa-solid fa-book-open"></i><span>Recettes</span></button>
+            <button class="link" data-nav="history"><i class="fa-solid fa-receipt"></i><span>Ventes</span></button>
+            <button class="link" data-nav="stock" data-perm="stock"><i class="fa-solid fa-boxes-stacked"></i><span>Stock</span></button>
+            <button class="link" data-nav="orders" data-perm="orders"><i class="fa-solid fa-cart-shopping"></i><span>Commandes</span></button>
+            <button class="link" data-nav="deliveries" data-perm="deliveries"><i class="fa-solid fa-truck"></i><span>Livraisons</span></button>
+            <button class="link" data-nav="employees" data-perm="employees"><i class="fa-solid fa-users"></i><span>Employés</span></button>
+            <button class="link" data-nav="billing" data-perm="billing"><i class="fa-solid fa-file-invoice-dollar"></i><span>Factures</span></button>
+            <button class="link" data-nav="settings" data-perm="settings"><i class="fa-solid fa-gear"></i><span>Paramètres</span></button>
+          </aside>
+
+          <main id="content" class="content"></main>
+
+          <footer class="foot">
+            <span id="brand">QBOX RESTAURANTS</span>
+            <span id="clock">--:--:--</span>
+            <span>v2.1.0</span>
+          </footer>
+        </div>
+        <div class="keys"><span>P1</span><span>+</span><span>−</span><span class="pwr"></span></div>
+      </div>
+    </div>
+    <div id="modal" class="modal hidden"><div class="modal-box" id="modal-box"></div></div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
