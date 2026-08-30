@@ -1,0 +1,54 @@
+-- =============================================================================
+-- SAN ANDREAS TAXI CORPORATION — Schéma SQL
+-- Exécution automatique prévue à l'Étape 15
+-- =============================================================================
+
+-- CREATE TABLE IF NOT EXISTS `taxi_rides` (
+--     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+--     `driver_identifier` VARCHAR(64) NOT NULL,
+--     `driver_name` VARCHAR(128) NOT NULL,
+--     `customer_identifier` VARCHAR(64) NOT NULL,
+--     `customer_name` VARCHAR(128) NOT NULL,
+--     `pickup` VARCHAR(255) NOT NULL,
+--     `destination` VARCHAR(255) NOT NULL,
+--     `distance` FLOAT NOT NULL DEFAULT 0,
+--     `duration` INT NOT NULL DEFAULT 0,
+--     `price` INT NOT NULL DEFAULT 0,
+--     `status` VARCHAR(32) NOT NULL DEFAULT 'pending',
+--     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     `completed_at` TIMESTAMP NULL DEFAULT NULL,
+--     PRIMARY KEY (`id`)
+-- );
+
+-- CREATE TABLE IF NOT EXISTS `taxi_ratings` (
+--     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+--     `ride_id` INT UNSIGNED NOT NULL,
+--     `driver_identifier` VARCHAR(64) NOT NULL,
+--     `customer_identifier` VARCHAR(64) NOT NULL,
+--     `rating` TINYINT UNSIGNED NOT NULL,
+--     `comment` VARCHAR(255) NULL,
+--     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     PRIMARY KEY (`id`)
+-- );
+
+-- CREATE TABLE IF NOT EXISTS `taxi_transactions` (
+--     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+--     `ride_id` INT UNSIGNED NULL,
+--     `type` VARCHAR(32) NOT NULL,
+--     `driver_identifier` VARCHAR(64) NULL,
+--     `customer_identifier` VARCHAR(64) NULL,
+--     `amount` INT NOT NULL DEFAULT 0,
+--     `commission` INT NOT NULL DEFAULT 0,
+--     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     PRIMARY KEY (`id`)
+-- );
+
+-- CREATE TABLE IF NOT EXISTS `taxi_duty_logs` (
+--     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+--     `identifier` VARCHAR(64) NOT NULL,
+--     `name` VARCHAR(128) NOT NULL,
+--     `action` ENUM('on', 'off') NOT NULL,
+--     `duration` INT NULL DEFAULT NULL,
+--     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     PRIMARY KEY (`id`)
+-- );
