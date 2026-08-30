@@ -17,7 +17,6 @@ window.SERENITY_LOADING = {
         loop: true,
         autoplay: true,
         defaultOn: true,
-        labelOn: 'SON : ON',
-        labelOff: 'SON : OFF',
+        volumeStep: 0.05,
     },
 };

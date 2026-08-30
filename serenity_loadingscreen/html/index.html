@@ -25,9 +25,24 @@
     <p class="tip" id="tip"></p>
   </main>
 
-  <button type="button" class="sound-toggle" id="soundToggle" aria-pressed="true" aria-label="Activer ou couper la musique">
-    SON : ON
-  </button>
+  <aside class="audio-dock" id="audioDock" aria-label="Contrôles audio">
+    <div class="audio-controls">
+      <button type="button" class="audio-btn" id="playBtn" aria-label="Lancer la musique" title="Play">
+        <span class="audio-icon" aria-hidden="true">▶</span>
+        <span class="audio-label">PLAY</span>
+      </button>
+      <button type="button" class="audio-btn" id="stopBtn" aria-label="Arrêter la musique" title="Stop">
+        <span class="audio-icon" aria-hidden="true">■</span>
+        <span class="audio-label">STOP</span>
+      </button>
+    </div>
+    <div class="volume-row">
+      <button type="button" class="volume-step" id="volDownBtn" aria-label="Baisser le volume">−</button>
+      <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="35" aria-label="Volume" />
+      <button type="button" class="volume-step" id="volUpBtn" aria-label="Augmenter le volume">+</button>
+      <span class="volume-pct" id="volumePct">35%</span>
+    </div>
+  </aside>
 
   <audio id="loadingMusic" preload="auto" loop></audio>
 

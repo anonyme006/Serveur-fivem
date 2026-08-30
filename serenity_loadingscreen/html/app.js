@@ -9,7 +9,13 @@
   const canvas = document.getElementById('particles');
   const ctx = canvas.getContext('2d');
   const musicEl = document.getElementById('loadingMusic');
-  const soundToggle = document.getElementById('soundToggle');
+  const audioDock = document.getElementById('audioDock');
+  const playBtn = document.getElementById('playBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const volumePct = document.getElementById('volumePct');
+  const volDownBtn = document.getElementById('volDownBtn');
+  const volUpBtn = document.getElementById('volUpBtn');
   const musicCfg = cfg.music || {};
 
   if (taglineEl && cfg.tagline) {
@@ -96,10 +102,8 @@
     if (fn) fn(data);
   });
 
-  // Pulse orange visible tant que la barre est à 0
   barTrack.classList.add('is-loading');
 
-  // Fallback : avance la barre si FiveM n'envoie pas loadProgress tout de suite
   const fallback = setInterval(() => {
     if (gotNativeProgress) {
       clearInterval(fallback);
@@ -127,59 +131,89 @@
   }, cfg.tipInterval || 6500);
 
   // Musique de chargement
-  let soundOn = musicCfg.defaultOn !== false;
+  let isPlaying = musicCfg.defaultOn !== false;
+  const volumeStep = typeof musicCfg.volumeStep === 'number' ? musicCfg.volumeStep : 0.05;
 
-  function updateSoundButton() {
-    if (!soundToggle) return;
+  function clampVolume(value) {
+    return Math.max(0, Math.min(1, value));
+  }
 
-    const labelOn = musicCfg.labelOn || 'SON : ON';
-    const labelOff = musicCfg.labelOff || 'SON : OFF';
+  function getVolumePercent() {
+    if (!musicEl) return 0;
+    return Math.round(musicEl.volume * 100);
+  }
 
-    soundToggle.textContent = soundOn ? labelOn : labelOff;
-    soundToggle.classList.toggle('is-on', soundOn);
-    soundToggle.classList.toggle('is-off', !soundOn);
-    soundToggle.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+  function setVolume(value) {
+    if (!musicEl) return;
+
+    const clamped = clampVolume(value);
+    musicEl.volume = clamped;
+
+    if (volumeSlider) {
+      volumeSlider.value = String(getVolumePercent());
+      volumeSlider.style.setProperty('--vol', getVolumePercent() + '%');
+    }
+    if (volumePct) {
+      volumePct.textContent = getVolumePercent() + '%';
+    }
+  }
+
+  function updatePlayState() {
+    if (!playBtn || !stopBtn) return;
+
+    const playing = musicEl && !musicEl.paused;
+    playBtn.classList.toggle('is-active', playing);
+    stopBtn.classList.toggle('is-active', !playing);
+    playBtn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+    stopBtn.setAttribute('aria-pressed', !playing ? 'true' : 'false');
   }
 
   function playMusic() {
     if (!musicEl || !musicCfg.enabled) return Promise.resolve();
 
-    return musicEl.play().catch(() => {
-      soundOn = false;
-      updateSoundButton();
-    });
+    isPlaying = true;
+    return musicEl.play()
+      .then(() => updatePlayState())
+      .catch(() => {
+        isPlaying = false;
+        updatePlayState();
+      });
   }
 
-  function pauseMusic() {
+  function stopMusic() {
     if (!musicEl) return;
+
     musicEl.pause();
+    musicEl.currentTime = 0;
+    isPlaying = false;
+    updatePlayState();
   }
 
-  function toggleSound() {
-    soundOn = !soundOn;
-    updateSoundButton();
-
-    if (soundOn) {
-      playMusic();
-    } else {
-      pauseMusic();
-    }
+  function adjustVolume(delta) {
+    if (!musicEl) return;
+    setVolume(musicEl.volume + delta);
   }
 
   if (musicEl && musicCfg.enabled && musicCfg.file) {
     musicEl.src = musicCfg.file;
     musicEl.loop = musicCfg.loop !== false;
-    musicEl.volume = typeof musicCfg.volume === 'number'
-      ? Math.max(0, Math.min(1, musicCfg.volume))
-      : 0.35;
+    setVolume(typeof musicCfg.volume === 'number' ? musicCfg.volume : 0.35);
+    updatePlayState();
 
-    updateSoundButton();
+    playBtn?.addEventListener('click', () => playMusic());
+    stopBtn?.addEventListener('click', () => stopMusic());
 
-    if (soundToggle) {
-      soundToggle.addEventListener('click', toggleSound);
-    }
+    volumeSlider?.addEventListener('input', () => {
+      setVolume(Number(volumeSlider.value) / 100);
+    });
 
-    if (musicCfg.autoplay !== false && soundOn) {
+    volDownBtn?.addEventListener('click', () => adjustVolume(-volumeStep));
+    volUpBtn?.addEventListener('click', () => adjustVolume(volumeStep));
+
+    musicEl.addEventListener('play', updatePlayState);
+    musicEl.addEventListener('pause', updatePlayState);
+
+    if (musicCfg.autoplay !== false && isPlaying) {
       const startMusic = () => playMusic();
 
       if (document.readyState === 'complete') {
@@ -188,13 +222,13 @@
         window.addEventListener('load', startMusic, { once: true });
       }
 
-      // CEF peut bloquer l'autoplay : réessayer au premier clic
-      document.addEventListener('click', () => {
-        if (soundOn && musicEl.paused) playMusic();
+      document.addEventListener('click', (event) => {
+        if (audioDock && audioDock.contains(event.target)) return;
+        if (isPlaying && musicEl.paused) playMusic();
       }, { once: true });
     }
-  } else if (soundToggle) {
-    soundToggle.hidden = true;
+  } else if (audioDock) {
+    audioDock.hidden = true;
   }
 
   // Particles

@@ -34,13 +34,12 @@ music: {
     volume: 0.35,      // 0 à 1
     loop: true,
     autoplay: true,
-    defaultOn: true,     // état au démarrage
-    labelOn: 'SON : ON',
-    labelOff: 'SON : OFF',
+    defaultOn: true,
+    volumeStep: 0.05,  // pas +/- volume
 },
 ```
 
-Un bouton **SON : ON/OFF** en haut à droite permet de couper la musique pendant le chargement.
+En haut à droite : **PLAY**, **STOP**, slider de volume et boutons **− / +**.
 
 ## Notes
 
