@@ -566,9 +566,9 @@
         salesTotal: 68500, salesCount: 17, salesToday: 24000, salesWeek: 51200, salesMonth: 68500,
         deliveryCount: 1, deliveryEarnings: 1350, commission: 17463, mySales: 24000,
         topProducts: [
-          { product_label: 'Formule Mini Dino', qty: 15, revenue: 12000 },
-          { product_label: 'Plat', qty: 10, revenue: 5000 },
-          { product_label: 'Burger', qty: 5, revenue: 3000 },
+          { product_label: 'Menu Combo Horny\'s', qty: 12, revenue: 14400 },
+          { product_label: 'Burger The Beef with the Bone', qty: 8, revenue: 6800 },
+          { product_label: 'Frites Horny\'s', qty: 15, revenue: 5250 },
         ],
         chartWeek: [
           { day: '2026-08-13', total: 4200 }, { day: '2026-08-14', total: 8100 },
@@ -579,19 +579,19 @@
       },
       service: { today: 16320, week: 78420, onDuty: true },
       products: [
-        { id: 'formula_jurassic_royal', label: 'Formule Jurassic Royal', price: 1400, category: 'Menus', color: '#C0392B' },
-        { id: 'formula_mini_dino', label: 'Formule Mini Dino', price: 800, category: 'Menus', color: '#E74C3C' },
-        { id: 'plat', label: 'Plat', price: 500, category: 'Petite Faim', color: '#E67E22' },
-        { id: 'burger', label: 'Burger', price: 600, category: 'Petite Faim', color: '#D35400' },
-        { id: 'dessert', label: 'Dessert', price: 600, category: 'Desserts', color: '#8E44AD' },
-        { id: 'boisson', label: 'Boisson', price: 400, category: 'Boissons', color: '#5D6D7E' },
+        { id: 'hornys_menu_combo', label: 'Menu Combo Horny\'s', price: 1200, category: 'Menus', color: '#A93226' },
+        { id: 'hornys_burger_bone', label: 'Burger The Beef with the Bone', price: 850, category: 'Burgers', color: '#C0392B' },
+        { id: 'hornys_burger_classic', label: 'Burger Classic', price: 650, category: 'Burgers', color: '#E74C3C' },
+        { id: 'hornys_fries', label: 'Frites Horny\'s', price: 350, category: 'Accompagnements', color: '#F39C12' },
+        { id: 'hornys_tacos', label: 'Tacos Horny\'s', price: 550, category: 'Burgers', color: '#E67E22' },
+        { id: 'hornys_milkshake', label: 'Milkshake', price: 400, category: 'Boissons', color: '#8E44AD' },
       ],
       recipes: [
-        { id: 'burger_classic', label: 'Burger Classic', time: 10000, grade: 2, ingredients: [
+        { id: 'hornys_burger_classic', label: 'Burger Classic', time: 10000, grade: 2, ingredients: [
           { label: 'Pain', amount: 1 }, { label: 'Viande', amount: 1 }, { label: 'Fromage', amount: 1 },
         ]},
-        { id: 'fries', label: 'Frites', time: 7000, grade: 1, ingredients: [
-          { label: 'Pomme de terre', amount: 2 }, { label: 'Huile', amount: 1 },
+        { id: 'hornys_fries', label: 'Frites Horny\'s', time: 7000, grade: 1, ingredients: [
+          { label: 'Pommes de terre', amount: 2 }, { label: 'Huile', amount: 1 },
         ]},
       ],
       patchNotes: ConfigPatchNotes(),
@@ -672,8 +672,8 @@
     if (page === 'sales') {
       setTimeout(() => {
         S.cart = [
-          { id: 'formula_mini_dino', label: 'Formule Mini Dino', price: 800, quantity: 15 },
-          { id: 'burger', label: 'Burger', price: 600, quantity: 2 },
+          { id: 'hornys_burger_bone', label: 'Burger The Beef with the Bone', price: 850, quantity: 2 },
+          { id: 'hornys_fries', label: 'Frites Horny\'s', price: 350, quantity: 3 },
         ];
         render();
       }, 100);
