@@ -63,16 +63,38 @@ function openExternalUrl(url) {
 }
 
 async function openDiscord() {
-  // Toujours récupérer l'invite depuis la config (client Lua → callback)
-  const res = await nui('openDiscord');
+  // Ouvre d'abord avec l'invite déjà poussée depuis Config.Discord.Invite
+  // (évite d'attendre un fetch NUI qui peut échouer / timeout hors CEF FiveM).
+  const cached = discordInvite;
+  if (cached) {
+    openExternalUrl(cached);
+  }
+
+  // Rafraîchit depuis la config Lua (source unique de vérité)
+  let res = {};
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 1500);
+    res = await fetch(`https://${resourceName()}/openDiscord`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+      body: JSON.stringify({}),
+      signal: ctrl.signal,
+    }).then((r) => r.json()).catch(() => ({}));
+    clearTimeout(t);
+  } catch (_) {
+    res = {};
+  }
+
   if (res && res.invite) {
     discordInvite = res.invite;
-  }
-  if (!discordInvite) {
+    // Si on n'avait pas encore d'invite en cache, ouvrir maintenant
+    if (!cached) {
+      openExternalUrl(discordInvite);
+    }
+  } else if (!cached) {
     console.warn('[rr_discord_gate] Invite Discord manquante — vérifier Config.Discord.Invite');
-    return;
   }
-  openExternalUrl(discordInvite);
 }
 
 function hideAllScreens() {
