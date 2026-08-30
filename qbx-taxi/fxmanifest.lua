@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 name 'qbx-taxi'
-description 'San Andreas Taxi Corporation — Entreprise taxi immersive pour Qbox'
+description 'San Andreas Taxi Corporation — Système taxi RP pour Qbox (MenuV)'
 author 'San Andreas Taxi Corporation'
 version '1.0.0'
 
@@ -11,7 +11,9 @@ use_experimental_fxv2_oal 'yes'
 
 ox_lib 'locale'
 
+--- MenuV doit démarrer AVANT qbx-taxi (server.cfg : ensure menuv)
 dependencies {
+    'menuv',
     'ox_lib',
     'qbx_core',
     'oxmysql',
@@ -22,36 +24,13 @@ dependencies {
 
 shared_scripts {
     '@ox_lib/init.lua',
-    '@qbx_core/modules/lib.lua',
     'config.lua',
-    'shared/utils.lua',
 }
 
-client_scripts {
-    '@qbx_core/modules/playerdata.lua',
-    'client/utils.lua',
-    'client/main.lua',
-    'client/duty.lua',
-    'client/dispatch.lua',
-    'client/rides.lua',
-    'client/vehicle.lua',
-    'client/garage.lua',
-}
-
-server_scripts {
-    '@oxmysql/lib/MySQL.lua',
-    'server/database.lua',
-    'server/callbacks.lua',
-    'server/billing.lua',
-    'server/rides.lua',
-    'server/main.lua',
-}
-
-ui_page 'web/index.html'
+--- Scripts client / serveur ajoutés aux étapes suivantes :
+--- Étape 2  : @menuv/menuv.lua + intégration MenuV
+--- Étape 3+ : client/menu_*.lua, client/main.lua, server/*.lua, shared/utils.lua
 
 files {
-    'web/index.html',
-    'web/style.css',
-    'web/app.js',
     'web/assets/logo.png',
 }

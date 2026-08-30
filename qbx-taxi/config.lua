@@ -1,7 +1,7 @@
 Config = Config or {}
 
 -- =============================================================================
--- ENTREPRISE
+-- 1. ENTREPRISE
 -- =============================================================================
 
 Config.Company = {
@@ -9,25 +9,54 @@ Config.Company = {
     shortName = 'SA Taxi',
     job = 'taxi',
     headquarters = 'Grapeseed',
-    logo = 'assets/logo.png',
+    formerHeadquarters = 'Los Santos',
+    logo = 'web/assets/logo.png',
     slogan = 'Los Santos a fermé ses portes. Les taxis, eux, ont simplement changé de point de départ.',
 }
 
---- Entreprise publique sous tutelle de l'État (true) ou privée (false).
---- Ne pas coder en dur la logique métier : utiliser cette valeur partout.
+--- Entreprise sous tutelle de l'État (true) ou privée (false).
+--- Ne pas coder en dur : lire cette valeur partout.
 Config.CompanyStateOwned = true
 
 -- =============================================================================
--- UNITÉS & LOCALISATION
+-- 2. MENU PRINCIPAL (MenuV)
 -- =============================================================================
 
-Config.Units = {
-    distance = 'km', -- 'km' | 'mi'
-    locale = 'fr',
+Config.Menu = {
+    command = 'taximenu',
+    key = 'F6',
+    enabled = true,
+    position = 'topleft',
+    requireJob = true,
+    requireAlive = true,
+    openCooldown = 500, -- ms anti-spam
+}
+
+--- Paramètres visuels MenuV (CreateMenu)
+--- API : MenuV:CreateMenu(title, subtitle, position, r, g, b, ...)
+Config.MenuV = {
+    title = 'San Andreas Taxi Corporation',
+    subtitle = 'Service de transport de San Andreas',
+    position = 'topleft',
+    color = {
+        r = 255,
+        g = 200,
+        b = 0,
+    },
+    namespace = 'qbx_taxi',
+    theme = 'default',
+    dictionary = 'menuv',
+    texture = 'default',
+    size = 'size-125',
+    --- Logo : MenuV supporte texture/dictionary si configuré côté MenuV.
+    --- Sinon le logo reste disponible via Config.Company.logo pour interfaces complémentaires.
+    useLogoTexture = false,
+    logoDictionary = 'qbx_taxi',
+    logoTexture = 'logo',
 }
 
 -- =============================================================================
--- GRADES & PERMISSIONS
+-- 3. GRADES
 -- =============================================================================
 
 Config.Grades = {
@@ -41,13 +70,13 @@ Config.Grades = {
             meter = true,
             billing = false,
             bossMenu = false,
+            employees = false,
             hire = false,
             fire = false,
             promote = false,
             demote = false,
             manageSalaries = false,
             manageVehicles = false,
-            manageStock = false,
             viewStats = false,
             viewRevenue = false,
         },
@@ -62,14 +91,14 @@ Config.Grades = {
             meter = true,
             billing = true,
             bossMenu = false,
+            employees = false,
             hire = false,
             fire = false,
             promote = false,
             demote = false,
             manageSalaries = false,
             manageVehicles = false,
-            manageStock = false,
-            viewStats = false,
+            viewStats = true,
             viewRevenue = false,
         },
     },
@@ -83,13 +112,13 @@ Config.Grades = {
             meter = true,
             billing = true,
             bossMenu = false,
+            employees = false,
             hire = false,
             fire = false,
             promote = false,
             demote = false,
             manageSalaries = false,
             manageVehicles = false,
-            manageStock = false,
             viewStats = true,
             viewRevenue = false,
         },
@@ -104,13 +133,13 @@ Config.Grades = {
             meter = true,
             billing = true,
             bossMenu = false,
+            employees = false,
             hire = false,
             fire = false,
             promote = false,
             demote = false,
             manageSalaries = false,
             manageVehicles = false,
-            manageStock = false,
             viewStats = true,
             viewRevenue = false,
         },
@@ -125,13 +154,13 @@ Config.Grades = {
             meter = true,
             billing = true,
             bossMenu = true,
+            employees = true,
             hire = true,
             fire = true,
             promote = true,
             demote = true,
             manageSalaries = true,
             manageVehicles = true,
-            manageStock = true,
             viewStats = true,
             viewRevenue = true,
         },
@@ -146,64 +175,50 @@ Config.Grades = {
             meter = true,
             billing = true,
             bossMenu = true,
+            employees = true,
             hire = true,
             fire = true,
             promote = true,
             demote = true,
             manageSalaries = true,
             manageVehicles = true,
-            manageStock = true,
             viewStats = true,
             viewRevenue = true,
         },
     },
 }
 
-Config.Permissions = {
-    minimumBossGrade = 4,
-    minimumDispatchGrade = 0,
-    minimumGarageGrade = 0,
-    minimumBillingGrade = 1,
-}
-
 -- =============================================================================
--- VÉHICULES
+-- 4. VÉHICULES
 -- =============================================================================
 
 Config.Vehicles = {
     {
         model = 'taxi',
         label = 'Vapid Taxi',
-        grade = 0,
+        minGrade = 0,
         category = 'standard',
         livery = 0,
     },
     {
         model = 'taxi',
-        label = 'Vapid Taxi Premium',
-        grade = 2,
+        label = 'Taxi Premium',
+        minGrade = 2,
         category = 'premium',
         livery = 1,
     },
     {
-        model = 'stretch',
-        label = 'Albany Stretch',
-        grade = 3,
-        category = 'premium',
+        model = 'speedo',
+        label = 'Taxi Van',
+        minGrade = 2,
+        category = 'van',
         livery = 0,
     },
     {
         model = 'baller',
-        label = 'Véhicule superviseur',
-        grade = 4,
+        label = 'Véhicule Responsable',
+        minGrade = 4,
         category = 'supervisor',
-        livery = 0,
-    },
-    {
-        model = 'speedo',
-        label = 'Véhicule de service',
-        grade = 4,
-        category = 'service',
         livery = 0,
     },
 }
@@ -214,16 +229,37 @@ Config.VehicleSettings = {
     giveKeys = true,
     setFuelOnSpawn = true,
     defaultFuel = 100.0,
-    fuelResource = 'ox_fuel', -- ignoré si la ressource n'est pas démarrée
-    lockOnSpawn = false,
-    platePrefix = 'SATAXI',
+    fuelResource = 'ox_fuel',
+    platePrefix = 'TAXI',
     deleteOnStore = true,
     repairCost = 250,
-    repairUsesCompanyAccount = true,
+    cleanCost = 50,
+    refuelCost = 100,
+    allowedModels = {}, -- vide = Config.Vehicles uniquement
+    lockDistance = 5.0,
+    storeDistance = 8.0,
 }
 
 -- =============================================================================
--- POSITIONS — GRAPESEED
+-- 5. GARAGE
+-- =============================================================================
+
+Config.Garage = {
+    enabled = true,
+    label = 'Garage SA Taxi',
+    coords = vec4(1703.15, 4918.62, 42.08, 55.0),
+    spawn = vec4(1708.42, 4912.35, 42.08, 55.0),
+    store = vec3(1703.15, 4918.62, 42.08),
+    interactRadius = 3.0,
+    storeRadius = 5.0,
+    requireDuty = true,
+    requireJob = true,
+    confirmSpawn = true,
+    maxActiveVehicles = 1,
+}
+
+-- =============================================================================
+-- 6. POSITIONS GÉNÉRALES
 -- =============================================================================
 
 Config.Locations = {
@@ -233,18 +269,9 @@ Config.Locations = {
         radius = 2.5,
     },
     duty = {
-        label = 'Prise de service',
+        label = 'Point de service',
         coords = vec4(1695.88, 4925.74, 42.08, 145.0),
         radius = 1.5,
-        useGlobalDuty = true, -- qbx-duty (Étape 3)
-    },
-    garage = {
-        label = 'Garage Taxi',
-        coords = vec4(1703.15, 4918.62, 42.08, 55.0),
-        spawn = vec4(1708.42, 4912.35, 42.08, 55.0),
-        store = vec3(1703.15, 4918.62, 42.08),
-        radius = 3.0,
-        storeRadius = 5.0,
     },
     locker = {
         label = 'Vestiaire Taxi',
@@ -257,32 +284,123 @@ Config.Locations = {
         radius = 1.5,
         minimumGrade = 4,
     },
-    tablet = {
-        label = 'Tablette chauffeur',
-        useItem = false,
-        item = 'taxi_tablet',
-        command = 'taxitablet',
-        keybind = false,
-        defaultKey = 'F6',
+    companyStash = {
+        label = 'Coffre entreprise',
+        coords = vec4(1690.50, 4926.80, 42.08, 235.0),
+        radius = 1.5,
+        minimumGrade = 4,
+        stashId = 'sataxi_stash',
+        slots = 50,
+        weight = 100000,
     },
 }
 
--- Siège historique Los Santos (fermé — lore / futur)
 Config.ClosedLocations = {
     losSantosHQ = {
         label = 'Ancien siège — Los Santos (fermé)',
         coords = vec3(-1246.91, -277.53, 37.71),
-        blip = {
-            enabled = false,
-            sprite = 198,
-            color = 1,
-            scale = 0.7,
-        },
+        blip = { enabled = false, sprite = 198, color = 1, scale = 0.7 },
     },
 }
 
 -- =============================================================================
--- BLIPS
+-- 7. DUTY (qbx-duty — intégration Étape 7)
+-- =============================================================================
+
+Config.Duty = {
+    resource = 'qbx-duty',
+    useGlobalDuty = true,
+    exportIsOnDuty = 'IsOnDuty',
+    requireDutyFor = {
+        dispatch = true,
+        garage = true,
+        rides = true,
+        meter = true,
+        billing = true,
+        driverBlip = true,
+    },
+}
+
+-- =============================================================================
+-- 8. TARIFICATION
+-- =============================================================================
+
+Config.Fares = {
+    base = 25,
+    perKm = 15,
+    perMinute = 2,
+    minimum = 50,
+    rounding = 5,
+    paymentAccount = 'cash', -- 'cash' | 'bank'
+    allowBankFallback = true,
+    driverSharePercent = 65,
+    companySharePercent = 35,
+}
+
+-- =============================================================================
+-- 9. DISPATCH
+-- =============================================================================
+
+Config.Dispatch = {
+    enabled = true,
+    maxActiveRequests = 25,
+    requestTimeout = 120,
+    autoAssign = false,
+    showCustomerName = true,
+    showEstimatedFare = true,
+    acceptDistanceCheck = true,
+    maxAcceptDistance = 15000.0,
+    refreshInterval = 5000,
+    notifySound = true,
+}
+
+-- =============================================================================
+-- 10. DEMANDE CLIENT (/taxi)
+-- =============================================================================
+
+Config.ClientRequest = {
+    enabled = true,
+    command = 'taxi',
+    cancelCommand = 'canceltaxi',
+    cooldown = 60,
+    allowComment = true,
+    maxCommentLength = 120,
+    destinationMode = 'waypoint', -- 'waypoint' | 'preset'
+    presetDestinations = {
+        { label = 'Sandy Shores', coords = vec3(1960.69, 3740.56, 32.34) },
+        { label = 'Paleto Bay', coords = vec3(-275.52, 6635.84, 7.42) },
+        { label = 'Aéroport LSIA', coords = vec3(-1037.12, -2737.71, 20.17) },
+        { label = 'Centre-ville LS', coords = vec3(215.76, -810.12, 30.73) },
+    },
+}
+
+-- =============================================================================
+-- 11. STATUTS DE COURSE
+-- =============================================================================
+
+Config.RideStatuses = {
+    WAITING = 'WAITING',
+    DRIVER_ASSIGNED = 'DRIVER_ASSIGNED',
+    DRIVER_ARRIVED = 'DRIVER_ARRIVED',
+    PASSENGER_ON_BOARD = 'PASSENGER_ON_BOARD',
+    RIDE_ACTIVE = 'RIDE_ACTIVE',
+    COMPLETED = 'COMPLETED',
+    CANCELLED = 'CANCELLED',
+}
+
+Config.Rides = {
+    meterUpdateInterval = 1000,
+    pickupRadius = 15.0,
+    dropoffRadius = 20.0,
+    cancelPenalty = 25,
+    noShowTimeout = 180,
+    ratingEnabled = true,
+    ratingTimeout = 60,
+    historyLimit = 50,
+}
+
+-- =============================================================================
+-- 12. BLIPS
 -- =============================================================================
 
 Config.Blips = {
@@ -303,230 +421,112 @@ Config.Blips = {
         label = 'Garage SA Taxi',
     },
     driver = {
-        managedByDutySystem = true, -- qbx-duty gère les blips chauffeurs
+        managedByDutySystem = true,
         resource = 'qbx-duty',
     },
 }
 
 -- =============================================================================
--- COULEURS NUI
+-- 13. VESTIAIRE
 -- =============================================================================
 
-Config.Colors = {
-    primary = '#FFC700',
-    primaryDark = '#E6B300',
-    secondary = '#111111',
-    background = '#0A0A0A',
-    surface = '#151515',
-    surfaceAlt = '#1E1E1E',
-    text = '#FFFFFF',
-    textMuted = '#B3B3B3',
-    success = '#2ECC71',
-    danger = '#E74C3C',
-    warning = '#F1C40F',
-    info = '#3498DB',
-}
-
--- =============================================================================
--- TARIFICATION
--- =============================================================================
-
-Config.Fares = {
-    categories = {
-        standard = {
-            label = 'Standard',
-            base = 25,
-            perKm = 15,
-            perMinute = 2,
-            minimumFare = 50,
-            multiplier = 1.0,
+Config.Vestiaire = {
+    enabled = true,
+    useNativeClothing = true,
+    outfits = {
+        civil = {
+            label = 'Civil',
+            restorePlayerSkin = true,
         },
-        premium = {
-            label = 'Premium',
-            base = 40,
-            perKm = 22,
-            perMinute = 3,
-            minimumFare = 75,
-            multiplier = 1.35,
+        driver = {
+            label = 'Chauffeur',
+            minGrade = 0,
+            male = {},
+            female = {},
         },
-        longDistance = {
-            label = 'Longue distance',
-            base = 50,
-            perKm = 12,
-            perMinute = 1.5,
-            minimumFare = 100,
-            multiplier = 0.95,
-            minimumDistanceKm = 5.0,
+        senior = {
+            label = 'Chauffeur senior',
+            minGrade = 3,
+            male = {},
+            female = {},
+        },
+        manager = {
+            label = 'Responsable',
+            minGrade = 4,
+            male = {},
+            female = {},
+        },
+        director = {
+            label = 'Directeur',
+            minGrade = 5,
+            male = {},
+            female = {},
         },
     },
-    defaultCategory = 'standard',
-    rounding = 5, -- arrondi au multiple de 5
-    paymentAccount = 'cash', -- 'cash' | 'bank'
-    allowBankFallback = true,
 }
 
 -- =============================================================================
--- ÉCONOMIE & COMMISSIONS
+-- 14. BOSS / GESTION ENTREPRISE
 -- =============================================================================
 
-Config.Economy = {
-    currencySymbol = '$',
+Config.Boss = {
+    enabled = true,
+    minimumGrade = 4,
     companyAccount = 'taxi',
-    useSocietyAccount = true,
-    societyResource = 'Renewed-Banking', -- adapté selon le serveur
-    driverPayoutMode = 'split', -- 'split' | 'salary_plus_bonus' | 'full_to_driver'
-    driverSharePercent = 65,
-    companySharePercent = 35,
-    invoiceTaxPercent = 0,
-    stateOwnedRevenueToTreasury = true,
-}
-
-Config.Commissions = {
-    ride = {
-        company = 35,
-        driver = 65,
-    },
-    invoice = {
-        company = 20,
-        driver = 80,
-    },
-    longDistanceBonus = {
-        driver = 10,
-        company = 0,
+    features = {
+        employees = true,
+        vehicles = true,
+        account = true,
+        stats = true,
+        salaries = true,
+        history = true,
+        companyInfo = true,
     },
 }
 
 -- =============================================================================
--- DISPATCH
--- =============================================================================
-
-Config.Dispatch = {
-    enabled = true,
-    maxActiveRequests = 25,
-    requestTimeout = 120, -- secondes
-    autoAssign = false,
-    showCustomerName = true,
-    showEstimatedFare = true,
-    refreshInterval = 5000, -- ms (UI uniquement)
-    acceptDistanceCheck = true,
-    maxAcceptDistance = 15000.0, -- mètres
-    notifySound = true,
-}
-
--- =============================================================================
--- DEMANDE CLIENT (/taxi)
--- =============================================================================
-
-Config.ClientRequest = {
-    enabled = true,
-    command = 'taxi',
-    useTarget = false,
-    targetModels = {},
-    requireOnFoot = false,
-    cooldown = 60, -- secondes
-    cancelCommand = 'canceltaxi',
-    allowComment = true,
-    maxCommentLength = 120,
-    destinationMode = 'waypoint', -- 'waypoint' | 'preset' | 'free'
-    presetDestinations = {
-        { label = 'Sandy Shores', coords = vec3(1960.69, 3740.56, 32.34) },
-        { label = 'Paleto Bay', coords = vec3(-275.52, 6635.84, 7.42) },
-        { label = 'Aéroport LSIA', coords = vec3(-1037.12, -2737.71, 20.17) },
-        { label = 'Centre-ville LS', coords = vec3(215.76, -810.12, 30.73) },
-    },
-}
-
--- =============================================================================
--- COURSES
--- =============================================================================
-
-Config.Rides = {
-    meterUpdateInterval = 1000, -- ms
-    pickupRadius = 15.0,
-    dropoffRadius = 20.0,
-    cancelPenalty = 25,
-    noShowTimeout = 180,
-    requireVehicleClass = 'automobile',
-    allowedVehicleModels = {}, -- vide = véhicules taxi du garage uniquement
-    ratingEnabled = true,
-    ratingTimeout = 60,
-    historyLimit = 50,
-}
-
--- =============================================================================
--- FACTURATION
+-- 15. FACTURATION
 -- =============================================================================
 
 Config.Billing = {
     enabled = true,
-    types = {
+    minAmount = 25,
+    maxAmount = 5000,
+    maxDistance = 10.0,
+    requireDuty = true,
+    requireReason = false,
+    maxReasonLength = 160,
+    services = {
         ride = { label = 'Course taxi', enabled = true },
         private = { label = 'Transport privé', enabled = true },
         longDistance = { label = 'Longue distance', enabled = true },
         special = { label = 'Service spécial', enabled = true },
     },
-    minAmount = 25,
-    maxAmount = 5000,
-    requireReason = false,
-    maxReasonLength = 160,
 }
 
 -- =============================================================================
--- VESTIAIRE
+-- 16. OX_TARGET
 -- =============================================================================
 
-Config.Locker = {
+Config.Target = {
     enabled = true,
-    useNativeClothing = true,
-    outfits = {
-        civil = {
-            label = 'Tenue civile',
-            restorePlayerSkin = true,
-        },
-        driver = {
-            label = 'Tenue chauffeur',
-            grade = 0,
-            male = {},
-            female = {},
-        },
-        senior = {
-            label = 'Tenue chauffeur senior',
-            grade = 3,
-            male = {},
-            female = {},
-        },
-        manager = {
-            label = 'Tenue responsable',
-            grade = 4,
-            male = {},
-            female = {},
-        },
-    },
-}
-
--- =============================================================================
--- DUTY (qbx-duty — intégration Étape 3)
--- =============================================================================
-
-Config.Duty = {
-    resource = 'qbx-duty',
-    useGlobalDuty = true,
-    requireDutyFor = {
-        dispatch = true,
+    distance = 2.0,
+    icon = 'fa-solid fa-taxi',
+    options = {
+        duty = true,
         garage = true,
-        rides = true,
-        meter = true,
-        billing = true,
-        driverBlip = true,
+        vehicleMenu = true,
+        locker = true,
+        companyStash = true,
     },
 }
 
 -- =============================================================================
--- NOTIFICATIONS
+-- 17. NOTIFICATIONS
 -- =============================================================================
 
 Config.Notifications = {
-    provider = 'ox_lib', -- 'ox_lib' | 'qbx_core'
+    provider = 'ox_lib',
     duration = 5000,
     position = 'top-right',
     messages = {
@@ -537,6 +537,7 @@ Config.Notifications = {
         newRequest = 'Nouvelle demande de taxi.',
         rideAccepted = 'Course acceptée.',
         clientWaiting = 'Le client vous attend.',
+        clientArrived = 'Client arrivé.',
         rideStarted = 'Course démarrée.',
         rideCompleted = 'Course terminée : %s.',
         rideCancelled = 'Course annulée.',
@@ -544,86 +545,58 @@ Config.Notifications = {
         vehicleStored = 'Véhicule rangé.',
         vehicleSpawned = 'Véhicule sorti.',
         insufficientGrade = 'Grade insuffisant.',
-        resourceReady = 'SA Taxi initialisé.',
+        menuDenied = 'Accès refusé.',
     },
 }
 
 -- =============================================================================
--- SONS
+-- 18. WEBHOOKS DISCORD
 -- =============================================================================
 
-Config.Sounds = {
-    enabled = true,
-    newRequest = {
-        name = 'Text_Arrive_Tone',
-        ref = 'Phone_SoundSet_Default',
-    },
-    rideAccepted = {
-        name = 'SELECT',
-        ref = 'HUD_FRONTEND_DEFAULT_SOUNDSET',
-    },
-    rideCompleted = {
-        name = 'PURCHASE',
-        ref = 'HUD_LIQUOR_STORE_SOUNDSET',
-    },
-}
-
--- =============================================================================
--- TEMPS & INTERVALLES
--- =============================================================================
-
-Config.Times = {
-    startupDelay = 500,
-    targetDistance = 2.0,
-    garageInteractCooldown = 2000,
-    statsRefresh = 30000,
-    dutyLogInterval = 60000,
-    saveStatsInterval = 120000,
-}
-
--- =============================================================================
--- LOGS DISCORD
--- =============================================================================
-
-Config.DiscordLogs = {
+Config.Webhooks = {
     enabled = false,
     botName = 'SA Taxi Logs',
     avatarUrl = '',
-    webhooks = {
+    urls = {
         duty = '',
         rides = '',
         billing = '',
         management = '',
+        vehicles = '',
         security = '',
     },
     colors = {
         dutyOn = 3066993,
         dutyOff = 15158332,
         rideAccepted = 3447003,
+        clientPickedUp = 10181046,
         rideCompleted = 15844367,
-        invoice = 10181046,
         payment = 5763719,
+        invoice = 10181046,
         hire = 2067276,
         fire = 15548997,
         promote = 9807270,
         demote = 15105570,
+        vehicleSpawn = 16776960,
     },
-    logEvents = {
+    events = {
         dutyOn = true,
         dutyOff = true,
         rideAccepted = true,
+        clientPickedUp = true,
         rideCompleted = true,
-        invoice = true,
         payment = true,
+        invoice = true,
         hire = true,
         fire = true,
         promote = true,
         demote = true,
+        vehicleSpawn = true,
     },
 }
 
 -- =============================================================================
--- SQL
+-- 19. SQL
 -- =============================================================================
 
 Config.SQL = {
@@ -634,11 +607,12 @@ Config.SQL = {
         ratings = 'taxi_ratings',
         transactions = 'taxi_transactions',
         dutyLogs = 'taxi_duty_logs',
+        employeeStats = 'taxi_employee_stats',
     },
 }
 
 -- =============================================================================
--- SÉCURITÉ
+-- 20. SÉCURITÉ
 -- =============================================================================
 
 Config.Security = {
@@ -652,66 +626,16 @@ Config.Security = {
         windowMs = 10000,
         maxEvents = 8,
     },
-    blockedExploitActions = {
-        setFare = true,
-        setCommission = true,
-        setDistance = true,
-        forceComplete = true,
-    },
 }
 
 -- =============================================================================
--- BOSS MENU
+-- 21. UNITÉS & DEBUG
 -- =============================================================================
 
-Config.BossMenu = {
-    enabled = true,
-    minimumGrade = 4,
-    useOxLibMenu = true,
-    features = {
-        employees = true,
-        hire = true,
-        fire = true,
-        promote = true,
-        demote = true,
-        salaries = true,
-        stats = true,
-        revenue = true,
-        expenses = true,
-        vehicles = true,
-        stock = false,
-    },
+Config.Units = {
+    distance = 'km',
+    locale = 'fr',
 }
-
--- =============================================================================
--- NUI
--- =============================================================================
-
-Config.NUI = {
-    focusOnOpen = true,
-    closeOnEscape = true,
-    tabletCommand = 'taxitablet',
-    tabletKey = false,
-    animations = true,
-    theme = 'sa-taxi-dark',
-}
-
--- =============================================================================
--- OX_TARGET
--- =============================================================================
-
-Config.Target = {
-    enabled = true,
-    distance = 2.0,
-    icon = 'fa-solid fa-taxi',
-    groups = {
-        taxi = 0,
-    },
-}
-
--- =============================================================================
--- DEBUG
--- =============================================================================
 
 Config.Debug = {
     enabled = false,
@@ -721,3 +645,25 @@ Config.Debug = {
     command = 'taxidebug',
 }
 
+-- =============================================================================
+-- VALIDATION AU CHARGEMENT
+-- =============================================================================
+
+local function validateConfig()
+    assert(Config.Company.job == 'taxi', '[qbx-taxi] Config.Company.job doit être "taxi"')
+    assert(Config.Grades[0], '[qbx-taxi] Config.Grades[0] est requis')
+    assert(Config.Menu.command ~= '', '[qbx-taxi] Config.Menu.command est requis')
+    assert(Config.Fares.companySharePercent + Config.Fares.driverSharePercent == 100,
+        '[qbx-taxi] Config.Fares : companySharePercent + driverSharePercent doit totaliser 100')
+
+    for index, vehicle in ipairs(Config.Vehicles) do
+        assert(vehicle.model, ('[qbx-taxi] Config.Vehicles[%s].model manquant'):format(index))
+        assert(vehicle.minGrade ~= nil, ('[qbx-taxi] Config.Vehicles[%s].minGrade manquant'):format(index))
+    end
+
+    if Config.Debug.enabled then
+        print(('[qbx-taxi] Configuration chargée : %s'):format(Config.Company.name))
+    end
+end
+
+validateConfig()

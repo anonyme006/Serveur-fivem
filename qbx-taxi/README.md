@@ -1,34 +1,36 @@
 # qbx-taxi — San Andreas Taxi Corporation
 
-Ressource taxi immersive pour serveur **Qbox**.
+Système taxi RP complet pour **Qbox** avec **MenuV** comme interface principale.
 
-## Étape 1 — Architecture + Config + Qbox
+## Étape 1 — fxmanifest.lua + config.lua
 
-Cette étape pose les fondations :
+Cette étape pose uniquement les fondations de configuration :
 
-- Structure complète du projet
-- `fxmanifest.lua` compatible Qbox / ox_lib / oxmysql
-- `config.lua` exhaustif
-- Intégration Qbox (client + serveur)
-- NUI shell (noir / jaune taxi)
-- Callbacks de base
+- **`fxmanifest.lua`** : dépendances (`menuv`, `qbx_core`, `ox_lib`, `oxmysql`, `ox_target`, `ox_inventory`, `qbx-duty`)
+- **`config.lua`** : configuration complète (entreprise, MenuV, grades, véhicules, garage, duty, tarifs, dispatch, vestiaire, boss, facturation, webhooks, SQL, sécurité)
 
-## Dépendances
+Aucun script client/serveur n'est chargé à cette étape.
 
-- [qbx_core](https://github.com/Qbox-project/qbx_core)
-- [ox_lib](https://github.com/overextended/ox_lib)
-- [oxmysql](https://github.com/overextended/oxmysql)
-- [ox_target](https://github.com/overextended/ox_target)
-- [ox_inventory](https://github.com/overextended/ox_inventory)
-- **qbx-duty** (intégration complète à l'étape 3)
+## Stack
+
+| Composant | Rôle |
+|-----------|------|
+| **Qbox** | Framework (`qbx_core`) |
+| **MenuV** | Menus principaux (pas de NUI parallèle) |
+| **ox_lib** | Notifications, callbacks, zones |
+| **ox_target** | Interactions monde |
+| **oxmysql** | Base de données |
+| **ox_inventory** | Coffre entreprise |
+| **qbx-duty** | Prise de service + blips map |
 
 ## Installation
 
-1. Copier `qbx-taxi` dans `resources/[jobs]/`
-2. Copier `San_Andreas_Taxi_Corporation.png` vers `web/assets/logo.png`
-3. Ajouter dans `server.cfg` :
+1. Installer [MenuV](https://github.com/ThymonA/menuv) et démarrer **avant** qbx-taxi
+2. Copier `San_Andreas_Taxi_Corporation.png` → `web/assets/logo.png`
+3. `server.cfg` :
 
 ```cfg
+ensure menuv
 ensure ox_lib
 ensure oxmysql
 ensure qbx_core
@@ -38,36 +40,73 @@ ensure ox_inventory
 ensure qbx-taxi
 ```
 
-4. Le job `taxi` sera ajouté à l'**Étape 2**.
+## Structure prévue
 
-## Exports
+```
+qbx-taxi/
+├── fxmanifest.lua
+├── config.lua
+├── client/
+│   ├── main.lua
+│   ├── menu_main.lua
+│   ├── menu_personnel.lua
+│   ├── menu_vehicle.lua
+│   ├── menu_garage.lua
+│   ├── menu_dispatch.lua
+│   ├── menu_rides.lua
+│   ├── menu_taximeter.lua
+│   ├── duty.lua
+│   ├── vehicle.lua
+│   ├── target.lua
+│   └── utils.lua
+├── server/
+│   ├── main.lua
+│   ├── rides.lua
+│   ├── employees.lua
+│   ├── billing.lua
+│   ├── database.lua
+│   └── callbacks.lua
+├── shared/
+│   └── utils.lua
+├── web/assets/logo.png
+└── sql/taxi.sql
+```
 
-### Client
+## Roadmap
 
-- `exports['qbx-taxi']:IsTaxiEmployee()`
-- `exports['qbx-taxi']:GetJobGrade()`
-- `exports['qbx-taxi']:HasJobPermission(permission)`
-- `exports['qbx-taxi']:GetPublicConfig()`
+| Étape | Contenu |
+|-------|---------|
+| **1** | fxmanifest + config |
+| 2 | Intégration MenuV |
+| 3 | Menu principal |
+| 4 | Menu personnel |
+| 5 | Menu véhicule |
+| 6 | Garage |
+| 7 | qbx-duty |
+| 8 | Dispatch |
+| 9 | Système de courses |
+| 10 | Taximètre |
+| 11 | Paiement |
+| 12 | Statistiques |
+| 13 | Gestion employés |
+| 14 | SQL |
+| 15 | Logs |
+| 16 | Tests |
+| 17 | Optimisation |
 
-### Serveur
+## Notes MenuV
 
-- `exports['qbx-taxi']:IsTaxiEmployee(source)`
-- `exports['qbx-taxi']:HasJobPermission(source, permission)`
-- `exports['qbx-taxi']:GetOnDutyTaxiDrivers()`
-- `exports['qbx-taxi']:GetPublicConfig()`
+API officielle (vérifier la version installée) :
 
-## Callbacks
+```lua
+local menu = MenuV:CreateMenu(title, subtitle, position, r, g, b)
+menu:AddButton({ icon = '🚕', label = '...', value = ..., description = '...' })
+menu:AddConfirm({ icon = '✅', label = '...', value = false })
+menu:On('select', function(item) end)
+```
 
-- `qbx-taxi:server:getPublicConfig`
-- `qbx-taxi:server:getPlayerStatus`
-
-## Notes Qbox
-
-- Pas de `GetCoreObject()` — utilisation de `exports.qbx_core:*`
-- PlayerData client via `@qbx_core/modules/playerdata.lua` (`QBX.PlayerData`)
-- Duty natif Qbox : `PlayerData.job.onduty` + `exports.qbx_core:GetDutyCountJob('taxi')`
-- Intégration **qbx-duty** prévue étape 3 (sans recréer un système duty)
+Couleurs taxi : RGB `255, 200, 0` — position `topleft`.
 
 ## Prochaine étape
 
-**Étape 2** — Job Taxi + grades + permissions dans Qbox.
+**Étape 2** — Intégrer MenuV (`@menuv/menuv.lua` + initialisation).
