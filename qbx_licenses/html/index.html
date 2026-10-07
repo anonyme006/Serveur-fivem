@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carte de permis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Orbitron:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="card" class="card" hidden>
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">État de San Andreas</p>
+        <h1>Permis à points</h1>
+      </div>
+      <div class="seal">LSPD</div>
+    </header>
+
+    <section class="identity">
+      <div class="identity-grid">
+        <div>
+          <span class="label">Nom</span>
+          <strong id="lastname">—</strong>
+        </div>
+        <div>
+          <span class="label">Prénom</span>
+          <strong id="firstname">—</strong>
+        </div>
+        <div>
+          <span class="label">Naissance</span>
+          <strong id="birthdate">—</strong>
+        </div>
+        <div>
+          <span class="label">Sexe</span>
+          <strong id="sex">—</strong>
+        </div>
+        <div>
+          <span class="label">Nationalité</span>
+          <strong id="nationality">—</strong>
+        </div>
+        <div>
+          <span class="label">ID citoyen</span>
+          <strong id="citizenid">—</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="licenses" id="licenses"></section>
+
+    <footer class="card-footer">
+      <span>Les points sont mis à jour en direct</span>
+      <span id="hint">Backspace pour fermer</span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
