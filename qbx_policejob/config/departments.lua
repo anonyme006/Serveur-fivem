@@ -15,10 +15,10 @@ Config.Departments = {
         enabled = true,
         --- Grades (doivent exister dans qbx_core shared/jobs.lua)
         grades = {
-            [0] = { name = 'Recruit', label = 'Recrue', permissions = { 'duty', 'cuff', 'escort', 'search', 'objects_basic' } },
-            [1] = { name = 'Officer', label = 'Officer', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects_basic', 'fines', 'gsr', 'impound' } },
-            [2] = { name = 'Senior Officer', label = 'Senior Officer', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects', 'fines', 'prison', 'gsr', 'impound', 'armory', 'spike' } },
-            [3] = { name = 'Sergeant', label = 'Sergeant', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects', 'fines', 'prison', 'community', 'gsr', 'impound', 'armory', 'spike', 'code1080', 'confiscate', 'stash_evidence' } },
+            [0] = { name = 'Recruit', label = 'Recrue', permissions = { 'duty', 'cuff', 'escort', 'search', 'objects_basic', 'licenses' } },
+            [1] = { name = 'Officer', label = 'Officer', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects_basic', 'fines', 'gsr', 'impound', 'licenses' } },
+            [2] = { name = 'Senior Officer', label = 'Senior Officer', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects', 'fines', 'prison', 'gsr', 'impound', 'armory', 'spike', 'licenses' } },
+            [3] = { name = 'Sergeant', label = 'Sergeant', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects', 'fines', 'prison', 'community', 'gsr', 'impound', 'armory', 'spike', 'code1080', 'confiscate', 'stash_evidence', 'licenses' } },
             [4] = { name = 'Lieutenant', label = 'Lieutenant', permissions = { '*' } },
             [5] = { name = 'Captain', label = 'Captain', permissions = { '*' } },
             [6] = { name = 'Chief', label = 'Chief', permissions = { '*' } },
@@ -79,9 +79,9 @@ Config.Departments = {
         emergencyNumber = '999',
         enabled = true,
         grades = {
-            [0] = { name = 'Deputy', label = 'Deputy', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects_basic', 'fines', 'gsr' } },
-            [1] = { name = 'Senior Deputy', label = 'Senior Deputy', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects', 'fines', 'prison', 'gsr', 'impound', 'armory', 'spike' } },
-            [2] = { name = 'Sergeant', label = 'Sergeant', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects', 'fines', 'prison', 'community', 'gsr', 'impound', 'armory', 'spike', 'code1080', 'confiscate', 'stash_evidence' } },
+            [0] = { name = 'Deputy', label = 'Deputy', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects_basic', 'fines', 'gsr', 'licenses' } },
+            [1] = { name = 'Senior Deputy', label = 'Senior Deputy', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects', 'fines', 'prison', 'gsr', 'impound', 'armory', 'spike', 'licenses' } },
+            [2] = { name = 'Sergeant', label = 'Sergeant', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects', 'fines', 'prison', 'community', 'gsr', 'impound', 'armory', 'spike', 'code1080', 'confiscate', 'stash_evidence', 'licenses' } },
             [3] = { name = 'Lieutenant', label = 'Lieutenant', permissions = { '*' } },
             [4] = { name = 'Sheriff', label = 'Sheriff', permissions = { '*' } },
         },
@@ -127,8 +127,8 @@ Config.Departments = {
         emergencyNumber = '911',
         enabled = true,
         grades = {
-            [0] = { name = 'Trooper', label = 'Trooper', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects_basic', 'fines', 'gsr', 'impound' } },
-            [1] = { name = 'Senior Trooper', label = 'Senior Trooper', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects', 'fines', 'prison', 'gsr', 'impound', 'armory', 'spike', 'code1080' } },
+            [0] = { name = 'Trooper', label = 'Trooper', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects_basic', 'fines', 'gsr', 'impound', 'licenses' } },
+            [1] = { name = 'Senior Trooper', label = 'Senior Trooper', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'objects', 'fines', 'prison', 'gsr', 'impound', 'armory', 'spike', 'code1080', 'licenses' } },
             [2] = { name = 'Sergeant', label = 'Sergeant', permissions = { '*' } },
             [3] = { name = 'Lieutenant', label = 'Lieutenant', permissions = { '*' } },
             [4] = { name = 'Colonel', label = 'Colonel', permissions = { '*' } },
@@ -175,7 +175,7 @@ Config.Departments = {
         emergencyNumber = '911',
         enabled = false, -- activer si le job fib existe côté qbx_core
         grades = {
-            [0] = { name = 'Agent', label = 'Agent', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'fines', 'gsr', 'confiscate' } },
+            [0] = { name = 'Agent', label = 'Agent', permissions = { 'duty', 'cuff', 'escort', 'search', 'vehicle', 'fines', 'gsr', 'confiscate', 'licenses' } },
             [1] = { name = 'Special Agent', label = 'Special Agent', permissions = { '*' } },
             [2] = { name = 'Supervisor', label = 'Supervisor', permissions = { '*' } },
             [3] = { name = 'Director', label = 'Director', permissions = { '*' } },

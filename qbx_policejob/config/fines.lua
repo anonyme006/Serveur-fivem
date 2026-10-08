@@ -12,30 +12,34 @@ Config.Fines = {
     useExternalBilling = false,
     externalBillingExport = nil, -- ex: { resource = 'rp_billing', name = 'CreateBill' }
 
+    --- Retrait de points qbx_licenses :
+    --- chaque amende peut définir :
+    ---   licenseType = 'driver'|'motorcycle'|'boat'|'aircraft'
+    ---   licensePoints = nombre de points à retirer (0 = aucun)
     categories = {
         traffic = {
             label = 'Code de la route',
             fines = {
-                speeding = { label = 'Excès de vitesse', amount = 500 },
-                redlight = { label = 'Feu rouge', amount = 350 },
-                stopSign = { label = 'Stop ignoré', amount = 250 },
-                noLights = { label = 'Feux non conformes', amount = 150 },
-                parking = { label = 'Stationnement illégal', amount = 200 },
+                speeding = { label = 'Excès de vitesse', amount = 500, licenseType = 'driver', licensePoints = 2 },
+                redlight = { label = 'Feu rouge', amount = 350, licenseType = 'driver', licensePoints = 2 },
+                stopSign = { label = 'Stop ignoré', amount = 250, licenseType = 'driver', licensePoints = 1 },
+                noLights = { label = 'Feux non conformes', amount = 150, licenseType = 'driver', licensePoints = 0 },
+                parking = { label = 'Stationnement illégal', amount = 200, licenseType = 'driver', licensePoints = 0 },
             },
         },
         dangerous = {
             label = 'Conduite dangereuse',
             fines = {
-                reckless = { label = 'Conduite dangereuse', amount = 1200 },
-                streetRace = { label = 'Course illégale', amount = 2500 },
-                dui = { label = 'Conduite sous influence', amount = 3000 },
+                reckless = { label = 'Conduite dangereuse', amount = 1200, licenseType = 'driver', licensePoints = 4 },
+                streetRace = { label = 'Course illégale', amount = 2500, licenseType = 'driver', licensePoints = 6 },
+                dui = { label = 'Conduite sous influence', amount = 3000, licenseType = 'driver', licensePoints = 6 },
             },
         },
         hitrun = {
             label = 'Délit de fuite',
             fines = {
-                hitAndRun = { label = 'Délit de fuite', amount = 4000 },
-                failToStop = { label = 'Refus d\'obtempérer', amount = 2000 },
+                hitAndRun = { label = 'Délit de fuite', amount = 4000, licenseType = 'driver', licensePoints = 6 },
+                failToStop = { label = 'Refus d\'obtempérer', amount = 2000, licenseType = 'driver', licensePoints = 3 },
             },
         },
         assault = {

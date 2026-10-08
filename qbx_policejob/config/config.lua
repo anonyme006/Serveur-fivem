@@ -52,6 +52,22 @@ Config.Integrations = {
         plateColumn = 'plate',
         vehicleColumn = 'vehicle',
     },
+    --- Permis à points (qbx_licenses + PATCH_qbx_idcard)
+    --- Ressource : branche cursor/qbx-licenses-points-6165 (PR #43)
+    licenses = {
+        enabled = true,
+        resource = 'qbx_licenses',
+        --- Ouvrir le menu natif qbx_licenses (export OpenPlayerLicenseMenu)
+        useNativeMenu = true,
+        --- Afficher les points dans les infos joueur police
+        showInPlayerInfo = true,
+        --- Appliquer automatiquement les points liés aux amendes (Config.Fines.*.licensePoints)
+        autoRemoveOnFine = true,
+        --- Type de permis par défaut si une amende ne précise pas licenseType
+        defaultLicenseType = 'driver',
+        --- Patch optionnel qbx_idcard : voir install/PATCH_qbx_idcard.md
+        idcardPatch = true,
+    },
 }
 
 --[[--------------------------------------------------------------------------
@@ -66,6 +82,8 @@ Config.Commands = {
     code1080Cancel = '1080cancel',
     gsr = 'gsr',
     impound = 'impound',
+    --- Gestion permis à points (joueur proche) — bridge qbx_licenses
+    licenses = 'permis',
 }
 
 --[[--------------------------------------------------------------------------

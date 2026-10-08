@@ -40,6 +40,13 @@ local function logIntegrations()
     Police.Debug(('  appearance: %s (%s)'):format(tostring(integ.appearance and integ.appearance.enabled), integ.appearance and integ.appearance.resource))
     Police.Debug(('  phone provider: %s'):format(integ.phone and integ.phone.provider))
     Police.Debug(('  vehicles table: %s'):format(integ.vehicles and integ.vehicles.table))
+    local lic = integ.licenses
+    local licState = lic and GetResourceState(lic.resource or 'qbx_licenses') or 'n/a'
+    Police.Debug(('  licenses: %s (%s) state=%s'):format(
+        tostring(lic and lic.enabled),
+        lic and lic.resource,
+        licState
+    ))
 end
 
 --- Infos joueur fiables (serveur)
@@ -119,11 +126,19 @@ lib.callback.register('qbx_policejob:server:getPlayerInfo', function(source, tar
         end
         targetSrc = target
     end
-    return PoliceServer.GetPlayerInfo(targetSrc)
+    local info = PoliceServer.GetPlayerInfo(targetSrc)
+    if info and PoliceLicenses then
+        info = PoliceLicenses.AttachToPlayerInfo(info, targetSrc)
+    end
+    return info
 end)
 
 lib.callback.register('qbx_policejob:server:getSelfSnapshot', function(source)
-    return PoliceServer.GetPlayerInfo(source)
+    local info = PoliceServer.GetPlayerInfo(source)
+    if info and PoliceLicenses then
+        info = PoliceLicenses.AttachToPlayerInfo(info, source)
+    end
+    return info
 end)
 
 AddEventHandler('onResourceStart', function(resource)

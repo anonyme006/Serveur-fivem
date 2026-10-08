@@ -37,6 +37,7 @@ shared_scripts {
 client_scripts {
     '@qbx_core/modules/playerdata.lua',
     'client/main.lua',
+    'client/licenses.lua',
 }
 
 server_scripts {
@@ -44,6 +45,7 @@ server_scripts {
     'server/database.lua',
     'server/security.lua',
     'server/departments.lua',
+    'server/licenses.lua',
     'server/main.lua',
 }
 

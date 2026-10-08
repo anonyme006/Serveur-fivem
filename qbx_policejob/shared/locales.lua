@@ -94,6 +94,21 @@ Locales.fr = {
     plate_scan = 'Scanner plaque',
     plate_result = 'PLAQUE : %s\nPropriétaire : %s\nVéhicule : %s\nStatut : %s\nWanted : %s',
 
+    -- Permis à points (qbx_licenses / PATCH_qbx_idcard)
+    licenses_menu_title = 'Permis à points',
+    licenses_target = 'Gérer les permis',
+    licenses_command_help = 'Gérer les permis à points du joueur proche',
+    licenses_unavailable = 'Système de permis (qbx_licenses) indisponible.',
+    licenses_no_nearby = 'Aucun joueur à proximité.',
+    licenses_points_removed = 'Retrait de %s point(s) sur le permis %s.',
+    licenses_error = 'Erreur lors de la gestion du permis.',
+    licenses_remove_title = 'Retirer des points',
+    licenses_remove_amount = 'Nombre de points',
+    licenses_remove_reason = 'Motif (optionnel)',
+    licenses_status_valid = 'Valide',
+    licenses_status_suspended = 'Suspendu',
+    licenses_status_missing = 'Non détenu',
+
     -- Debug
     debug_loaded = 'qbx_policejob chargé (PHASE 1).',
 }
@@ -175,6 +190,20 @@ Locales.en = {
 
     plate_scan = 'Scan plate',
     plate_result = 'PLATE: %s\nOwner: %s\nVehicle: %s\nStatus: %s\nWanted: %s',
+
+    licenses_menu_title = 'License points',
+    licenses_target = 'Manage licenses',
+    licenses_command_help = 'Manage nearby player license points',
+    licenses_unavailable = 'License system (qbx_licenses) unavailable.',
+    licenses_no_nearby = 'No player nearby.',
+    licenses_points_removed = 'Removed %s point(s) from %s license.',
+    licenses_error = 'License management error.',
+    licenses_remove_title = 'Remove points',
+    licenses_remove_amount = 'Points to remove',
+    licenses_remove_reason = 'Reason (optional)',
+    licenses_status_valid = 'Valid',
+    licenses_status_suspended = 'Suspended',
+    licenses_status_missing = 'Not owned',
 
     debug_loaded = 'qbx_policejob loaded (PHASE 1).',
 }
