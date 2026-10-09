@@ -4,6 +4,26 @@ American DMV Driving School for **Qbox** (`qbx_core`), with optional **QBCore** 
 
 Fully working theory tablet, practical road tests, license issuance, points system, admin/police tools, oxmysql persistence, and NUI license card.
 
+## UI Previews
+
+Interactive browser preview (no FiveM required):
+
+```bash
+cd sky_drivingschool/web
+python3 -m http.server 8765
+# open http://127.0.0.1:8765/preview.html
+```
+
+| Home | Catalog | Theory |
+|------|---------|--------|
+| ![Home](docs/previews/preview-home.png) | ![Catalog](docs/previews/preview-catalog.png) | ![Theory](docs/previews/preview-theory.png) |
+
+| License card | Admin | Practical HUD |
+|--------------|-------|---------------|
+| ![Card](docs/previews/preview-license-card.png) | ![Admin](docs/previews/preview-admin.png) | ![HUD](docs/previews/preview-practical-hud.png) |
+
+All shots: `docs/previews/`.
+
 ## Features
 
 - Multiple configurable DMV schools (Los Santos + Paleto by default)

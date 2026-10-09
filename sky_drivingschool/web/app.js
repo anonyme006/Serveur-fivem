@@ -22,8 +22,20 @@
   const resourceName = typeof GetParentResourceName === 'function'
     ? GetParentResourceName()
     : 'sky_drivingschool';
+  const isPreview = new URLSearchParams(location.search).get('preview') === '1'
+    || window.parent !== window;
 
   function post(name, data = {}) {
+    if (isPreview) {
+      // Browser preview: no FiveM NUI callbacks
+      if (name === 'close') return Promise.resolve({ ok: true });
+      if (name === 'refreshSchool') return Promise.resolve({ ok: true, data: { school: state.school, player: state.player, categories: state.categories, licenses: state.licenses, history: state.history, pointsHistory: state.pointsHistory, stats: state.stats, isAdmin: state.isAdmin, requireTheory: state.requireTheory } });
+      if (name === 'adminDashboard') return Promise.resolve(state.admin || { ok: false, error: 'Open Admin from preview toolbar' });
+      if (name === 'startTheory' || name === 'startPractical' || name === 'submitTheory' || name === 'cancelTheory') {
+        return Promise.resolve({ ok: false, error: 'Preview mode — actions are visual only' });
+      }
+      return Promise.resolve({ ok: true });
+    }
     return fetch(`https://${resourceName}/${name}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json; charset=UTF-8' },
@@ -605,7 +617,14 @@
       clearTheoryTimer();
       showView('home');
     }
+    if (msg.action === 'previewEnroll' && msg.category) {
+      openEnroll(msg.category);
+    }
   });
+
+  if (isPreview) {
+    window.parent.postMessage({ action: 'previewReady' }, '*');
+  }
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !app.classList.contains('hidden')) {

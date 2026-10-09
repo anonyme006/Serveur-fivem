@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sky_drivingschool — NUI Preview</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(30,90,171,0.35), transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(11,42,74,0.5), transparent 45%),
+        linear-gradient(160deg, #0a1628, #1a2a40 40%, #0d1b2a);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      color: #e8edf3;
+    }
+    .toolbar {
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+      padding: 12px 16px; background: rgba(0,0,0,0.35);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .toolbar h1 { font-size: 14px; margin: 0 12px 0 0; font-weight: 600; opacity: 0.9; }
+    .toolbar button {
+      border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08);
+      color: white; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 13px;
+    }
+    .toolbar button.active { background: #1e5aab; border-color: #2f74d0; }
+    iframe {
+      width: 100%; height: calc(100vh - 54px); border: 0; display: block;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <h1>sky_drivingschool preview</h1>
+    <button data-view="home" class="active">Home</button>
+    <button data-view="catalog">Licenses</button>
+    <button data-view="enroll">Enroll</button>
+    <button data-view="theory">Theory Exam</button>
+    <button data-view="theoryResult">Theory Result</button>
+    <button data-view="practicalResult">Practical Result</button>
+    <button data-view="licenseCard">License Card</button>
+    <button data-view="history">History</button>
+    <button data-view="admin">Admin</button>
+    <button data-view="practicalHud">Practical HUD</button>
+  </div>
+  <iframe id="frame" src="index.html?preview=1" title="DMV NUI"></iframe>
+  <script>
+    const mock = {
+      school: { id: 'ls_dmv', label: 'Los Santos DMV' },
+      player: { citizenid: 'ABC12345', firstName: 'Jordan', lastName: 'Hayes', bank: 4250, cash: 380 },
+      categories: [
+        { id: 'class_c', label: 'Class C — Car', short: 'Class C', icon: 'car', description: 'Standard passenger vehicle license for cars and light trucks.', theoryPrice: 150, practicalPrice: 350, color: '#1e5aab', maxPoints: 12, hasLicense: false, hasTheory: true },
+        { id: 'class_m', label: 'Class M — Motorcycle', short: 'Class M', icon: 'motorcycle', description: 'Motorcycle and scooter endorsement.', theoryPrice: 120, practicalPrice: 280, color: '#0ea5e9', maxPoints: 12, hasLicense: false, hasTheory: false },
+        { id: 'class_a', label: 'Class A — Heavy Vehicle', short: 'Class A', icon: 'truck', description: 'Heavy truck and combination vehicle license.', theoryPrice: 250, practicalPrice: 550, color: '#f59e0b', maxPoints: 12, hasLicense: false, hasTheory: false },
+        { id: 'cdl', label: 'CDL — Commercial Driver', short: 'CDL', icon: 'bus', description: 'Commercial Driver License for professional transport.', theoryPrice: 400, practicalPrice: 800, color: '#8b5cf6', maxPoints: 12, hasLicense: false, hasTheory: false },
+        { id: 'boat', label: 'Boat License', short: 'Boat', icon: 'ship', description: 'Recreational and commercial vessel operation.', theoryPrice: 180, practicalPrice: 400, color: '#14b8a6', maxPoints: 12, hasLicense: true },
+        { id: 'pilot', label: 'Pilot License', short: 'Pilot', icon: 'plane', description: 'Aircraft and helicopter operation certificate.', theoryPrice: 600, practicalPrice: 1500, color: '#6366f1', maxPoints: 12, hasLicense: false, hasTheory: false },
+      ],
+      licenses: [
+        { category: 'class_c', label: 'Class C — Car', short: 'Class C', icon: 'car', color: '#1e5aab', points: 12, maxPoints: 12, status: 'valid', documentId: 'DMV-CLASS_C-1730000000-482913', issuedAt: '2026-03-12 14:22:00', firstName: 'Jordan', lastName: 'Hayes' },
+        { category: 'class_m', label: 'Class M — Motorcycle', short: 'Class M', icon: 'motorcycle', color: '#0ea5e9', points: 9, maxPoints: 12, status: 'valid', documentId: 'DMV-CLASS_M-1730000100-119204', issuedAt: '2026-04-02 11:05:00', firstName: 'Jordan', lastName: 'Hayes' },
+        { category: 'class_a', label: 'Class A — Heavy Vehicle', short: 'Class A', icon: 'truck', color: '#f59e0b', points: 0, maxPoints: 12, status: 'suspended', documentId: 'DMV-CLASS_A-1730000200-778112', issuedAt: '2026-01-18 09:40:00', firstName: 'Jordan', lastName: 'Hayes' },
+        { category: 'cdl', label: 'CDL — Commercial Driver', short: 'CDL', icon: 'bus', color: '#8b5cf6', points: 0, maxPoints: 12, status: 'none' },
+        { category: 'boat', label: 'Boat License', short: 'Boat', icon: 'ship', color: '#14b8a6', points: 12, maxPoints: 12, status: 'valid', documentId: 'DMV-BOAT-1730000300-551009', issuedAt: '2026-02-01 16:10:00', firstName: 'Jordan', lastName: 'Hayes' },
+        { category: 'pilot', label: 'Pilot License', short: 'Pilot', icon: 'plane', color: '#6366f1', points: 0, maxPoints: 12, status: 'none' },
+      ],
+      history: [
+        { created_at: '2026-10-08 18:22:11', exam_type: 'practical', category: 'class_c', score: 88, passed: 1 },
+        { created_at: '2026-10-08 17:55:03', exam_type: 'theory', category: 'class_c', score: 93, passed: 1 },
+        { created_at: '2026-10-07 12:10:44', exam_type: 'theory', category: 'class_m', score: 66, passed: 0 },
+      ],
+      pointsHistory: [
+        { created_at: '2026-09-20 21:14:02', category: 'class_m', action: 'remove', points_delta: -3, points_before: 12, points_after: 9, reason: 'Speeding — Vinewood Blvd', actor_name: 'Ofc. Ramirez' },
+        { created_at: '2026-08-02 10:01:33', category: 'class_a', action: 'suspend', points_delta: -4, points_before: 4, points_after: 0, reason: 'Commercial vehicle violation', actor_name: 'Sgt. Cole' },
+        { created_at: '2026-03-12 14:22:00', category: 'class_c', action: 'grant', points_delta: 12, points_before: 0, points_after: 12, reason: 'License issued after practical exam', actor_name: 'DMV' },
+      ],
+      stats: { theory_attempts: 4, theory_passes: 2, practical_attempts: 2, practical_passes: 1 },
+      strings: {},
+      isAdmin: true,
+      requireTheory: true,
+      locale: 'en',
+    };
+
+    const theoryExam = {
+      examId: 'TH-PREVIEW',
+      category: 'class_c',
+      label: 'Class C — Car',
+      timeSeconds: 600,
+      passPercent: 80,
+      questions: [
+        { id: 'c01', question: 'What does a solid red traffic light mean?', answers: ['Stop completely until the light turns green', 'Slow down and proceed with caution', 'Stop only if other vehicles are present', 'Yield, then continue'], image: 'sign_red_light' },
+        { id: 'c05', question: 'When approaching a stop sign, you must:', answers: ['Slow to 5 mph and continue', 'Stop completely behind the limit line or crosswalk', 'Honk then proceed', 'Stop only if pedestrians are visible'], image: 'sign_stop' },
+        { id: 'c14', question: 'What is a safe following distance under normal conditions?', answers: ['One car length', 'At least a three-second gap', 'Half a second', 'Whatever feels comfortable'] },
+      ],
+    };
+
+    const frame = document.getElementById('frame');
+    let ready = false;
+
+    function send(view, data) {
+      frame.contentWindow.postMessage({ action: 'open', view, data }, '*');
+    }
+
+    function show(view) {
+      document.querySelectorAll('.toolbar button').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
+      if (view === 'home' || view === 'catalog' || view === 'history' || view === 'enroll') {
+        send(view === 'enroll' ? 'home' : view, mock);
+        if (view === 'enroll') {
+          setTimeout(() => {
+            frame.contentWindow.postMessage({ action: 'previewEnroll', category: 'class_c' }, '*');
+          }, 80);
+        }
+      } else if (view === 'theory') {
+        send('theory', theoryExam);
+      } else if (view === 'theoryResult') {
+        send('theoryResult', {
+          passed: true, score: 93, correct: 14, total: 15, passPercent: 80,
+          review: [
+            { correct: true }, { correct: true }, { correct: false, expected: 1 },
+            { correct: true }, { correct: true },
+          ],
+          category: 'class_c', label: 'Class C — Car',
+        });
+      } else if (view === 'practicalResult') {
+        send('practicalResult', {
+          passed: true, score: 88, passScore: 70, errorCount: 2,
+          checkpointsHit: 9, checkpointTotal: 9, category: 'class_c', label: 'Class C — Car',
+          documentId: 'DMV-CLASS_C-1730000000-482913',
+          errors: [
+            { type: 'speeding', amount: 8 },
+            { type: 'vehicle_damage', amount: 5 },
+          ],
+        });
+      } else if (view === 'licenseCard') {
+        send('licenseCard', {
+          ok: true, firstName: 'Jordan', lastName: 'Hayes',
+          cards: mock.licenses, title: 'California Driver License',
+        });
+      } else if (view === 'admin') {
+        send('admin', {
+          ok: true,
+          stats: { totalExams: 1284, theoryPasses: 610, practicalPasses: 402, failures: 272, activeExams: 2, validLicenses: 891 },
+          active: [
+            { source: 12, name: 'Alex Rivera', citizenid: 'XYZ9988', type: 'practical', category: 'class_c', score: 92 },
+            { source: 27, name: 'Sam Okonkwo', citizenid: 'QWE4411', type: 'theory', category: 'cdl', score: null },
+          ],
+          recent: mock.history,
+          categories: mock.categories,
+          canEditPrices: true, canCancel: true, canRevoke: true, canManagePoints: true, canRestore: true,
+          infractions: {
+            speeding: { label: 'Speeding', points: 2 },
+            reckless: { label: 'Reckless driving', points: 4 },
+            red_light: { label: 'Running a red light', points: 3 },
+          },
+          logs: [],
+        });
+      } else if (view === 'practicalHud') {
+        send('home', mock);
+        frame.contentWindow.postMessage({
+          action: 'practicalHud',
+          data: { active: true, label: 'Class C — Car', score: 92, checkpoint: 4, total: 9, remaining: 412, speedLimit: 45 },
+        }, '*');
+      }
+      history.replaceState(null, '', '#' + view);
+    }
+
+    frame.addEventListener('load', () => {
+      ready = true;
+      const view = (location.hash || '#home').slice(1);
+      setTimeout(() => show(view), 120);
+    });
+
+    document.querySelectorAll('.toolbar button').forEach((btn) => {
+      btn.addEventListener('click', () => show(btn.dataset.view));
+    });
+
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.action === 'previewReady') show((location.hash || '#home').slice(1));
+    });
+  </script>
+</body>
+</html>
