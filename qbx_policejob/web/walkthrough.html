@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qbx_policejob — Walkthrough</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      overflow: auto;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(61, 110, 168, 0.35), transparent 55%),
+        radial-gradient(900px 500px at 90% 0%, rgba(20, 40, 70, 0.55), transparent 50%),
+        linear-gradient(165deg, #0a0e14 0%, #121820 45%, #0d1117 100%);
+      color: var(--pd-text);
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+    .hero {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 28px;
+      animation: panel-in 280ms ease-out;
+    }
+    .hero h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      letter-spacing: 0.02em;
+    }
+    .hero .tag {
+      display: inline-flex;
+      width: fit-content;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 10px;
+      border: 1px solid var(--pd-border);
+      border-radius: 6px;
+      color: var(--pd-muted);
+      font-size: 0.85rem;
+      background: rgba(22, 27, 34, 0.7);
+    }
+    .hero .tag strong { color: #7eb0e8; font-weight: 600; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: linear-gradient(160deg, #1a222d 0%, var(--pd-panel) 55%, #12171f 100%);
+      border: 1px solid var(--pd-border);
+      border-radius: var(--pd-radius);
+      padding: 16px;
+      animation: panel-in 320ms ease-out;
+    }
+    .card h2 {
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      color: #9ec1ea;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      border: 1px solid var(--pd-border);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      color: var(--pd-muted);
+      background: rgba(0,0,0,0.2);
+    }
+    .chip--accent { border-color: #3d6ea8; color: #c9ddf5; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid rgba(48,54,61,0.8); }
+    th { color: var(--pd-muted); font-weight: 500; }
+    .pts { color: #f0b35a; font-variant-numeric: tabular-nums; }
+    .amt { color: #7dcea0; font-variant-numeric: tabular-nums; }
+    .muted { color: var(--pd-muted); font-size: 0.88rem; line-height: 1.45; }
+    .section { margin-top: 18px; }
+    .nui-stage {
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    #app.walkthrough-nui {
+      position: relative;
+      width: 100%;
+      height: auto;
+      min-height: 260px;
+      background: transparent;
+    }
+    #app.walkthrough-nui:not(.hidden) { display: flex; }
+    .notice {
+      margin-top: 18px;
+      padding: 12px 14px;
+      border-left: 3px solid #c94444;
+      background: rgba(201, 68, 68, 0.08);
+      border-radius: 0 6px 6px 0;
+      color: #e7b4b4;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="tag"><strong>PD</strong> Walkthrough configuration — pas une session FiveM</div>
+      <h1 id="title">qbx_policejob</h1>
+      <p class="muted" id="phase">Chargement…</p>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Stack</h2>
+        <div class="chips" id="stack"></div>
+      </section>
+      <section class="card">
+        <h2>Commandes</h2>
+        <div class="chips" id="commands"></div>
+      </section>
+      <section class="card">
+        <h2>Bridge permis</h2>
+        <div id="bridge" class="muted"></div>
+      </section>
+    </div>
+
+    <section class="card section">
+      <h2>Départements</h2>
+      <table>
+        <thead><tr><th>Service</th><th>Job</th><th>Urgence</th></tr></thead>
+        <tbody id="depts"></tbody>
+      </table>
+    </section>
+
+    <section class="card section">
+      <h2>Amendes ↔ points permis (driver)</h2>
+      <table>
+        <thead><tr><th>Infraction</th><th>Amende</th><th>Points</th></tr></thead>
+        <tbody id="fines"></tbody>
+      </table>
+    </section>
+
+    <section class="card section">
+      <h2>Panneau NUI (composant réel)</h2>
+      <p class="muted">Ouvre le vrai panneau `web/index.html` / `app.js` de la ressource.</p>
+      <div class="actions">
+        <button type="button" class="btn" id="btn-open-nui">Ouvrir NUI</button>
+        <button type="button" class="btn btn--ghost" id="btn-close-nui">Fermer</button>
+      </div>
+      <div class="nui-stage">
+        <div id="app" class="hidden walkthrough-nui" aria-hidden="true">
+          <div class="panel">
+            <header class="panel__header">
+              <span class="panel__badge">PD</span>
+              <h1 id="panel-title">Police</h1>
+            </header>
+            <main id="panel-body" class="panel__body">
+              <p class="panel__muted">Interface NUI — phases suivantes</p>
+            </main>
+            <footer class="panel__footer">
+              <button type="button" id="btn-close" class="btn btn--ghost">Fermer</button>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <p class="notice">
+      Impossible d’enregistrer une session GTA/FiveM ici (pas de client FXServer).
+      Cette vidéo présente la configuration et le NUI réels livrés en PHASE 1.
+    </p>
+  </div>
+  <script src="app.js"></script>
+  <script>
+    fetch('walkthrough_data.json')
+      .then((r) => r.json())
+      .then((data) => {
+        document.getElementById('title').textContent = data.resource;
+        document.getElementById('phase').textContent = `${data.phase} · v${data.version}`;
+        document.getElementById('stack').innerHTML = data.stack.map((s) => `<span class="chip chip--accent">${s}</span>`).join('');
+        document.getElementById('commands').innerHTML = data.commands.map((c) => `<span class="chip">/${c}</span>`).join('');
+        const b = data.bridge;
+        document.getElementById('bridge').innerHTML = `
+          <div><strong>Commande</strong> — ${b.command}</div>
+          <div><strong>Export</strong> — ${b.export}</div>
+          <div><strong>Amendes</strong> — ${b.fineHook}</div>
+          <div><strong>Patch carte</strong> — ${b.patch}</div>
+        `;
+        document.getElementById('depts').innerHTML = data.departments.map((d) => `
+          <tr>
+            <td>${d.short} — ${d.label}${d.enabled === false ? ' <span class="muted">(off)</span>' : ''}</td>
+            <td><code>${d.job}</code></td>
+            <td>${d.emergency}</td>
+          </tr>
+        `).join('');
+        document.getElementById('fines').innerHTML = data.fines.map((f) => `
+          <tr>
+            <td>${f.label}</td>
+            <td class="amt">$${f.amount}</td>
+            <td class="pts">-${f.licensePoints} pts</td>
+          </tr>
+        `).join('');
+      });
+
+    const openBtn = document.getElementById('btn-open-nui');
+    const closeBtn = document.getElementById('btn-close-nui');
+    openBtn.addEventListener('click', () => {
+      window.postMessage({
+        action: 'open',
+        title: 'POLICE MENU',
+        html: '<p class="panel__muted">Bridge qbx_licenses · /permis · amendes → points</p><p class="panel__muted">PHASE 1 ready</p>',
+      }, '*');
+    });
+    closeBtn.addEventListener('click', () => {
+      window.postMessage({ action: 'close' }, '*');
+    });
+    // Auto-open shortly after load for the recording
+    setTimeout(() => openBtn.click(), 600);
+  </script>
+</body>
+</html>

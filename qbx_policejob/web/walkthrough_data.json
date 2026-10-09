@@ -1,0 +1,40 @@
+{
+  "resource": "qbx_policejob",
+  "version": "0.1.0",
+  "phase": "PHASE 1 + bridge permis à points",
+  "stack": ["qbx_core", "ox_lib", "ox_target", "ox_inventory", "oxmysql", "qbx_licenses"],
+  "commands": ["duty", "policemenu", "911", "pd", "police", "1080", "1080cancel", "gsr", "impound", "permis"],
+  "departments": [
+    {"id": "police", "label": "Los Santos Police Department", "short": "LSPD", "job": "police", "emergency": "911"},
+    {"id": "sheriff", "label": "Blaine County Sheriff Office", "short": "BCSO", "job": "sheriff", "emergency": "999"},
+    {"id": "statepolice", "label": "San Andreas State Police", "short": "SASP", "job": "statepolice", "emergency": "911"},
+    {"id": "fib", "label": "Federal Investigation Bureau", "short": "FIB", "job": "fib", "emergency": "911", "enabled": false}
+  ],
+  "fines": [
+    {"key": "speeding", "label": "Excès de vitesse", "amount": 500, "licenseType": "driver", "licensePoints": 2},
+    {"key": "redlight", "label": "Feu rouge", "amount": 350, "licenseType": "driver", "licensePoints": 2},
+    {"key": "stopSign", "label": "Stop ignoré", "amount": 250, "licenseType": "driver", "licensePoints": 1},
+    {"key": "reckless", "label": "Conduite dangereuse", "amount": 1200, "licenseType": "driver", "licensePoints": 4},
+    {"key": "streetRace", "label": "Course illégale", "amount": 2500, "licenseType": "driver", "licensePoints": 6},
+    {"key": "dui", "label": "Conduite sous influence", "amount": 3000, "licenseType": "driver", "licensePoints": 6},
+    {"key": "hitAndRun", "label": "Délit de fuite", "amount": 4000, "licenseType": "driver", "licensePoints": 6},
+    {"key": "failToStop", "label": "Refus d'obtempérer", "amount": 2000, "licenseType": "driver", "licensePoints": 3}
+  ],
+  "integrations": {
+    "licenses": "qbx_licenses + PATCH_qbx_idcard",
+    "appearance": "illenium-appearance",
+    "phone": "qbx charinfo / pulse-phone",
+    "garage": "opt-in (désactivé)"
+  },
+  "bridge": {
+    "command": "/permis",
+    "export": "exports.qbx_licenses:OpenPlayerLicenseMenu",
+    "fineHook": "qbx_policejob:server:fineIssued → RemovePoints",
+    "patch": "install/PATCH_qbx_idcard.md"
+  },
+  "files": {
+    "client": ["main.lua", "licenses.lua", "+ stubs phases 2–10"],
+    "server": ["main.lua", "security.lua", "database.lua", "departments.lua", "licenses.lua"],
+    "config": ["config.lua", "departments.lua", "fines.lua", "weapons.lua", "vehicles.lua", "uniforms.lua", "objects.lua", "prison.lua"]
+  }
+}
