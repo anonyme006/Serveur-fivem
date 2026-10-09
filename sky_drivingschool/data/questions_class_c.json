@@ -1,0 +1,366 @@
+{
+  "questions": [
+    {
+      "id": "c01",
+      "question": "What does a solid red traffic light mean?",
+      "answers": [
+        "Stop completely until the light turns green",
+        "Slow down and proceed with caution",
+        "Stop only if other vehicles are present",
+        "Yield, then continue"
+      ],
+      "correct": 0,
+      "image": "sign_red_light"
+    },
+    {
+      "id": "c02",
+      "question": "When must you stop for a school bus with flashing red lights?",
+      "answers": [
+        "Only if you are behind the bus",
+        "Whenever you approach from either direction on an undivided road",
+        "Only in school zones",
+        "Never if the road has a median"
+      ],
+      "correct": 1,
+      "image": "sign_school_bus"
+    },
+    {
+      "id": "c03",
+      "question": "What is the basic speed law in most U.S. states?",
+      "answers": [
+        "You may drive as fast as traffic allows",
+        "Drive at a speed that is safe for current conditions",
+        "Always drive 5 mph under the posted limit",
+        "Match the speed of the fastest vehicle"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c04",
+      "question": "A yellow diamond-shaped sign usually indicates:",
+      "answers": [
+        "A regulatory requirement",
+        "A warning of a hazard or change ahead",
+        "A temporary construction detour only",
+        "A parking restriction"
+      ],
+      "correct": 1,
+      "image": "sign_warning"
+    },
+    {
+      "id": "c05",
+      "question": "When approaching a stop sign, you must:",
+      "answers": [
+        "Slow to 5 mph and continue",
+        "Stop completely behind the limit line or crosswalk",
+        "Honk then proceed",
+        "Stop only if pedestrians are visible"
+      ],
+      "correct": 1,
+      "image": "sign_stop"
+    },
+    {
+      "id": "c06",
+      "question": "What does a solid white line on the right edge of the roadway mean?",
+      "answers": [
+        "You may cross it to pass",
+        "It marks the right edge of the travel lane",
+        "It separates opposing traffic",
+        "Parking is allowed on it"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c07",
+      "question": "At an uncontrolled four-way intersection, who has the right of way?",
+      "answers": [
+        "The largest vehicle",
+        "The vehicle that arrives first; if simultaneous, the one on the right",
+        "The vehicle turning left",
+        "Whoever flashes headlights first"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c08",
+      "question": "When should you use your headlights?",
+      "answers": [
+        "Only at night on highways",
+        "From sunset to sunrise and in poor visibility",
+        "Only during rain",
+        "Never in the city"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c09",
+      "question": "What does a circular yellow sign with a black \"X\" and \"RR\" mean?",
+      "answers": [
+        "Road ends ahead",
+        "Railroad crossing ahead",
+        "Rest area ahead",
+        "Restricted road"
+      ],
+      "correct": 1,
+      "image": "sign_railroad"
+    },
+    {
+      "id": "c10",
+      "question": "The legal blood alcohol concentration (BAC) limit for drivers 21+ in most states is:",
+      "answers": [
+        "0.02%",
+        "0.05%",
+        "0.08%",
+        "0.10%"
+      ],
+      "correct": 2
+    },
+    {
+      "id": "c11",
+      "question": "When parallel parking on a two-way street, you should park:",
+      "answers": [
+        "Facing against traffic",
+        "Within 18 inches of the curb, facing traffic flow",
+        "In the middle of the lane",
+        "On the sidewalk if needed"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c12",
+      "question": "A flashing red traffic light means:",
+      "answers": [
+        "Proceed without stopping",
+        "Treat it like a stop sign",
+        "Slow down only",
+        "Same as a green light"
+      ],
+      "correct": 1,
+      "image": "sign_flashing_red"
+    },
+    {
+      "id": "c13",
+      "question": "When changing lanes you should:",
+      "answers": [
+        "Signal, check mirrors and blind spot, then change lanes",
+        "Change lanes quickly without signaling",
+        "Honk then merge",
+        "Brake hard first"
+      ],
+      "correct": 0
+    },
+    {
+      "id": "c14",
+      "question": "What is a safe following distance under normal conditions?",
+      "answers": [
+        "One car length",
+        "At least a three-second gap",
+        "Half a second",
+        "Whatever feels comfortable"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c15",
+      "question": "A white rectangular sign with black lettering is typically:",
+      "answers": [
+        "A warning sign",
+        "A regulatory sign",
+        "A guide sign for attractions",
+        "A construction sign"
+      ],
+      "correct": 1,
+      "image": "sign_regulatory"
+    },
+    {
+      "id": "c16",
+      "question": "If your vehicle starts to skid, you should:",
+      "answers": [
+        "Slam on the brakes and turn opposite the skid",
+        "Ease off the accelerator and steer in the direction you want to go",
+        "Accelerate hard",
+        "Close your eyes"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c17",
+      "question": "Pedestrians in a crosswalk have:",
+      "answers": [
+        "No special rights",
+        "The right of way; drivers must yield",
+        "To wait for vehicles to pass always",
+        "Priority only at night"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c18",
+      "question": "What does a pentagon-shaped yellow-green sign indicate?",
+      "answers": [
+        "Hospital ahead",
+        "School zone or school crossing",
+        "No passing zone",
+        "Airport"
+      ],
+      "correct": 1,
+      "image": "sign_school"
+    },
+    {
+      "id": "c19",
+      "question": "When driving in fog, you should use:",
+      "answers": [
+        "High beams",
+        "Low beams or fog lights",
+        "Hazard lights while moving at full speed",
+        "No lights"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c20",
+      "question": "A double solid yellow line means:",
+      "answers": [
+        "Passing is allowed for both directions",
+        "Passing is prohibited for both directions",
+        "Passing is allowed for the right lane only",
+        "It marks a bike lane"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c21",
+      "question": "Before turning right at a red light (where legal), you must:",
+      "answers": [
+        "Proceed if no cameras are visible",
+        "Come to a complete stop and yield to traffic and pedestrians",
+        "Slow slightly",
+        "Honk twice"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c22",
+      "question": "Hydroplaning is most likely when:",
+      "answers": [
+        "Roads are dry",
+        "You drive too fast on wet roads",
+        "You use cruise control on ice only",
+        "Tires are brand new and dry"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c23",
+      "question": "What should you do if an emergency vehicle approaches with lights and siren?",
+      "answers": [
+        "Speed up to clear the lane",
+        "Pull to the right and stop until it passes",
+        "Ignore if you are late",
+        "Stop in the middle of the intersection"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c24",
+      "question": "A broken yellow line in your lane means:",
+      "answers": [
+        "You may pass when safe",
+        "You may never pass",
+        "Passing is allowed only at night",
+        "The road is one-way"
+      ],
+      "correct": 0
+    },
+    {
+      "id": "c25",
+      "question": "The purpose of a roundabout is to:",
+      "answers": [
+        "Increase vehicle speeds",
+        "Keep traffic moving while reducing conflict points",
+        "Eliminate all yielding",
+        "Allow U-turns only"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c26",
+      "question": "When parked facing downhill with a curb, turn your wheels:",
+      "answers": [
+        "Away from the curb",
+        "Toward the curb",
+        "Straight",
+        "Onto the sidewalk"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c27",
+      "question": "Using a handheld phone while driving is:",
+      "answers": [
+        "Always legal if under 25 mph",
+        "Illegal or restricted in many states and unsafe",
+        "Required for navigation",
+        "Safer than hands-free"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c28",
+      "question": "What does an orange diamond-shaped sign indicate?",
+      "answers": [
+        "Permanent hazard",
+        "Temporary construction or maintenance work zone",
+        "Scenic overlook",
+        "School zone"
+      ],
+      "correct": 1,
+      "image": "sign_construction"
+    },
+    {
+      "id": "c29",
+      "question": "At night, dim your high beams when within about:",
+      "answers": [
+        "50 feet of an oncoming vehicle",
+        "500 feet of an oncoming vehicle",
+        "1 mile of any vehicle",
+        "Never dim them"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c30",
+      "question": "If two vehicles arrive at a T-intersection, who yields?",
+      "answers": [
+        "The vehicle on the through road",
+        "The vehicle on the terminating road (bottom of the T)",
+        "Whoever has the nicer car",
+        "The vehicle turning right always"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "c31",
+      "question": "A green arrow traffic signal means:",
+      "answers": [
+        "You may turn in that direction after stopping",
+        "You may turn in that direction; oncoming traffic should stop",
+        "Proceed straight only",
+        "Stop completely"
+      ],
+      "correct": 1,
+      "image": "sign_green_arrow"
+    },
+    {
+      "id": "c32",
+      "question": "Seat belts must be worn:",
+      "answers": [
+        "Only on freeways",
+        "By the driver and required passengers as required by law",
+        "Only by passengers under 18",
+        "Never in the back seat"
+      ],
+      "correct": 1
+    }
+  ]
+}

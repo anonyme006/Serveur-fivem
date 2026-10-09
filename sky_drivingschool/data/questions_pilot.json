@@ -1,0 +1,169 @@
+{
+  "questions": [
+    {
+      "id": "p01",
+      "question": "Before takeoff, pilots should perform:",
+      "answers": [
+        "No checks if hurried",
+        "A thorough preflight inspection of aircraft and systems",
+        "Only a fuel glance",
+        "A radio selfie"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p02",
+      "question": "The right-of-way for converging aircraft at the same altitude generally goes to:",
+      "answers": [
+        "The faster aircraft",
+        "The aircraft on the right",
+        "Whoever radios first",
+        "Gliders never"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p03",
+      "question": "Controlled airspace operations require:",
+      "answers": [
+        "Ignoring ATC",
+        "Compliance with ATC clearances and applicable regulations",
+        "Only visual landmarks",
+        "No radios"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p04",
+      "question": "A go-around should be executed when:",
+      "answers": [
+        "Landing looks unstable or the runway is not clear",
+        "You feel like showing off",
+        "Fuel is low and you must land no matter what",
+        "ATC forbids it always"
+      ],
+      "correct": 0
+    },
+    {
+      "id": "p05",
+      "question": "Carburetor icing can occur:",
+      "answers": [
+        "Only below freezing OAT always",
+        "In moist air even at temperatures above freezing",
+        "Never in summer",
+        "Only on jets"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p06",
+      "question": "Minimum safe altitudes over congested areas generally require:",
+      "answers": [
+        "Skimming rooftops",
+        "An altitude allowing an emergency landing without undue hazard, per regs",
+        "Flying through clouds illegally",
+        "Matching highway cars"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p07",
+      "question": "Transponder Mode C/ADS-B where required:",
+      "answers": [
+        "Is decorative",
+        "Helps ATC and collision avoidance systems with altitude/position",
+        "Replaces all radios",
+        "Is illegal"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p08",
+      "question": "Density altitude affects:",
+      "answers": [
+        "Only paint color",
+        "Aircraft performance (takeoff distance, climb rate)",
+        "Radio commercials",
+        "Tire brand"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p09",
+      "question": "In the traffic pattern, the standard direction is usually:",
+      "answers": [
+        "Right turns always",
+        "Left turns unless otherwise specified",
+        "Straight-in only",
+        "Random"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p10",
+      "question": "Hypoxia risk increases with:",
+      "answers": [
+        "Sea-level flights only",
+        "Altitude and inadequate oxygen",
+        "Eating snacks",
+        "Using checklists"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p11",
+      "question": "Wake turbulence is most severe:",
+      "answers": [
+        "Behind light aircraft idling",
+        "Behind heavy aircraft, especially when slow/clean/high angle of attack",
+        "In front of jets only",
+        "Never near airports"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p12",
+      "question": "NOTAMs should be reviewed because they provide:",
+      "answers": [
+        "Movie times",
+        "Time-critical aeronautical information about hazards/outages",
+        "Only weather poetry",
+        "Insurance quotes"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p13",
+      "question": "Helicopter settling with power is related to:",
+      "answers": [
+        "Too much coffee",
+        "Vortex ring state from descent into downwash",
+        "Landing on grass",
+        "Radio failure only"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p14",
+      "question": "Fuel management requires:",
+      "answers": [
+        "Guessing remaining fuel",
+        "Knowing quantity/quality and planning reserves",
+        "Running tanks dry intentionally always",
+        "Ignoring gauges"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "p15",
+      "question": "A hard landing may indicate:",
+      "answers": [
+        "Perfect technique",
+        "Excessive descent rate or improper flare; inspect for damage",
+        "Need for more speed always",
+        "That brakes failed only"
+      ],
+      "correct": 1
+    }
+  ]
+}
