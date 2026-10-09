@@ -1,0 +1,224 @@
+{
+  "questions": [
+    {
+      "id": "d01",
+      "question": "A CDL is required to operate:",
+      "answers": [
+        "Any bicycle",
+        "Certain commercial motor vehicles by weight/passenger/hazmat criteria",
+        "Only rental cars",
+        "Golf carts"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d02",
+      "question": "Hours of Service rules exist to:",
+      "answers": [
+        "Increase speeding",
+        "Prevent fatigued driving by limiting driving/on-duty time",
+        "Ban all night driving forever",
+        "Replace rest breaks"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d03",
+      "question": "Pre-trip inspections should include:",
+      "answers": [
+        "Radio stations only",
+        "Lights, tires, brakes, coupling, fluids, and safety equipment",
+        "Only the windshield wipers",
+        "Nothing if the truck looks fine"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d04",
+      "question": "HazMat placards indicate:",
+      "answers": [
+        "Preferred radio channel",
+        "Hazardous materials class/division for emergency responders",
+        "Tire brand",
+        "Driver lunch preference"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d05",
+      "question": "Backing a commercial vehicle is safest when:",
+      "answers": [
+        "Done quickly without looking",
+        "Using a spotter when available and checking mirrors constantly",
+        "Done with eyes closed",
+        "Never using reverse lights"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d06",
+      "question": "Double-clutching is used to:",
+      "answers": [
+        "Open doors",
+        "Match engine and transmission speeds in non-synchro transmissions",
+        "Wash windows",
+        "Increase radio volume"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d07",
+      "question": "If you are cited for a serious traffic violation in a CMV:",
+      "answers": [
+        "Nothing happens",
+        "It may affect CDL privileges even in a personal vehicle",
+        "Only your car insurance cares",
+        "You get a free meal"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d08",
+      "question": "Passenger endorsement is needed to:",
+      "answers": [
+        "Drive a pickup",
+        "Transport passengers in vehicles requiring a CDL passenger endorsement",
+        "Ride the bus",
+        "Own a taxi medallion only"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d09",
+      "question": "Bridge laws / weight distribution matter because:",
+      "answers": [
+        "They decorate bridges",
+        "Axle weights and spacing protect infrastructure and affect legality",
+        "They only apply to boats",
+        "Police never enforce them"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d10",
+      "question": "Emergency triangles should be placed:",
+      "answers": [
+        "Inside the cab",
+        "At prescribed distances behind/ahead of a stopped CMV",
+        "On the roof only",
+        "Never used"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d11",
+      "question": "Alcohol while on duty for CDL holders:",
+      "answers": [
+        "Is fine under 0.08 only",
+        "Has stricter prohibited conduct and lower BAC limits",
+        "Is encouraged",
+        "Only matters off-duty"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d12",
+      "question": "Retarders (engine/exhaust brakes) should be used carefully when:",
+      "answers": [
+        "Roads are dry only always",
+        "Road surfaces are slippery because they can cause drive-wheel skids",
+        "Never descending hills",
+        "Parked"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d13",
+      "question": "A convex mirror helps you:",
+      "answers": [
+        "See farther ahead only",
+        "See a wider area beside/behind the vehicle",
+        "Replace all flat mirrors",
+        "Heat the cab"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d14",
+      "question": "Cargo that shifts in transit can:",
+      "answers": [
+        "Improve MPG",
+        "Cause rollover or loss of control",
+        "Never happen",
+        "Only affect aesthetics"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d15",
+      "question": "When approaching a scale / weigh station:",
+      "answers": [
+        "Always ignore closed signs",
+        "Follow posted directions; open stations may require entry",
+        "Speed through",
+        "Only stop if empty"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d16",
+      "question": "Defensive driving for CDL operators emphasizes:",
+      "answers": [
+        "Aggressive merging",
+        "Scanning, space, speed management, and anticipating others",
+        "Texting safely",
+        "Tailgating buses"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d17",
+      "question": "Air line glad hands connect:",
+      "answers": [
+        "Fuel tanks",
+        "Tractor and trailer brake air systems",
+        "Radios",
+        "Winches only"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d18",
+      "question": "If brakes fade on a long downgrade:",
+      "answers": [
+        "Pump harder and hope",
+        "Downshift earlier next time; stop safely if possible and cool brakes",
+        "Shift to neutral and coast faster",
+        "Turn off headlights"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d19",
+      "question": "Passenger stops require:",
+      "answers": [
+        "Leaving the vehicle unlocked with keys inside always",
+        "Safe procedures for boarding/alighting and securement as required",
+        "No mirror checks",
+        "Parking in travel lanes"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "d20",
+      "question": "Logbooks / ELDs record:",
+      "answers": [
+        "Favorite songs",
+        "Duty status and driving time for compliance",
+        "Tire pressure only",
+        "Weather forecasts"
+      ],
+      "correct": 1
+    }
+  ]
+}

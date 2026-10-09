@@ -1,0 +1,136 @@
+{
+  "questions": [
+    {
+      "id": "b01",
+      "question": "A personal flotation device (PFD) should be:",
+      "answers": [
+        "Stored sealed forever",
+        "USCG-approved, accessible, and worn as required",
+        "Optional for children",
+        "Used only as seat cushions always"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "b02",
+      "question": "Navigation lights are required:",
+      "answers": [
+        "Never",
+        "Between sunset and sunrise and in restricted visibility",
+        "Only on weekends",
+        "Only inland"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "b03",
+      "question": "The stand-on vessel should:",
+      "answers": [
+        "Always turn left",
+        "Maintain course and speed unless collision cannot be avoided",
+        "Stop immediately always",
+        "Ignore other boats"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "b04",
+      "question": "A red nun buoy typically marks:",
+      "answers": [
+        "The left side of the channel when returning from sea (red right returning)",
+        "A swimming area",
+        "An airport",
+        "A parking lot"
+      ],
+      "correct": 0
+    },
+    {
+      "id": "b05",
+      "question": "Operating under the influence on the water is:",
+      "answers": [
+        "Legal below highway limits always",
+        "Illegal and dangerous",
+        "Encouraged at night",
+        "Only banned for Jet Skis"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "b06",
+      "question": "Before launching you should:",
+      "answers": [
+        "Skip weather checks",
+        "Check weather, equipment, fuel, and file a float plan when appropriate",
+        "Remove all life jackets",
+        "Ignore capacity plates"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "b07",
+      "question": "A capacity plate shows:",
+      "answers": [
+        "Radio frequencies",
+        "Maximum persons/weight/horsepower recommendations",
+        "Fish species",
+        "Insurance rates"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "b08",
+      "question": "When crossing another vessel's path, power-driven vessels generally:",
+      "answers": [
+        "Ignore COLREGS",
+        "Give way to the vessel on their starboard (right)",
+        "Always speed up",
+        "Pass port-to-port only never"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "b09",
+      "question": "Propeller strike prevention includes:",
+      "answers": [
+        "Leaving engine in gear near swimmers",
+        "Shutting off the engine near people in the water",
+        "Revving near docks",
+        "Removing the kill switch"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "b10",
+      "question": "A sounding signal of five or more short blasts means:",
+      "answers": [
+        "All clear",
+        "Doubt / danger / disagreement with another's intentions",
+        "Passing agreement",
+        "Request for coffee"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "b11",
+      "question": "Anchoring safely requires:",
+      "answers": [
+        "Dropping anchor while at full speed",
+        "Adequate scope and clearance from hazards/channels",
+        "Anchoring in marked channels",
+        "Ignoring tide"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "b12",
+      "question": "PWC (personal watercraft) operators should:",
+      "answers": [
+        "Jump wakes close to other boats",
+        "Maintain lookout, obey speed/no-wake zones, and keep clear of swimmers",
+        "Ride at night without lights",
+        "Remove the lanyard kill switch"
+      ],
+      "correct": 1
+    }
+  ]
+}

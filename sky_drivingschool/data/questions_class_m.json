@@ -1,0 +1,136 @@
+{
+  "questions": [
+    {
+      "id": "m01",
+      "question": "Motorcyclists should wear:",
+      "answers": [
+        "Shorts in summer for cooling",
+        "DOT-approved helmet and protective gear",
+        "No helmet if experienced",
+        "Sandals for better feel"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "m02",
+      "question": "The best way to be seen by other drivers is to:",
+      "answers": [
+        "Ride in blind spots",
+        "Wear bright/reflective gear and use headlights",
+        "Weave between cars",
+        "Ride without a mirror"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "m03",
+      "question": "When braking on a motorcycle in a straight line:",
+      "answers": [
+        "Use only the rear brake",
+        "Use both front and rear brakes smoothly",
+        "Never use the front brake",
+        "Lock both wheels"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "m04",
+      "question": "Lane positioning should:",
+      "answers": [
+        "Always stay far left",
+        "Maximize visibility and escape paths",
+        "Follow the car ahead exactly",
+        "Ignore other traffic"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "m05",
+      "question": "A motorcycle needs more distance to stop when:",
+      "answers": [
+        "Roads are dry and warm",
+        "Surfaces are wet, gravelly, or oily",
+        "You are going downhill slowly",
+        "Traffic is light"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "m06",
+      "question": "Countersteering means:",
+      "answers": [
+        "Turning the bars opposite the desired lean at speed to initiate a turn",
+        "Steering with your feet",
+        "Never leaning",
+        "Braking while turning only"
+      ],
+      "correct": 0
+    },
+    {
+      "id": "m07",
+      "question": "Before changing lanes on a motorcycle:",
+      "answers": [
+        "Signal and check mirrors and blind spots",
+        "Just accelerate",
+        "Rely only on other drivers",
+        "Close your eyes briefly"
+      ],
+      "correct": 0
+    },
+    {
+      "id": "m08",
+      "question": "Carrying a passenger requires:",
+      "answers": [
+        "No special consideration",
+        "Proper footpegs, adjusted suspension, and smooth control",
+        "Standing on the pegs",
+        "Removing the helmet"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "m09",
+      "question": "Group riding is safest when:",
+      "answers": [
+        "Riders ride side-by-side always",
+        "Riders use a staggered formation with safe spacing",
+        "Everyone drafts closely",
+        "No signals are used"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "m10",
+      "question": "At night, motorcyclists should:",
+      "answers": [
+        "Use high beams constantly even oncoming",
+        "Increase following distance and watch for animals/debris",
+        "Remove reflective gear",
+        "Ride faster to finish sooner"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "m11",
+      "question": "A skid on the rear wheel is often corrected by:",
+      "answers": [
+        "Accelerating hard",
+        "Easing off the rear brake and steering straight",
+        "Jumping off",
+        "Turning sharply"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "m12",
+      "question": "Eye protection while riding is:",
+      "answers": [
+        "Optional in all states",
+        "Important to protect from wind, debris, and insects",
+        "Only for dirt bikes",
+        "Illegal"
+      ],
+      "correct": 1
+    }
+  ]
+}

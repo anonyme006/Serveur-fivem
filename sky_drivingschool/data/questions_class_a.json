@@ -1,0 +1,169 @@
+{
+  "questions": [
+    {
+      "id": "a01",
+      "question": "Class A vehicles typically include:",
+      "answers": [
+        "Passenger cars only",
+        "Combination vehicles with a high GCWR / tractor-trailers",
+        "Mopeds",
+        "Personal watercraft"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a02",
+      "question": "Before descending a steep grade, you should:",
+      "answers": [
+        "Shift to a lower gear and check brakes",
+        "Shift to neutral",
+        "Turn off the engine",
+        "Use only the parking brake"
+      ],
+      "correct": 0
+    },
+    {
+      "id": "a03",
+      "question": "The \"no-zone\" refers to:",
+      "answers": [
+        "A parking lot",
+        "Large truck blind spots where cars disappear from view",
+        "A speed trap",
+        "An HOV lane"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a04",
+      "question": "Air brake systems require:",
+      "answers": [
+        "No inspections",
+        "Pre-trip checks of pressure, leaks, and low-pressure warning",
+        "Only weekly checks",
+        "Water in the tanks always"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a05",
+      "question": "When turning a long vehicle right:",
+      "answers": [
+        "Hug the curb tightly always",
+        "Swing wide as needed while watching for vehicles cutting inside",
+        "Ignore mirrors",
+        "Accelerate through the corner"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a06",
+      "question": "Cargo securement is important because:",
+      "answers": [
+        "It looks neat",
+        "Shifting loads can cause loss of control or spills",
+        "It is optional under 70 mph",
+        "Police never check it"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a07",
+      "question": "Following distance for heavy trucks should be:",
+      "answers": [
+        "Shorter than cars",
+        "Longer than for passenger cars due to stopping distance",
+        "Exactly one second",
+        "Irrelevant"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a08",
+      "question": "Engine braking helps:",
+      "answers": [
+        "Increase fuel use only",
+        "Control speed on downgrades without overheating service brakes",
+        "Replace all braking forever",
+        "Only work in reverse"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a09",
+      "question": "If you experience a tire blowout:",
+      "answers": [
+        "Brake hard immediately",
+        "Hold the wheel firmly, ease off throttle, then brake gently when stable",
+        "Turn sharply",
+        "Leave the roadway at full speed"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a10",
+      "question": "Overweight loads may:",
+      "answers": [
+        "Improve handling",
+        "Damage roads, reduce braking ability, and be illegal",
+        "Always be fine if flagged",
+        "Only matter for boats"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a11",
+      "question": "Coupling a tractor-trailer requires verifying:",
+      "answers": [
+        "Only the paint color",
+        "Kingpin engagement, locking jaws, and lines connected",
+        "That the trailer is empty always",
+        "Nothing special"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a12",
+      "question": "Space management means:",
+      "answers": [
+        "Parking close to others",
+        "Maintaining cushion space ahead, behind, and to the sides",
+        "Ignoring mirrors",
+        "Driving in others' blind spots"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a13",
+      "question": "Railroad crossings with long vehicles require:",
+      "answers": [
+        "Speeding across",
+        "Ensuring enough space to clear tracks completely before crossing",
+        "Stopping on the tracks",
+        "Ignoring signals if late"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a14",
+      "question": "Mirror adjustment on trucks should:",
+      "answers": [
+        "Show mostly your own trailer paint",
+        "Minimize blind spots and show adjacent lanes",
+        "Point at the sky",
+        "Never be checked"
+      ],
+      "correct": 1
+    },
+    {
+      "id": "a15",
+      "question": "A warning of low air pressure means you should:",
+      "answers": [
+        "Continue driving normally",
+        "Stop safely and not continue until repaired",
+        "Ignore it under 10 miles",
+        "Rev the engine harder"
+      ],
+      "correct": 1
+    }
+  ]
+}

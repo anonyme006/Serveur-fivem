@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>California DMV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="hidden">
+    <div class="tablet">
+      <div class="tablet-bezel">
+        <div class="tablet-camera"></div>
+        <div class="tablet-screen">
+          <header class="topbar">
+            <div class="brand">
+              <div class="seal">CA</div>
+              <div>
+                <div class="brand-title">Department of Motor Vehicles</div>
+                <div class="brand-sub" id="schoolLabel">Driving School</div>
+              </div>
+            </div>
+            <div class="topbar-actions">
+              <button class="icon-btn" id="btnRefresh" title="Refresh">↻</button>
+              <button class="icon-btn" id="btnClose" title="Close">✕</button>
+            </div>
+          </header>
+
+          <nav class="nav" id="mainNav">
+            <button data-view="home" class="nav-btn active">Home</button>
+            <button data-view="catalog" class="nav-btn">Licenses</button>
+            <button data-view="history" class="nav-btn">History</button>
+            <button data-view="licenseCard" class="nav-btn">My Card</button>
+            <button data-view="admin" class="nav-btn hidden" id="navAdmin">Admin</button>
+          </nav>
+
+          <main id="views">
+            <!-- HOME -->
+            <section class="view" id="view-home">
+              <div class="hero">
+                <h1>California DMV</h1>
+                <p id="welcomeText">Schedule theory and road tests. Pay at the desk. Earn your license.</p>
+                <div class="hero-meta" id="playerMeta"></div>
+                <div class="cta-row">
+                  <button class="btn primary" data-view="catalog">Browse Licenses</button>
+                  <button class="btn ghost" data-view="history">Exam History</button>
+                </div>
+              </div>
+              <div class="stat-row" id="homeStats"></div>
+            </section>
+
+            <!-- CATALOG -->
+            <section class="view hidden" id="view-catalog">
+              <h2>License Catalog</h2>
+              <p class="muted">Select a category to enroll in theory or practical exams.</p>
+              <div class="catalog-grid" id="catalogGrid"></div>
+            </section>
+
+            <!-- ENROLL -->
+            <section class="view hidden" id="view-enroll">
+              <button class="link-back" data-view="catalog">← Back to catalog</button>
+              <div id="enrollPanel"></div>
+            </section>
+
+            <!-- THEORY EXAM -->
+            <section class="view hidden" id="view-theory">
+              <div class="theory-header">
+                <div>
+                  <h2 id="theoryTitle">Theory Exam</h2>
+                  <div class="muted" id="theoryProgress">Question 1 / 15</div>
+                </div>
+                <div class="timer" id="theoryTimer">10:00</div>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" id="theoryBar"></div></div>
+              <div class="question-card" id="questionCard"></div>
+              <div class="theory-actions">
+                <button class="btn ghost" id="theoryPrev">Previous</button>
+                <button class="btn danger" id="theoryQuit">Quit Exam</button>
+                <button class="btn primary" id="theoryNext">Next</button>
+              </div>
+            </section>
+
+            <!-- THEORY RESULT -->
+            <section class="view hidden" id="view-theoryResult">
+              <div id="theoryResultPanel"></div>
+            </section>
+
+            <!-- PRACTICAL HUD overlay handled separately; result view: -->
+            <section class="view hidden" id="view-practicalResult">
+              <div id="practicalResultPanel"></div>
+            </section>
+
+            <!-- LICENSE CARD -->
+            <section class="view hidden" id="view-licenseCard">
+              <h2>Driver License Card</h2>
+              <div id="licenseCardPanel"></div>
+            </section>
+
+            <!-- HISTORY -->
+            <section class="view hidden" id="view-history">
+              <h2>Exam & Points History</h2>
+              <div class="tabs">
+                <button class="tab active" data-tab="exams">Exams</button>
+                <button class="tab" data-tab="points">Points</button>
+              </div>
+              <div id="historyExams"></div>
+              <div id="historyPoints" class="hidden"></div>
+            </section>
+
+            <!-- ADMIN -->
+            <section class="view hidden" id="view-admin">
+              <h2>Instructor / Police Console</h2>
+              <div id="adminPanel"></div>
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Practical HUD (no mouse capture) -->
+  <div id="practicalHud" class="practical-hud hidden">
+    <div class="ph-title" id="phTitle">Road Test</div>
+    <div class="ph-row"><span>Score</span><strong id="phScore">100</strong></div>
+    <div class="ph-row"><span>Checkpoint</span><strong id="phCp">0/0</strong></div>
+    <div class="ph-row"><span>Time</span><strong id="phTime">--:--</strong></div>
+    <div class="ph-row"><span>Limit</span><strong id="phLimit">45 mph</strong></div>
+    <div class="ph-alert" id="phAlert"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
