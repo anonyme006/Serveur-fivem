@@ -1,0 +1,3 @@
+--- Patch à appliquer dans ox_inventory/client.lua (après les require existants)
+
+require 'modules.qbox_ui.client'
