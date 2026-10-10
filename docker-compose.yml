@@ -1,0 +1,24 @@
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: serenityv-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: serenityv
+      MYSQL_USER: serenity
+      MYSQL_PASSWORD: serenitypass
+    ports:
+      - "3306:3306"
+    volumes:
+      - serenityv_data:/var/lib/mysql
+      - ./sql/00_portal_tables.sql:/docker-entrypoint-initdb.d/00_portal_tables.sql:ro
+      - ./sql/01_seed_dev.sql:/docker-entrypoint-initdb.d/01_seed_dev.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  serenityv_data:
