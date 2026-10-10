@@ -14,8 +14,19 @@ Intégration **ox_inventory** (fork [Samuels-Development](https://github.com/Sam
 Utilisez le dossier **`ox_inventory/`** :
 
 1. Copiez `ox_inventory/` dans vos resources FiveM
-2. `ensure ox_inventory` (après ox_lib, oxmysql, qbx_core)
-3. Consultez [ox_inventory/README_QBOX.md](ox_inventory/README_QBOX.md)
+2. Dans `server.cfg` :
+
+```cfg
+ensure ox_lib
+ensure oxmysql
+ensure ox_target
+ensure qbx_core
+ensure ox_inventory
+setr inventory:target 1
+```
+
+3. Shops : [ox_inventory/SHOPS.md](ox_inventory/SHOPS.md)  
+4. UI / stats : [ox_inventory/README_QBOX.md](ox_inventory/README_QBOX.md)
 
 ## Documentation drop-in (legacy)
 

@@ -2,28 +2,36 @@
 
 Basé sur [Samuels-Development/ox_inventory](https://github.com/Samuels-Development/ox_inventory).
 
-L'interface reste **identique au fork Samuel** (thème vert, 10 slots vêtements, silhouette, recherche/filtres, fast slots). Seul ajout : barres **santé, faim, soif** dans l'inventaire ; **armure** uniquement quand un gilet pare-balles est **activé** (`GetPedArmour > 0`).
-
 ## Installation
 
-1. Copier `ox_inventory/` dans vos resources
-2. Dépendances : `ox_lib`, `oxmysql`, `qbx_core`
-3. `ensure ox_inventory`
+```cfg
+ensure ox_lib
+ensure oxmysql
+ensure ox_target
+ensure qbx_core
+ensure ox_inventory
 
-## Stats (qboxUi)
-
-Config dans `data/ui.lua` :
-
-```lua
-qboxUi = {
-    showHealth = true,
-    showHunger = true,
-    showThirst = true,
-    statusUpdateInterval = 500,
-},
+setr inventory:target 1
 ```
 
-L'armure s'affiche automatiquement après utilisation d'un item `armour` (gilet activé).
+## Contenu
+
+| Fichier | Rôle |
+|---------|------|
+| `data/ui.lua` | UI (thème vert, clothing, stats) |
+| `data/shops.lua` | **Magasins natifs** (24/7, alcool, armes, etc.) |
+| `modules/qbox_ui/` | Stats santé / faim / soif (+ armure si gilet activé) |
+
+## Shops
+
+Tout se fait **via ox_inventory** — voir [SHOPS.md](SHOPS.md).
+
+Aucun script shop externe n’est nécessaire : ciblez le comptoir (`ox_target`) ou un marker, l’inventaire s’ouvre en mode shop.
+
+## Stats inventaire
+
+- Santé / faim / soif : toujours dans l’UI inventaire
+- Armure : uniquement si gilet pare-balles **activé** (`GetPedArmour > 0`)
 
 ## Build NUI
 

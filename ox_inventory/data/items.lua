@@ -2580,9 +2580,29 @@ return {
     },
 
     ['sandwich'] = {
-        label = 'beer',
+        label = 'Sandwich',
         rarity = 'common',
         weight = 200,
+        client = {
+            status = { hunger = 200000 },
+            anim = 'eating',
+            prop = 'burger',
+            usetime = 2500,
+            notification = 'Vous avez mangé un sandwich'
+        },
+    },
+
+    ['cola'] = {
+        label = 'Cola',
+        rarity = 'common',
+        weight = 350,
+        client = {
+            status = { thirst = 200000 },
+            anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
+            prop = { model = `prop_ecola_can`, pos = vec3(0.01, 0.01, 0.06), rot = vec3(5.0, 5.0, -180.5) },
+            usetime = 2500,
+            notification = 'Vous avez bu un cola'
+        },
     },
 
     ['walking_stick'] = {
